@@ -7,7 +7,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 
+from provloom.api.app import create_app
 from provloom.cli.main import main as cli_main
 from provloom.config import AppConfig
 from provloom.domain.common import AccessScope, PageSpec, TimeRange
@@ -117,3 +119,31 @@ class CliAndExtendedCoverageTests(unittest.TestCase):
                     os.environ.pop("PROVLOOM_DATABASE_URL", None)
                 else:
                     os.environ["PROVLOOM_DATABASE_URL"] = prev
+
+    def test_web_dist_assets_and_spa_fallback(self) -> None:
+        rt = ProvLoomRuntime.build(AppConfig(database_url="sqlite+pysqlite:///:memory:"))
+        client = TestClient(create_app(rt))
+
+        root_res = client.get("/")
+        self.assertEqual(root_res.status_code, 200)
+        self.assertIn("text/html", root_res.headers["content-type"])
+
+        docs_res = client.get("/docs")
+        self.assertEqual(docs_res.status_code, 200)
+
+        api_missing = client.get("/api/v1/nonexistent")
+        self.assertEqual(api_missing.status_code, 404)
+
+        web_dist_assets = Path("web/dist/assets")
+        if web_dist_assets.is_dir():
+            spa_res = client.get("/graph")
+            self.assertEqual(spa_res.status_code, 200)
+            self.assertIn("text/html", spa_res.headers["content-type"])
+
+            js_files = list(web_dist_assets.glob("*.js"))
+            self.assertGreater(len(js_files), 0)
+            asset_res = client.get(f"/assets/{js_files[0].name}")
+            self.assertEqual(asset_res.status_code, 200)
+
+            missing_asset = client.get("/assets/does-not-exist.js")
+            self.assertEqual(missing_asset.status_code, 404)

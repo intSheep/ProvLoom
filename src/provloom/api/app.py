@@ -62,13 +62,28 @@ def create_app(runtime: ProvLoomRuntime | None = None) -> FastAPI:
     app.include_router(ops.router, prefix="/api/v1")
 
     static_dir = Path(__file__).resolve().parent / "static"
-    web_dist = Path("web/dist")
-    ui_root = web_dist if web_dist.is_dir() else static_dir
-    if ui_root.is_dir():
-        app.mount("/assets", StaticFiles(directory=str(ui_root)), name="ui-assets")
+    repo_web_dist = Path(__file__).resolve().parents[3] / "web" / "dist"
+    cwd_web_dist = Path("web/dist")
+    web_dist = cwd_web_dist if cwd_web_dist.is_dir() else repo_web_dist
+
+    if web_dist.is_dir():
+        assets_dir = web_dist / "assets"
+        if assets_dir.is_dir():
+            app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="ui-assets")
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        def serve_spa(full_path: str) -> Response:
+            if full_path.startswith(("api/", "assets/")) or full_path in {"api", "assets"}:
+                return JSONResponse(status_code=404, content={"detail": "Not Found"})
+            candidate = (web_dist / full_path).resolve()
+            if full_path and candidate.is_file() and candidate.is_relative_to(web_dist.resolve()):
+                return FileResponse(candidate)
+            return FileResponse(web_dist / "index.html")
+    elif static_dir.is_dir():
+        app.mount("/assets", StaticFiles(directory=str(static_dir)), name="ui-assets")
 
         @app.get("/", include_in_schema=False)
         def serve_console() -> FileResponse:
-            return FileResponse(ui_root / "index.html")
+            return FileResponse(static_dir / "index.html")
 
     return app

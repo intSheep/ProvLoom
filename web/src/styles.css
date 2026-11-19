@@ -1,1 +1,292 @@
 @import "tailwindcss";
+
+:root {
+  --pl-bg-light: #f4f6fa;
+  --pl-bg-dark: #070b14;
+  --pl-surface-light: #ffffff;
+  --pl-surface-dark: #0f172a;
+  --pl-surface-alt-light: #eef2f7;
+  --pl-surface-alt-dark: #162036;
+  --pl-code-bg-light: #f8fafc;
+  --pl-code-bg-dark: #050811;
+  --pl-border-light: #d7e0ec;
+  --pl-border-dark: #23304c;
+  --pl-border-strong-light: #b6c4d8;
+  --pl-border-strong-dark: #33466e;
+  --pl-text-light: #0f172a;
+  --pl-text-dark: #e6edf7;
+  --pl-text-muted-light: #475569;
+  --pl-text-muted-dark: #94a3b8;
+  --pl-accent-light: #2563eb;
+  --pl-accent-dark: #3b82f6;
+  --pl-accent-soft-light: #dbeafe;
+  --pl-accent-soft-dark: #172554;
+  --pl-ok-light: #059669;
+  --pl-ok-dark: #10b981;
+  --pl-amber-light: #d97706;
+  --pl-amber-dark: #f59e0b;
+  --pl-danger-light: #dc2626;
+  --pl-danger-dark: #ef4444;
+  --pl-scrollbar-track-light: #e2e8f0;
+  --pl-scrollbar-track-dark: #0f172a;
+  --pl-scrollbar-thumb-light: #64748b;
+  --pl-scrollbar-thumb-dark: #475569;
+
+  --pl-bg: var(--pl-bg-light);
+  --pl-surface: var(--pl-surface-light);
+  --pl-surface-alt: var(--pl-surface-alt-light);
+  --pl-code-bg: var(--pl-code-bg-light);
+  --pl-border: var(--pl-border-light);
+  --pl-border-strong: var(--pl-border-strong-light);
+  --pl-text: var(--pl-text-light);
+  --pl-text-muted: var(--pl-text-muted-light);
+  --pl-accent: var(--pl-accent-light);
+  --pl-accent-soft: var(--pl-accent-soft-light);
+  --pl-ok: var(--pl-ok-light);
+  --pl-amber: var(--pl-amber-light);
+  --pl-danger: var(--pl-danger-light);
+  --pl-scrollbar-track: var(--pl-scrollbar-track-light);
+  --pl-scrollbar-thumb: var(--pl-scrollbar-thumb-light);
+
+  color-scheme: light dark;
+  accent-color: var(--pl-accent);
+  scrollbar-color: var(--pl-scrollbar-thumb) var(--pl-scrollbar-track);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --pl-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pl-bg: var(--pl-bg-dark);
+    --pl-surface: var(--pl-surface-dark);
+    --pl-surface-alt: var(--pl-surface-alt-dark);
+    --pl-code-bg: var(--pl-code-bg-dark);
+    --pl-border: var(--pl-border-dark);
+    --pl-border-strong: var(--pl-border-strong-dark);
+    --pl-text: var(--pl-text-dark);
+    --pl-text-muted: var(--pl-text-muted-dark);
+    --pl-accent: var(--pl-accent-dark);
+    --pl-accent-soft: var(--pl-accent-soft-dark);
+    --pl-ok: var(--pl-ok-dark);
+    --pl-amber: var(--pl-amber-dark);
+    --pl-danger: var(--pl-danger-dark);
+    --pl-scrollbar-track: var(--pl-scrollbar-track-dark);
+    --pl-scrollbar-thumb: var(--pl-scrollbar-thumb-dark);
+  }
+}
+
+:root:has(> head > meta[name="color-scheme"][content="dark"]) {
+  color-scheme: dark;
+}
+
+:root:has(> head > meta[name="color-scheme"][content="light"]) {
+  color-scheme: light;
+}
+
+@supports (color: light-dark(white, black)) {
+  :root {
+    --pl-bg: light-dark(var(--pl-bg-light), var(--pl-bg-dark));
+    --pl-surface: light-dark(var(--pl-surface-light), var(--pl-surface-dark));
+    --pl-surface-alt: light-dark(var(--pl-surface-alt-light), var(--pl-surface-alt-dark));
+    --pl-code-bg: light-dark(var(--pl-code-bg-light), var(--pl-code-bg-dark));
+    --pl-border: light-dark(var(--pl-border-light), var(--pl-border-dark));
+    --pl-border-strong: light-dark(var(--pl-border-strong-light), var(--pl-border-strong-dark));
+    --pl-text: light-dark(var(--pl-text-light), var(--pl-text-dark));
+    --pl-text-muted: light-dark(var(--pl-text-muted-light), var(--pl-text-muted-dark));
+    --pl-accent: light-dark(var(--pl-accent-light), var(--pl-accent-dark));
+    --pl-accent-soft: light-dark(var(--pl-accent-soft-light), var(--pl-accent-soft-dark));
+    --pl-ok: light-dark(var(--pl-ok-light), var(--pl-ok-dark));
+    --pl-amber: light-dark(var(--pl-amber-light), var(--pl-amber-dark));
+    --pl-danger: light-dark(var(--pl-danger-light), var(--pl-danger-dark));
+    --pl-scrollbar-track: light-dark(var(--pl-scrollbar-track-light), var(--pl-scrollbar-track-dark));
+    --pl-scrollbar-thumb: light-dark(var(--pl-scrollbar-thumb-light), var(--pl-scrollbar-thumb-dark));
+  }
+}
+
+html,
+body {
+  background-color: var(--pl-bg);
+  color: var(--pl-text);
+  margin: 0;
+  min-height: 100%;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.font-mono-code {
+  font-family: var(--pl-mono);
+}
+
+.pl-surface {
+  background-color: var(--pl-surface);
+  border: 1px solid var(--pl-border);
+}
+
+.pl-surface-alt {
+  background-color: var(--pl-surface-alt);
+  border: 1px solid var(--pl-border);
+}
+
+.pl-code-box {
+  background-color: var(--pl-code-bg);
+  border: 1px solid var(--pl-border);
+  font-family: var(--pl-mono);
+}
+
+.pl-input {
+  background-color: var(--pl-code-bg);
+  color: var(--pl-text);
+  border: 1px solid var(--pl-border-strong);
+  border-radius: 0.375rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 12px;
+}
+
+.pl-input:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--pl-accent);
+  outline-offset: 2px;
+}
+
+/* Native <dialog> modal & backdrop scroll containment */
+dialog.pl-dialog {
+  background-color: var(--pl-surface);
+  color: var(--pl-text);
+  border: 1px solid var(--pl-border-strong);
+  border-radius: 0.75rem;
+  padding: 0;
+  margin: auto;
+  max-width: min(94vw, 1340px);
+  max-height: min(90vh, 920px);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+dialog.pl-dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.pl-dialog::backdrop {
+  background-color: rgba(2, 6, 23, 0.7);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Sortable & responsive tables */
+.pl-table-scroll {
+  overflow: auto;
+  max-inline-size: 100%;
+  border: 1px solid var(--pl-border);
+  border-radius: 0.5rem;
+  background-color: var(--pl-surface);
+}
+
+.pl-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-inline-size: 620px;
+}
+
+.pl-table thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background-color: var(--pl-surface-alt);
+  color: var(--pl-text-muted);
+  border-bottom: 1px solid var(--pl-border);
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.pl-table thead th:not(:has(> button)) {
+  padding: 0.5rem 0.75rem;
+}
+
+.pl-table thead th > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.375rem;
+  width: 100%;
+  min-height: 30px;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pl-table thead th > button:hover {
+  color: var(--pl-text);
+}
+
+.pl-table thead th .sort-indicator {
+  opacity: 0.45;
+  font-size: 10px;
+}
+
+.pl-table thead th[aria-sort="ascending"] .sort-indicator::after {
+  content: "▲";
+  opacity: 1;
+  color: var(--pl-accent);
+}
+
+.pl-table thead th[aria-sort="descending"] .sort-indicator::after {
+  content: "▼";
+  opacity: 1;
+  color: var(--pl-accent);
+}
+
+.pl-table thead th:not([aria-sort]) .sort-indicator::after {
+  content: "⇅";
+}
+
+.pl-table tbody td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--pl-border);
+  vertical-align: top;
+}
+
+.pl-table tbody tr:hover td {
+  background-color: color-mix(in srgb, var(--pl-accent) 7%, transparent);
+}
+
+/* Epistemic & Provisional visual invariants */
+.pl-pill-provisional {
+  border-style: dashed !important;
+  border-color: var(--pl-amber) !important;
+  color: var(--pl-amber) !important;
+}
+
+.pl-pill-candidate {
+  border-style: dashed !important;
+  border-color: var(--pl-amber) !important;
+  color: var(--pl-amber) !important;
+}
+
+/* Dark/Light mode toggle button text branching without JS lag */
+:root[data-resolved-theme="dark"] .theme-only-light {
+  display: none;
+}
+
+@supports not (scrollbar-color: auto) {
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: var(--pl-scrollbar-track);
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--pl-scrollbar-thumb);
+    border-radius: 5px;
+  }
+}

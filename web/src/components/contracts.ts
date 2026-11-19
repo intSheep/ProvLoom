@@ -15,20 +15,33 @@ export interface GlobalContextBarProps {
 }
 
 export interface EventTripleDiffProps {
-  event: EventDetail;
+  event: EventDetail | null;
+  isLoading?: boolean;
+  error?: Error | null;
+  open: boolean;
+  onClose: () => void;
 }
+
+export type GraphLayoutMode = "dagre" | "dagre-tb" | "fcose";
 
 export interface ProvenanceGraphCanvasProps {
   nodes: EntityDto[];
   edges: RelationDto[];
+  seedEntityId?: string | null;
+  selectedEntityId?: string | null;
+  selectedRelationId?: string | null;
   includeCandidates: boolean;
-  layout: "dagre" | "fcose";
+  layout: GraphLayoutMode;
+  onLayoutChange?: (next: GraphLayoutMode) => void;
   onSelectEntity: (entityId: string) => void;
+  onExpandEntity?: (entityId: string) => void;
   onSelectRelation: (relationId: string) => void;
 }
 
 export interface RelationEvidenceDrawerProps {
   relation: RelationDto | null;
   evidences: RelationEvidenceDetail[];
+  isLoading?: boolean;
+  error?: Error | null;
   onClose: () => void;
 }
