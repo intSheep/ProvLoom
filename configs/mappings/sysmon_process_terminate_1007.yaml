@@ -1,0 +1,17 @@
+rule_id: sysmon_process_terminate_1007
+rule_version: "1.0.0"
+ocsf_version: "1.3.0"
+match:
+  parser_id: sysmon
+  event_code: "5"
+target:
+  category_uid: 1
+  class_uid: 1007
+  activity_id: 2
+fields:
+  metadata.original_uid: EventRecordID
+  device.hostname: Computer
+  actor.user.name: User
+  process.uid: ProcessGuid
+  process.pid: ProcessId
+  process.file.path: Image

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProvLoom — Security Fact &amp; Provenance Console</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <strong>ProvLoom</strong>
+        <span class="badge-muted">OCSF v1.3 · Provenance Inspector</span>
+      </div>
+      <div class="scope-bar" role="region" aria-label="Global Query Guardrails">
+        <label>
+          <span>Tenant</span>
+          <input id="ctx-tenant" type="text" value="default" />
+        </label>
+        <label>
+          <span>Allowed Sources</span>
+          <input id="ctx-sources" type="text" placeholder="全部授权源 (逗号分隔过滤)" />
+        </label>
+        <label>
+          <span>Start (UTC)</span>
+          <input id="ctx-start" type="text" value="2026-11-18T00:00:00Z" />
+        </label>
+        <label>
+          <span>End (UTC)</span>
+          <input id="ctx-end" type="text" value="2026-11-19T00:00:00Z" />
+        </label>
+        <button id="btn-fit-bounds" type="button" class="btn-secondary">对齐数据时间窗</button>
+        <button id="btn-seed-examples" type="button" class="btn-primary">导入内置标准样本</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <nav class="sidenav" aria-label="Console Navigation">
+        <button type="button" class="nav-btn active" data-tab="overview">1. 概览与可观测指标</button>
+        <button type="button" class="nav-btn" data-tab="ingestion">2. 数据接入与重放</button>
+        <button type="button" class="nav-btn" data-tab="events">3. OCSF 事件三栏对照</button>
+        <button type="button" class="nav-btn" data-tab="entities">4. 实体归一与生命周期</button>
+        <button type="button" class="nav-btn" data-tab="graph">5. 溯源关系图与证据链</button>
+        <button type="button" class="nav-btn" data-tab="playground">6. API 沙盒与映射规则</button>
+      </nav>
+
+      <main class="content">
+        <div id="status-banner" class="status-banner" hidden></div>
+
+        <!-- 1. Overview -->
+        <section id="tab-overview" class="view-panel">
+          <div class="panel-header">
+            <h2>流水线可观测性概览 (PRD §5)</h2>
+            <button id="btn-refresh-overview" type="button" class="btn-secondary">刷新指标</button>
+          </div>
+          <div id="metrics-grid" class="metrics-grid"></div>
+          <h3>最近接入批次</h3>
+          <div class="table-wrap">
+            <table id="overview-batches-table">
+              <thead>
+                <tr>
+                  <th scope="col">接收时间</th>
+                  <th scope="col">Source ID</th>
+                  <th scope="col">类型</th>
+                  <th scope="col">总计</th>
+                  <th scope="col">新增</th>
+                  <th scope="col">幂等去重</th>
+                  <th scope="col">失败</th>
+                  <th scope="col">状态</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 2. Ingestion & Replay -->
+        <section id="tab-ingestion" class="view-panel" hidden>
+          <div class="panel-header">
+            <h2>数据接入、死信排障与确定性重建</h2>
+            <div class="btn-group">
+              <button id="btn-retry-failures" type="button" class="btn-secondary">重试可恢复失败项</button>
+              <button id="btn-trigger-replay" type="button" class="btn-danger">从原始日志全量重建图</button>
+            </div>
+          </div>
+
+          <form id="form-raw-import" class="card form-grid">
+            <h3>在线粘贴 / 调试样本接入</h3>
+            <div class="row-inputs">
+              <label>Source ID <input id="imp-source-id" value="debug-sysmon-01" required /></label>
+              <label>
+                Source Type
+                <select id="imp-source-type">
+                  <option value="sysmon">sysmon</option>
+                  <option value="zeek_conn">zeek_conn</option>
+                  <option value="zeek_dns">zeek_dns</option>
+                  <option value="firewall">firewall</option>
+                  <option value="auth">auth</option>
+                  <option value="app">app</option>
+                  <option value="asset">asset</option>
+                  <option value="custom_unknown">custom_unknown (测试兜底)</option>
+                </select>
+              </label>
+              <label>
+                格式
+                <select id="imp-adapter">
+                  <option value="jsonl">jsonl</option>
+                  <option value="json">json</option>
+                  <option value="csv">csv</option>
+                </select>
+              </label>
+              <label>
+                选择本地文件
+                <input id="imp-file" type="file" accept=".json,.jsonl,.csv,.log,.txt" />
+              </label>
+            </div>
+            <textarea
+              id="imp-raw-text"
+              rows="4"
+              placeholder='粘贴 JSONL / JSON / CSV 原始日志，例如: {"EventRecordID":"9901","EventID":7,"UtcTime":"2026-11-18T08:01:00Z","Computer":"win01.corp.local"}'
+              required
+            ></textarea>
+            <div>
+              <button type="submit" class="btn-primary">提交接入并执行流水线</button>
+            </div>
+          </form>
+
+          <h3>流水线失败与异常留痕 (pipeline_failures)</h3>
+          <div class="table-wrap">
+            <table id="failures-table">
+              <thead>
+                <tr>
+                  <th scope="col">时间</th>
+                  <th scope="col">阶段</th>
+                  <th scope="col">错误码</th>
+                  <th scope="col">错误信息</th>
+                  <th scope="col">重试次数</th>
+                  <th scope="col">原始片段</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 3. OCSF Event Explorer -->
+        <section id="tab-events" class="view-panel" hidden>
+          <div class="panel-header">
+            <h2>OCSF v1.3.0 事件检索与映射对照</h2>
+            <div class="filter-bar">
+              <select id="flt-event-class" aria-label="OCSF Class Filter">
+                <option value="">全部 OCSF Class</option>
+                <option value="1007">1007 Process Activity</option>
+                <option value="1001">1001 File System Activity</option>
+                <option value="4001">4001 Network Activity</option>
+                <option value="3002">3002 Authentication</option>
+                <option value="4003">4003 DNS Activity</option>
+                <option value="6001">6001 Web Resources Activity</option>
+                <option value="6002">6002 Application Lifecycle</option>
+                <option value="6003">6003 API Activity</option>
+                <option value="5001">5001 Inventory Info</option>
+                <option value="0">0 Unsupported Passthrough</option>
+              </select>
+              <label class="inline-check">
+                <input id="flt-include-fallback" type="checkbox" checked /> 包含未映射兜底事件
+              </label>
+              <button id="btn-search-events" type="button" class="btn-primary">查询事件</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="events-table">
+              <thead>
+                <tr>
+                  <th scope="col">事件时间 (UTC)</th>
+                  <th scope="col">Source</th>
+                  <th scope="col">Class UID</th>
+                  <th scope="col">状态</th>
+                  <th scope="col">Original UID</th>
+                  <th scope="col">操作</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. Entity Inspector -->
+        <section id="tab-entities" class="view-panel" hidden>
+          <div class="panel-header">
+            <h2>实体目录、作用域生命周期与合并审计</h2>
+            <div class="filter-bar">
+              <select id="flt-entity-type" aria-label="Entity Type">
+                <option value="">全部 7 类实体</option>
+                <option value="HOST">HOST</option>
+                <option value="PROCESS">PROCESS</option>
+                <option value="USER">USER</option>
+                <option value="FILE">FILE</option>
+                <option value="NETWORK_ENDPOINT">NETWORK_ENDPOINT</option>
+                <option value="SERVICE">SERVICE</option>
+                <option value="CONTAINER">CONTAINER</option>
+              </select>
+              <select id="flt-entity-state" aria-label="Resolution State">
+                <option value="">全部归一状态</option>
+                <option value="RESOLVED">RESOLVED (强键)</option>
+                <option value="SCOPED_TEMPORAL">SCOPED_TEMPORAL (作用域时效)</option>
+                <option value="PROVISIONAL">PROVISIONAL (暂存独立)</option>
+              </select>
+              <input id="flt-entity-q" type="search" placeholder="搜 IP / PID / GUID / 主机名 / Hash" />
+              <button id="btn-search-entities" type="button" class="btn-primary">检索实体</button>
+            </div>
+          </div>
+          <div class="split-layout">
+            <div class="table-wrap">
+              <table id="entities-table">
+                <thead>
+                  <tr>
+                    <th scope="col">类型</th>
+                    <th scope="col">显示名称</th>
+                    <th scope="col">归一状态</th>
+                    <th scope="col">生命周期窗口</th>
+                    <th scope="col">操作</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <aside id="entity-detail-pane" class="inspector-pane">
+              <p class="muted">点击左侧任意实体查看绑定的多维标识、PID/IP 有效期与合并审计记录。</p>
+            </aside>
+          </div>
+        </section>
+
+        <!-- 5. Provenance Graph -->
+        <section id="tab-graph" class="view-panel" hidden>
+          <div class="panel-header">
+            <h2>交互式实体关系图谱与原始证据链</h2>
+            <div class="filter-bar">
+              <select id="graph-seed-select" aria-label="Seed Entity"></select>
+              <label>
+                深度
+                <select id="graph-depth">
+                  <option value="1">1 跳</option>
+                  <option value="2" selected>2 跳</option>
+                  <option value="3">3 跳</option>
+                  <option value="4">4 跳</option>
+                </select>
+              </label>
+              <label>
+                方向
+                <select id="graph-direction">
+                  <option value="BOTH" selected>双向 (BOTH)</option>
+                  <option value="OUTBOUND">出边 (OUTBOUND)</option>
+                  <option value="INBOUND">入边 (INBOUND)</option>
+                </select>
+              </label>
+              <label class="inline-check">
+                <input id="graph-candidates" type="checkbox" /> 包含候选关联 (CANDIDATE)
+              </label>
+              <button id="btn-run-traverse" type="button" class="btn-primary">遍历子图</button>
+            </div>
+          </div>
+          <div class="graph-legend">
+            <span><i class="legend-line solid"></i> DETERMINISTIC (确定性事实边)</span>
+            <span><i class="legend-line dashed"></i> CANDIDATE (候选推断边)</span>
+            <span><i class="legend-box provisional"></i> PROVISIONAL (未合并独立实体)</span>
+            <span class="muted">提示：点击任意连线反查全部原始日志证据；双击节点以其为中心继续展开。</span>
+          </div>
+          <div class="graph-layout">
+            <div class="graph-canvas-wrap">
+              <svg id="graph-svg" viewBox="0 0 960 560" role="img" aria-label="Entity Provenance Graph"></svg>
+            </div>
+            <aside id="evidence-pane" class="inspector-pane">
+              <p class="muted">点击图谱中的任意关系有向边，在此查看聚合的终端与网络原始证据（get_relation_evidence）。</p>
+            </aside>
+          </div>
+        </section>
+
+        <!-- 6. API Playground & Mappings -->
+        <section id="tab-playground" class="view-panel" hidden>
+          <div class="panel-header">
+            <h2>标准查询 API 沙盒与活跃 OCSF 映射字典</h2>
+          </div>
+          <div class="split-layout">
+            <div class="card">
+              <h3>已加载 YAML OCSF 映射规则</h3>
+              <div class="table-wrap">
+                <table id="mappings-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Rule ID</th>
+                      <th scope="col">Parser</th>
+                      <th scope="col">Code</th>
+                      <th scope="col">Class UID</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <h3>REST API 实时请求验证</h3>
+              <div class="row-inputs">
+                <select id="pg-preset" aria-label="API Preset">
+                  <option value="events_search">POST /api/v1/events/search</option>
+                  <option value="entities_search">POST /api/v1/entities/search</option>
+                  <option value="metrics">GET /api/v1/ops/metrics/summary</option>
+                </select>
+                <button id="btn-run-pg" type="button" class="btn-primary">发送请求</button>
+              </div>
+              <textarea id="pg-body" rows="6"></textarea>
+              <pre id="pg-output" class="code-box">点击“发送请求”查看携带当前 AccessScope 的 API 响应。</pre>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Triple-pane Event Inspector Modal -->
+    <dialog id="event-dialog" class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="dlg-title">事件三栏溯源对照 (Raw ↔ OCSF v1.3 ↔ Unmapped)</h3>
+        <button id="btn-close-dlg" type="button" class="btn-secondary">关闭</button>
+      </div>
+      <div class="triple-grid">
+        <div>
+          <h4>1. 原始日志 (raw_payload)</h4>
+          <pre id="dlg-raw" class="code-box"></pre>
+        </div>
+        <div>
+          <h4>2. 标准 OCSF 载荷 (ocsf_payload)</h4>
+          <pre id="dlg-ocsf" class="code-box"></pre>
+        </div>
+        <div>
+          <h4>3. 未映射扩展字段 (unmapped_fields)</h4>
+          <pre id="dlg-unmapped" class="code-box"></pre>
+        </div>
+      </div>
+    </dialog>
+
+    <script type="module" src="/assets/app.js"></script>
+  </body>
+</html>

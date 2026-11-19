@@ -1,0 +1,3 @@
+event_uid,timestamp,src_ip,src_port,dst_ip,dst_port,protocol,action,bytes_sent
+fw-7001,2026-11-18T08:00:05.145Z,10.10.1.25,51320,198.51.100.42,443,tcp,ALLOW,1420
+fw-7002,2026-11-18T08:00:05.200Z,203.0.113.10,60111,198.51.100.42,443,tcp,ALLOW,512

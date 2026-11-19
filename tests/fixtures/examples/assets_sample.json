@@ -1,0 +1,18 @@
+[
+  {
+    "asset_id": "asset-win-01",
+    "hostname": "win01.corp.local",
+    "ip": "10.10.1.25",
+    "os": "Windows 11 Enterprise",
+    "is_nat_shared": false,
+    "valid_from": "2026-11-01T00:00:00Z"
+  },
+  {
+    "asset_id": "asset-win-02",
+    "hostname": "win02.corp.local",
+    "ip": "10.10.1.26",
+    "os": "Windows 11 Enterprise",
+    "is_nat_shared": false,
+    "valid_from": "2026-11-01T00:00:00Z"
+  }
+]

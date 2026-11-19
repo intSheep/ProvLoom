@@ -1,0 +1,14 @@
+rule_id: network_5tuple_v1
+rule_version: "1.0.0"
+
+# DETERMINISTIC requires verified endpoint IP ownership (no unknown SNAT) + exact 5-tuple + bounded skew.
+deterministic:
+  match_fields: [src_ip, src_port, dst_ip, dst_port, protocol]
+  require_non_nat_host_binding: true
+  max_clock_skew_seconds: 5.0
+
+# Incomplete tuples (e.g. missing ephemeral src_port) may only emit CANDIDATE edges, never DETERMINISTIC.
+candidate:
+  enabled: true
+  match_fields: [src_ip, dst_ip, dst_port, protocol]
+  max_clock_skew_seconds: 3.0

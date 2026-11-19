@@ -1,0 +1,19 @@
+rule_id: zeek_conn_4001
+rule_version: "1.0.0"
+ocsf_version: "1.3.0"
+match:
+  parser_id: zeek_json
+  event_code: conn
+target:
+  category_uid: 4
+  class_uid: 4001
+  activity_id: 6
+fields:
+  metadata.original_uid: uid
+  src_endpoint.ip: id.orig_h
+  src_endpoint.port: id.orig_p
+  dst_endpoint.ip: id.resp_h
+  dst_endpoint.port: id.resp_p
+  connection_info.protocol_name: proto
+  traffic.bytes_out: orig_bytes
+  traffic.bytes_in: resp_bytes

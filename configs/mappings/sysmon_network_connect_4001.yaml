@@ -1,0 +1,22 @@
+rule_id: sysmon_network_connect_4001
+rule_version: "1.0.0"
+ocsf_version: "1.3.0"
+match:
+  parser_id: sysmon
+  event_code: "3"
+target:
+  category_uid: 4
+  class_uid: 4001
+  activity_id: 1
+fields:
+  metadata.original_uid: EventRecordID
+  device.hostname: Computer
+  actor.user.name: User
+  actor.process.uid: ProcessGuid
+  actor.process.pid: ProcessId
+  actor.process.file.path: Image
+  src_endpoint.ip: SourceIp
+  src_endpoint.port: SourcePort
+  dst_endpoint.ip: DestinationIp
+  dst_endpoint.port: DestinationPort
+  connection_info.protocol_name: Protocol
