@@ -1,4 +1,4 @@
-.PHONY: install fmt lint typecheck test test-acceptance db-up db-down db-migrate api-dev web-install web-dev web-check
+.PHONY: install fmt lint typecheck test test-acceptance db-up db-down db-migrate api-dev web-install web-dev web-build web-check
 
 BIN := $(shell [ -d .venv/bin ] && echo .venv/bin/ || echo "")
 PYTHON ?= $(BIN)python3
@@ -41,6 +41,9 @@ web-install:
 
 web-dev:
 	npm --prefix web run dev
+
+web-build:
+	npm --prefix web run build
 
 web-check:
 	npm --prefix web run typecheck

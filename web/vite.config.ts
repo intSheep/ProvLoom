@@ -6,6 +6,15 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     target: "esnext",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+          tanstack: ["@tanstack/react-query", "@tanstack/react-table"],
+          graph: ["cytoscape", "cytoscape-dagre"],
+        },
+      },
+    },
   },
   server: {
     proxy: {
