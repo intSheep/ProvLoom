@@ -7,12 +7,16 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from provloom import __version__
-from provloom.api.v1 import entities, events, graph, ops
+from provloom.api.v1 import detection, entities, events, graph, ops
 from provloom.config import AppConfig
 from provloom.domain.errors import (
     AdapterReadError,
+    DetectionExecutionError,
+    DetectionPermissionError,
     InvalidTimeRangeError,
     QueryLimitExceededError,
+    RuleUnsupportedError,
+    RuleValidationError,
     ScopeViolationError,
 )
 from provloom.runtime import ProvLoomRuntime
@@ -28,6 +32,7 @@ def create_app(runtime: ProvLoomRuntime | None = None) -> FastAPI:
     app.state.runtime = rt
     app.state.query_service = rt.query_service
     app.state.ops_service = rt.ops_service
+    app.state.detection_service = rt.detection_service
 
     @app.exception_handler(InvalidTimeRangeError)
     def _handle_time_err(_req: Request, exc: InvalidTimeRangeError) -> JSONResponse:
@@ -45,6 +50,23 @@ def create_app(runtime: ProvLoomRuntime | None = None) -> FastAPI:
     def _handle_scope_err(_req: Request, exc: ScopeViolationError) -> JSONResponse:
         return JSONResponse(status_code=403, content={"detail": str(exc)})
 
+    @app.exception_handler(DetectionPermissionError)
+    def _handle_det_perm_err(_req: Request, exc: DetectionPermissionError) -> JSONResponse:
+        return JSONResponse(status_code=403, content={"detail": str(exc)})
+
+    @app.exception_handler(RuleValidationError)
+    def _handle_rule_val_err(_req: Request, exc: RuleValidationError) -> JSONResponse:
+        return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+    @app.exception_handler(RuleUnsupportedError)
+    def _handle_rule_unsup_err(_req: Request, exc: RuleUnsupportedError) -> JSONResponse:
+        return JSONResponse(status_code=422, content={"detail": str(exc)})
+
+    @app.exception_handler(DetectionExecutionError)
+    def _handle_det_exec_err(_req: Request, exc: DetectionExecutionError) -> JSONResponse:
+        code = 404 if "not found" in str(exc).lower() else 400
+        return JSONResponse(status_code=code, content={"detail": str(exc)})
+
     @app.get("/healthz", tags=["system"])
     def healthz() -> dict[str, str]:
         return {"status": "ok", "version": __version__}
@@ -59,6 +81,7 @@ def create_app(runtime: ProvLoomRuntime | None = None) -> FastAPI:
     app.include_router(events.router, prefix="/api/v1")
     app.include_router(entities.router, prefix="/api/v1")
     app.include_router(graph.router, prefix="/api/v1")
+    app.include_router(detection.router, prefix="/api/v1")
     app.include_router(ops.router, prefix="/api/v1")
 
     static_dir = Path(__file__).resolve().parent / "static"

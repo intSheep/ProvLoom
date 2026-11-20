@@ -19,10 +19,19 @@ class PipelineMetricsSnapshot:
     entity_merges_total: int
     deterministic_relations_total: int
     candidate_relations_total: int
+    detection_rules_total: int = 0
+    detection_rules_supported_total: int = 0
+    detection_rules_unsupported_total: int = 0
+    detection_executions_total: int = 0
+    detection_matches_total: int = 0
+    signals_created_total: int = 0
+    signals_deduplicated_total: int = 0
+    signals_aggregated_total: int = 0
+    candidate_groups_created_total: int = 0
 
 
 class PipelineTelemetry(Protocol):
-    """Records all 8 observability signals required by PRD Section 5."""
+    """Records pipeline and detection observability signals."""
 
     def record_ingest(self, source_type: str, status: str, count: int = 1) -> None: ...
     def record_parse(self, parser_id: str, success: bool) -> None: ...
@@ -31,3 +40,15 @@ class PipelineTelemetry(Protocol):
     def record_relation(self, relation_type: RelationType, certainty: Certainty) -> None: ...
     def observe_stage_latency(self, stage: PipelineStage, seconds: float) -> None: ...
     def observe_query_latency(self, operation: str, seconds: float) -> None: ...
+    def set_detection_rule_counts(self, total: int, supported: int, unsupported: int) -> None: ...
+    def record_detection_execution(
+        self,
+        status: str,
+        duration_seconds: float,
+        matches_created: int,
+        signals_created: int,
+        signals_deduplicated: int,
+        signals_aggregated: int,
+        candidate_groups_created: int,
+    ) -> None: ...
+    def record_detection_failure(self, stage: str, count: int = 1) -> None: ...

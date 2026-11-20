@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -13,8 +13,8 @@ from provloom.runtime import ProvLoomRuntime
 
 SCOPE = AccessScope(tenant_id="default")
 WINDOW = TimeRange(
-    start_time=datetime(2026, 11, 18, 7, 0, tzinfo=timezone.utc),
-    end_time=datetime(2026, 11, 18, 10, 0, tzinfo=timezone.utc),
+    start_time=datetime(2026, 11, 18, 7, 0, tzinfo=UTC),
+    end_time=datetime(2026, 11, 18, 10, 0, tzinfo=UTC),
 )
 
 

@@ -6,6 +6,15 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from provloom.detection.domain.rule import (
+    DetectionType,
+    ExecutionMode,
+    ExecutionStatus,
+    RuleSeverity,
+    RuleSource,
+    RuleStatus,
+)
+from provloom.detection.domain.signal import SignalStatus
 from provloom.domain.enums import (
     BatchStatus,
     Certainty,
@@ -223,3 +232,229 @@ class PipelineFailureDto(ApiModel):
 class ReplayRequestDto(ApiModel):
     time_range: TimeRangeDto | None = None
     batch_ids: list[UUID] | None = None
+
+
+# --- Detection Layer DTOs (/api/v1/detection/*) ---
+
+
+class LogsourceDto(ApiModel):
+    category: str | None = None
+    product: str | None = None
+    service: str | None = None
+
+
+class RuleCompatibilityDto(ApiModel):
+    parse_success: bool
+    mapping_success: bool
+    data_coverage: bool
+    compile_success: bool
+    execution_success: bool | None = None
+    mapped_class_uids: list[int] = Field(default_factory=list)
+    field_mappings: dict[str, str] = Field(default_factory=dict)
+    uncovered_fields: list[str] = Field(default_factory=list)
+    unsupported_reasons: list[str] = Field(default_factory=list)
+
+
+class DetectionRuleDto(ApiModel):
+    rule_id: str
+    rule_name: str
+    source: RuleSource
+    source_reference: str
+    version: str
+    description: str
+    severity: RuleSeverity
+    attack_tags: list[str]
+    logsource: LogsourceDto
+    detection_type: DetectionType
+    raw_content: str
+    status: RuleStatus
+    compatibility: RuleCompatibilityDto
+    created_at: datetime
+    updated_at: datetime
+
+
+class DetectionRuleDetailDto(ApiModel):
+    rule: DetectionRuleDto
+    compiled_sql: str | None = None
+    parsed_summary: dict[str, Any] | None = None
+
+
+class ValidateRuleRequestDto(ApiModel):
+    raw_yaml: str
+    source_hint: RuleSource | None = None
+
+
+class ImportRuleRequestDto(ApiModel):
+    raw_yaml: str
+    source_reference: str = "api-import"
+    source_hint: RuleSource | None = None
+
+
+class TestRuleRequestDto(ApiModel):
+    time_range: TimeRangeDto
+    raw_yaml: str | None = None
+    rule_id: str | None = None
+    max_matches: int = Field(default=100, ge=1, le=500)
+
+
+class EvidenceReferenceDto(ApiModel):
+    event_id: UUID | None = None
+    raw_event_id: UUID | None = None
+    relation_id: UUID | None = None
+    source_id: str = ""
+    original_event_uid: str | None = None
+    observed_at: datetime | None = None
+
+
+class RuleMatchDto(ApiModel):
+    match_id: UUID
+    rule_id: str
+    rule_name: str
+    rule_version: str
+    severity: RuleSeverity
+    detection_type: DetectionType
+    primary_event_id: UUID | None = None
+    matched_event_ids: list[UUID]
+    primary_entity_id: UUID | None = None
+    related_entity_ids: list[UUID]
+    matched_fields: list[str]
+    matched_values: dict[str, Any]
+    evidence_references: list[EvidenceReferenceDto]
+    source_ids: list[str]
+    matched_at: datetime
+    execution_id: UUID
+
+
+class RuleTestResponseDto(ApiModel):
+    rule: DetectionRuleDto
+    parsed_summary: dict[str, Any] | None = None
+    field_mappings: dict[str, str]
+    compiled_sql: str | None = None
+    matches: list[RuleMatchDto]
+    failure_reason: str | None = None
+    duration_ms: float
+
+
+class ExecuteRuleRequestDto(ApiModel):
+    time_range: TimeRangeDto
+    max_matches: int | None = Field(default=None, ge=1, le=500)
+
+
+class ExecuteRuleBatchRequestDto(ApiModel):
+    time_range: TimeRangeDto
+    rule_ids: list[str] | None = None
+    max_matches_per_rule: int | None = Field(default=None, ge=1, le=500)
+
+
+class RuleExecutionFailureDto(ApiModel):
+    rule_id: str
+    stage: str
+    error_message: str
+
+
+class DetectionExecutionDto(ApiModel):
+    execution_id: UUID
+    tenant_scope: str
+    mode: ExecutionMode
+    status: ExecutionStatus
+    time_range: TimeRangeDto
+    rule_ids: list[str]
+    rules_evaluated: int
+    matches_created: int
+    matches_deduplicated: int
+    signals_created: int
+    signals_updated: int
+    candidate_groups_created: int
+    duration_ms: float
+    failures: list[RuleExecutionFailureDto]
+    started_at: datetime
+    completed_at: datetime | None = None
+
+
+class RuleMatchSearchRequestDto(ApiModel):
+    time_range: TimeRangeDto
+    rule_id: str | None = None
+    detection_type: DetectionType | None = None
+    severity: RuleSeverity | None = None
+    entity_id: UUID | None = None
+    limit: int = Field(default=100, ge=1, le=500)
+    cursor: str | None = None
+
+
+class SignalDto(ApiModel):
+    signal_id: UUID
+    signal_type: str
+    title: str
+    severity: RuleSeverity
+    status: SignalStatus
+    primary_entity_id: UUID | None = None
+    related_entity_ids: list[UUID]
+    rule_match_ids: list[UUID]
+    event_ids: list[UUID]
+    evidence_refs: list[EvidenceReferenceDto]
+    source_ids: list[str]
+    attack_tags: list[str]
+    first_seen_at: datetime
+    last_seen_at: datetime
+    occurrence_count: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class SignalSearchRequestDto(ApiModel):
+    time_range: TimeRangeDto
+    status: SignalStatus | None = None
+    severity: RuleSeverity | None = None
+    entity_id: UUID | None = None
+    signal_type: str | None = None
+    limit: int = Field(default=100, ge=1, le=500)
+    cursor: str | None = None
+
+
+class UpdateSignalStatusRequestDto(ApiModel):
+    status: SignalStatus
+
+
+class SignalEvidenceDetailDto(ApiModel):
+    event_id: UUID
+    raw_event_id: UUID
+    source_id: str
+    ocsf_class_uid: int
+    event_time: datetime
+    original_event_uid: str | None = None
+    ocsf_payload: dict[str, Any]
+    raw_payload: str
+    relation_id: UUID | None = None
+    relation_type: RelationType | None = None
+    certainty: Certainty | None = None
+
+
+class CandidateGroupDto(ApiModel):
+    group_id: UUID
+    group_key: str
+    signal_ids: list[UUID]
+    rule_match_ids: list[UUID]
+    shared_entity_ids: list[UUID]
+    grouping_rule_id: str
+    grouping_basis: dict[str, Any]
+    certainty: Certainty
+    unresolved_ambiguities: list[str]
+    source_ids: list[str]
+    first_seen_at: datetime
+    last_seen_at: datetime
+    created_at: datetime
+    updated_at: datetime
+
+
+class CandidateGroupSearchRequestDto(ApiModel):
+    time_range: TimeRangeDto
+    entity_id: UUID | None = None
+    certainty: Certainty | None = None
+    limit: int = Field(default=100, ge=1, le=500)
+    cursor: str | None = None
+
+
+class CandidateGroupMembersDto(ApiModel):
+    group: CandidateGroupDto
+    signals: list[SignalDto]
+    rule_matches: list[RuleMatchDto]

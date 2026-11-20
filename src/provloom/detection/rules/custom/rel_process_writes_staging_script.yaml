@@ -1,0 +1,23 @@
+rule_type: provloom_custom
+rule_id: custom-rel-proc-writes-temp-script
+rule_name: Process Writes Script to Temp Directory
+version: "1.0.0"
+description: Detects a process with a DETERMINISTIC WRITES relation targeting a script file inside temporary directories.
+severity: medium
+attack_tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: provenance_graph
+  product: provloom
+detection_type: RELATION
+relation_spec:
+  src_entity_type: PROCESS
+  relation_type: WRITES
+  dst_entity_type: FILE
+  deterministic_only: true
+  min_evidence_count: 1
+  dst_predicates:
+    - field: display_label
+      op: regex
+      value: '(\\temp\\|/tmp/).*\.(ps1|bat|vbs|sh|exe|dll)$'

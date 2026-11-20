@@ -27,3 +27,19 @@ class ScopeViolationError(ProvLoomError):
 
 class QueryLimitExceededError(ProvLoomError):
     """Raised when requested page size or traversal depth exceeds hard guardrails."""
+
+
+class RuleValidationError(ProvLoomError):
+    """Raised when a detection rule YAML or structured spec is malformed."""
+
+
+class RuleUnsupportedError(ProvLoomError):
+    """Raised when attempting to enable or execute an unsupported detection rule."""
+
+
+class DetectionPermissionError(ProvLoomError):
+    """Raised when caller lacks permission to mutate or execute detection rules."""
+
+
+class DetectionExecutionError(ProvLoomError):
+    """Raised when rule execution fails or exceeds safety guardrails."""

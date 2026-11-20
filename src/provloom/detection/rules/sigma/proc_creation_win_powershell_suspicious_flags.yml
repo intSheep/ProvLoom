@@ -1,0 +1,30 @@
+title: Suspicious PowerShell CommandLine Flags
+id: 6d4b1e8c-91b2-4e45-8c01-100700000001
+status: stable
+version: 1.0.0
+description: Detects PowerShell execution with non-interactive, bypass, hidden, encoded, or temp-script staging arguments.
+references:
+  - https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation
+tags:
+  - attack.execution
+  - attack.t1059.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_img:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+  selection_cli:
+    CommandLine|contains:
+      - '-nop'
+      - '-enc'
+      - 'EncodedCommand'
+      - 'FromBase64String'
+      - 'DownloadString'
+      - '\Temp\'
+  filter_benign:
+    CommandLine|contains: 'Get-Date'
+  condition: selection_img and selection_cli and not filter_benign
+level: high

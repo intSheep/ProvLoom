@@ -1,0 +1,21 @@
+title: Suspicious Update or Staging Domain DNS Lookup
+id: 6d4b1e8c-91b2-4e45-8c01-400300000001
+status: stable
+version: 1.0.0
+description: Detects DNS queries matching common staging, fake-update, or high-risk TLD patterns.
+references:
+  - https://github.com/SigmaHQ/sigma/tree/master/rules/network/dns
+tags:
+  - attack.command_and_control
+  - attack.t1071.004
+logsource:
+  category: dns
+detection:
+  selection:
+    query|contains:
+      - 'cdn-update.'
+      - 'stage-'
+      - '.onion'
+      - '.top'
+  condition: selection
+level: medium

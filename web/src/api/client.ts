@@ -1,5 +1,11 @@
 import type {
   AccessScopeContext,
+  CandidateGroupDto,
+  CandidateGroupMembersDto,
+  CandidateGroupSearchRequest,
+  DetectionExecutionDto,
+  DetectionRuleDetailDto,
+  DetectionRuleDto,
   Direction,
   EntityDetail,
   EntityDto,
@@ -22,8 +28,19 @@ import type {
   ReplayReceipt,
   ReplayRequest,
   RetryReceipt,
+  RuleMatchDto,
+  RuleMatchSearchRequest,
+  RuleSeverity,
+  RuleSource,
+  RuleStatus,
+  RuleTestRequest,
+  RuleTestResponseDto,
   SampleImportRequest,
   SeedExamplesResponse,
+  SignalDto,
+  SignalEvidenceDetailDto,
+  SignalSearchRequest,
+  SignalStatus,
   SubgraphResponse,
   TimeRange,
 } from "./types";
@@ -235,5 +252,173 @@ export const opsApi = {
       method: "POST",
       body: JSON.stringify(body),
     });
+  },
+};
+
+export const detectionApi = {
+  listRules(
+    scope: AccessScopeContext,
+    params?: {
+      source?: RuleSource;
+      status?: RuleStatus;
+      severity?: RuleSeverity;
+      attackTag?: string;
+      q?: string;
+      limit?: number;
+      cursor?: string;
+    },
+    signal?: AbortSignal,
+  ) {
+    const qs = new URLSearchParams({ limit: String(params?.limit ?? 200) });
+    if (params?.source) qs.set("source", params.source);
+    if (params?.status) qs.set("status", params.status);
+    if (params?.severity) qs.set("severity", params.severity);
+    if (params?.attackTag) qs.set("attack_tag", params.attackTag);
+    if (params?.q) qs.set("q", params.q);
+    if (params?.cursor) qs.set("cursor", params.cursor);
+    return apiFetch<PageResponse<DetectionRuleDto>>(
+      `/api/v1/detection/rules?${qs.toString()}`,
+      scope,
+      { signal },
+    );
+  },
+
+  getRule(scope: AccessScopeContext, ruleId: string, signal?: AbortSignal) {
+    return apiFetch<DetectionRuleDetailDto>(
+      `/api/v1/detection/rules/${encodeURIComponent(ruleId)}`,
+      scope,
+      { signal },
+    );
+  },
+
+  validateRule(scope: AccessScopeContext, rawYaml: string, sourceHint?: RuleSource) {
+    return apiFetch<DetectionRuleDetailDto>("/api/v1/detection/rules/validate", scope, {
+      method: "POST",
+      body: JSON.stringify({ raw_yaml: rawYaml, source_hint: sourceHint ?? null }),
+    });
+  },
+
+  importRule(
+    scope: AccessScopeContext,
+    rawYaml: string,
+    sourceReference = "web-console",
+    sourceHint?: RuleSource,
+  ) {
+    return apiFetch<DetectionRuleDetailDto>("/api/v1/detection/rules/import", scope, {
+      method: "POST",
+      body: JSON.stringify({
+        raw_yaml: rawYaml,
+        source_reference: sourceReference,
+        source_hint: sourceHint ?? null,
+      }),
+    });
+  },
+
+  enableRule(scope: AccessScopeContext, ruleId: string) {
+    return apiFetch<DetectionRuleDto>(
+      `/api/v1/detection/rules/${encodeURIComponent(ruleId)}/enable`,
+      scope,
+      { method: "POST" },
+    );
+  },
+
+  disableRule(scope: AccessScopeContext, ruleId: string) {
+    return apiFetch<DetectionRuleDto>(
+      `/api/v1/detection/rules/${encodeURIComponent(ruleId)}/disable`,
+      scope,
+      { method: "POST" },
+    );
+  },
+
+  testRule(scope: AccessScopeContext, body: RuleTestRequest) {
+    return apiFetch<RuleTestResponseDto>("/api/v1/detection/rules/test", scope, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+
+  executeRule(scope: AccessScopeContext, ruleId: string, timeRange: TimeRange) {
+    return apiFetch<DetectionExecutionDto>(
+      `/api/v1/detection/execute/${encodeURIComponent(ruleId)}`,
+      scope,
+      {
+        method: "POST",
+        body: JSON.stringify({ time_range: timeRange }),
+      },
+    );
+  },
+
+  executeBatch(scope: AccessScopeContext, timeRange: TimeRange, ruleIds?: string[]) {
+    return apiFetch<DetectionExecutionDto>("/api/v1/detection/execute-batch", scope, {
+      method: "POST",
+      body: JSON.stringify({ time_range: timeRange, rule_ids: ruleIds ?? null }),
+    });
+  },
+
+  searchMatches(scope: AccessScopeContext, body: RuleMatchSearchRequest, signal?: AbortSignal) {
+    return apiFetch<PageResponse<RuleMatchDto>>("/api/v1/detection/matches/search", scope, {
+      method: "POST",
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  searchSignals(scope: AccessScopeContext, body: SignalSearchRequest, signal?: AbortSignal) {
+    return apiFetch<PageResponse<SignalDto>>("/api/v1/detection/signals/search", scope, {
+      method: "POST",
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  getSignalMatches(scope: AccessScopeContext, signalId: string, signal?: AbortSignal) {
+    return apiFetch<RuleMatchDto[]>(
+      `/api/v1/detection/signals/${encodeURIComponent(signalId)}/matches`,
+      scope,
+      { signal },
+    );
+  },
+
+  getSignalEvidence(scope: AccessScopeContext, signalId: string, signal?: AbortSignal) {
+    return apiFetch<SignalEvidenceDetailDto[]>(
+      `/api/v1/detection/signals/${encodeURIComponent(signalId)}/evidence`,
+      scope,
+      { signal },
+    );
+  },
+
+  updateSignalStatus(scope: AccessScopeContext, signalId: string, status: SignalStatus) {
+    return apiFetch<SignalDto>(
+      `/api/v1/detection/signals/${encodeURIComponent(signalId)}/status`,
+      scope,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      },
+    );
+  },
+
+  searchCandidateGroups(
+    scope: AccessScopeContext,
+    body: CandidateGroupSearchRequest,
+    signal?: AbortSignal,
+  ) {
+    return apiFetch<PageResponse<CandidateGroupDto>>(
+      "/api/v1/detection/candidate-groups/search",
+      scope,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+        signal,
+      },
+    );
+  },
+
+  getCandidateGroupMembers(scope: AccessScopeContext, groupId: string, signal?: AbortSignal) {
+    return apiFetch<CandidateGroupMembersDto>(
+      `/api/v1/detection/candidate-groups/${encodeURIComponent(groupId)}/members`,
+      scope,
+      { signal },
+    );
   },
 };

@@ -68,6 +68,16 @@ export function OverviewPage() {
         sub: `接入 ${snap.ingest_failed_total} · 解析 ${snap.parse_failed_total} · 映射 ${snap.normalize_failed_total}`,
         alert: deadLetters > 0,
       },
+      {
+        label: "检测规则与命中 (RuleMatch)",
+        value: `${snap.detection_matches_total} 命中`,
+        sub: `支持规则 ${snap.detection_rules_supported_total} / 总计 ${snap.detection_rules_total}`,
+      },
+      {
+        label: "调查线索 (Signal / 候选组)",
+        value: `${snap.signals_created_total} / ${snap.candidate_groups_created_total}`,
+        sub: `聚合 ${snap.signals_aggregated_total} · 幂等去重 ${snap.signals_deduplicated_total}`,
+      },
     ];
   }, [snap]);
 

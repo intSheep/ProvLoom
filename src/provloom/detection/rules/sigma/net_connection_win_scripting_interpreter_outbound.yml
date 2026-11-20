@@ -1,0 +1,28 @@
+title: Scripting Interpreter Initiating Outbound Network Connection
+id: 6d4b1e8c-91b2-4e45-8c01-400100000001
+status: stable
+version: 1.0.0
+description: Detects PowerShell or Windows script interpreters establishing external network connections.
+references:
+  - https://github.com/SigmaHQ/sigma/tree/master/rules/windows/network_connection
+tags:
+  - attack.command_and_control
+  - attack.t1071.001
+logsource:
+  category: network_connection
+  product: windows
+detection:
+  selection_proc:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\wscript.exe'
+      - '\cscript.exe'
+      - '\mshta.exe'
+      - '\rundll32.exe'
+  filter_loopback:
+    DestinationIp|startswith:
+      - '127.'
+      - '::1'
+  condition: selection_proc and not filter_loopback
+level: high

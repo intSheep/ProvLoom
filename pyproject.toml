@@ -4,14 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "provloom"
-version = "0.1.0"
-description = "Deterministic OCSF v1.3 security fact and provenance graph data service for APT investigation"
+version = "0.2.0"
+description = "Deterministic OCSF v1.3 security fact, provenance graph, and detection signal service for APT investigation"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 keywords = [
     "ocsf",
     "provenance-graph",
+    "sigma",
     "apt",
     "threat-hunting",
     "cybersecurity",
@@ -27,7 +28,6 @@ classifiers = [
     "Topic :: Security",
 ]
 dependencies = [
-    "eval-type-backport>=0.2.0; python_version < '3.10'",
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.30.0",
     "pydantic>=2.8.0",
@@ -40,6 +40,8 @@ dependencies = [
     "structlog>=24.1.0",
     "prometheus-client>=0.20.0",
     "python-multipart>=0.0.9",
+    "pysigma>=1.0.0",
+    "pysigma-pipeline-ocsf>=0.1.2",
 ]
 
 [project.optional-dependencies]
@@ -59,22 +61,26 @@ provloom = "provloom.cli.main:main"
 packages = ["src/provloom"]
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py312"
 line-length = 100
 src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
-ignore = ["B008", "UP007", "UP045"]
+ignore = ["B008", "B905", "UP007", "UP042", "UP045", "UP046"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["E501"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.12"
 strict = true
 mypy_path = "src"
 packages = ["provloom"]
+
+[[tool.mypy.overrides]]
+module = ["sigma.pipelines.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

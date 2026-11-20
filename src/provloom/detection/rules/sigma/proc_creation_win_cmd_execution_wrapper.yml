@@ -1,0 +1,26 @@
+title: Command Shell Spawning Scripting Interpreter
+id: 6d4b1e8c-91b2-4e45-8c01-100700000002
+status: stable
+version: 1.0.0
+description: Detects cmd.exe /c launching PowerShell or Windows script hosts.
+references:
+  - https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_creation
+tags:
+  - attack.execution
+  - attack.t1059.003
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_parent:
+    ParentImage|endswith: '\cmd.exe'
+    ParentCommandLine|contains: '/c'
+  selection_child:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\wscript.exe'
+      - '\cscript.exe'
+      - '\mshta.exe'
+  condition: selection_parent and selection_child
+level: medium

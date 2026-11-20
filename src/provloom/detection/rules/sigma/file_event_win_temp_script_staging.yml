@@ -1,0 +1,29 @@
+title: Suspicious Script or Executable Dropped in Temp Directory
+id: 6d4b1e8c-91b2-4e45-8c01-100100000001
+status: stable
+version: 1.0.0
+description: Detects creation of executable scripts or binaries inside temporary staging directories.
+references:
+  - https://github.com/SigmaHQ/sigma/tree/master/rules/windows/file/file_event
+tags:
+  - attack.defense_evasion
+  - attack.execution
+  - attack.t1059.001
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection_dir:
+    TargetFilename|contains:
+      - '\Temp\'
+      - '/tmp/'
+  selection_ext:
+    TargetFilename|endswith:
+      - '.ps1'
+      - '.bat'
+      - '.vbs'
+      - '.hta'
+      - '.dll'
+      - '.exe'
+  condition: selection_dir and selection_ext
+level: high

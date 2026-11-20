@@ -1,0 +1,18 @@
+rule_type: provloom_custom
+rule_id: custom-rel-user-authenticates-asset
+rule_name: User Deterministic Authentication Relation
+version: "1.0.0"
+description: Detects a user entity establishing a DETERMINISTIC AUTHENTICATES_TO relation to a host or service.
+severity: low
+attack_tags:
+  - attack.valid_accounts
+  - attack.t1078
+logsource:
+  category: provenance_graph
+  product: provloom
+detection_type: RELATION
+relation_spec:
+  src_entity_type: USER
+  relation_type: AUTHENTICATES_TO
+  deterministic_only: true
+  min_evidence_count: 1

@@ -16,7 +16,7 @@ lint:
 
 typecheck:
 	$(BIN)mypy src
-	@if [ -d web/node_modules ]; then npm --prefix web run typecheck; fi
+	@if [ -d web/node_modules ] && command -v npm >/dev/null 2>&1; then npm --prefix web run typecheck; fi
 
 test:
 	$(BIN)pytest -m "not acceptance"

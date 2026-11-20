@@ -1,14 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { opsApi, queryApi } from "./client";
+import { detectionApi, opsApi, queryApi } from "./client";
 import type {
   AccessScopeContext,
+  CandidateGroupSearchRequest,
   EntitySearchRequest,
   EventSearchRequest,
   GraphTraverseRequest,
   PipelineStage,
   RawPasteImportRequest,
   ReplayRequest,
+  RuleMatchSearchRequest,
+  RuleSeverity,
+  RuleSource,
+  RuleStatus,
+  RuleTestRequest,
   SampleImportRequest,
+  SignalSearchRequest,
+  SignalStatus,
+  TimeRange,
 } from "./types";
 
 function scopeKey(scope: AccessScopeContext) {
@@ -40,6 +49,30 @@ export const provloomKeys = {
     ["provloom", "graph", scopeKey(scope), req] as const,
   relationEvidence: (scope: AccessScopeContext, relationId: string | null) =>
     ["provloom", "relationEvidence", scopeKey(scope), relationId] as const,
+  detectionRules: (
+    scope: AccessScopeContext,
+    params?: {
+      source?: RuleSource;
+      status?: RuleStatus;
+      severity?: RuleSeverity;
+      attackTag?: string;
+      q?: string;
+    },
+  ) => ["provloom", "detectionRules", scopeKey(scope), params ?? {}] as const,
+  detectionRuleDetail: (scope: AccessScopeContext, ruleId: string | null) =>
+    ["provloom", "detectionRuleDetail", scopeKey(scope), ruleId] as const,
+  ruleMatches: (scope: AccessScopeContext, req: RuleMatchSearchRequest) =>
+    ["provloom", "ruleMatches", scopeKey(scope), req] as const,
+  signals: (scope: AccessScopeContext, req: SignalSearchRequest) =>
+    ["provloom", "signals", scopeKey(scope), req] as const,
+  signalMatches: (scope: AccessScopeContext, signalId: string | null) =>
+    ["provloom", "signalMatches", scopeKey(scope), signalId] as const,
+  signalEvidence: (scope: AccessScopeContext, signalId: string | null) =>
+    ["provloom", "signalEvidence", scopeKey(scope), signalId] as const,
+  candidateGroups: (scope: AccessScopeContext, req: CandidateGroupSearchRequest) =>
+    ["provloom", "candidateGroups", scopeKey(scope), req] as const,
+  candidateGroupMembers: (scope: AccessScopeContext, groupId: string | null) =>
+    ["provloom", "candidateGroupMembers", scopeKey(scope), groupId] as const,
 };
 
 export function useMetricsQuery(scope: AccessScopeContext) {
@@ -164,6 +197,122 @@ export function useReplayMutation(scope: AccessScopeContext) {
   const invalidate = useInvalidateProvLoomData();
   return useMutation({
     mutationFn: (body: ReplayRequest) => opsApi.replayFromRaw(scope, body),
+    onSuccess: () => void invalidate(),
+  });
+}
+
+export function useDetectionRulesQuery(
+  scope: AccessScopeContext,
+  params?: {
+    source?: RuleSource;
+    status?: RuleStatus;
+    severity?: RuleSeverity;
+    attackTag?: string;
+    q?: string;
+  },
+) {
+  return useQuery({
+    queryKey: provloomKeys.detectionRules(scope, params),
+    queryFn: ({ signal }) => detectionApi.listRules(scope, params, signal),
+  });
+}
+
+export function useDetectionRuleDetailQuery(scope: AccessScopeContext, ruleId: string | null) {
+  return useQuery({
+    queryKey: provloomKeys.detectionRuleDetail(scope, ruleId),
+    queryFn: ({ signal }) => detectionApi.getRule(scope, ruleId!, signal),
+    enabled: Boolean(ruleId),
+  });
+}
+
+export function useRuleMatchesQuery(scope: AccessScopeContext, req: RuleMatchSearchRequest) {
+  return useQuery({
+    queryKey: provloomKeys.ruleMatches(scope, req),
+    queryFn: ({ signal }) => detectionApi.searchMatches(scope, req, signal),
+  });
+}
+
+export function useSignalsQuery(scope: AccessScopeContext, req: SignalSearchRequest) {
+  return useQuery({
+    queryKey: provloomKeys.signals(scope, req),
+    queryFn: ({ signal }) => detectionApi.searchSignals(scope, req, signal),
+  });
+}
+
+export function useSignalMatchesQuery(scope: AccessScopeContext, signalId: string | null) {
+  return useQuery({
+    queryKey: provloomKeys.signalMatches(scope, signalId),
+    queryFn: ({ signal }) => detectionApi.getSignalMatches(scope, signalId!, signal),
+    enabled: Boolean(signalId),
+  });
+}
+
+export function useSignalEvidenceQuery(scope: AccessScopeContext, signalId: string | null) {
+  return useQuery({
+    queryKey: provloomKeys.signalEvidence(scope, signalId),
+    queryFn: ({ signal }) => detectionApi.getSignalEvidence(scope, signalId!, signal),
+    enabled: Boolean(signalId),
+  });
+}
+
+export function useCandidateGroupsQuery(
+  scope: AccessScopeContext,
+  req: CandidateGroupSearchRequest,
+) {
+  return useQuery({
+    queryKey: provloomKeys.candidateGroups(scope, req),
+    queryFn: ({ signal }) => detectionApi.searchCandidateGroups(scope, req, signal),
+  });
+}
+
+export function useCandidateGroupMembersQuery(scope: AccessScopeContext, groupId: string | null) {
+  return useQuery({
+    queryKey: provloomKeys.candidateGroupMembers(scope, groupId),
+    queryFn: ({ signal }) => detectionApi.getCandidateGroupMembers(scope, groupId!, signal),
+    enabled: Boolean(groupId),
+  });
+}
+
+export function useExecuteBatchMutation(scope: AccessScopeContext) {
+  const invalidate = useInvalidateProvLoomData();
+  return useMutation({
+    mutationFn: (params: { timeRange: TimeRange; ruleIds?: string[] }) =>
+      detectionApi.executeBatch(scope, params.timeRange, params.ruleIds),
+    onSuccess: () => void invalidate(),
+  });
+}
+
+export function useToggleRuleMutation(scope: AccessScopeContext) {
+  const invalidate = useInvalidateProvLoomData();
+  return useMutation({
+    mutationFn: (params: { ruleId: string; enable: boolean }) =>
+      params.enable
+        ? detectionApi.enableRule(scope, params.ruleId)
+        : detectionApi.disableRule(scope, params.ruleId),
+    onSuccess: () => void invalidate(),
+  });
+}
+
+export function useImportRuleMutation(scope: AccessScopeContext) {
+  const invalidate = useInvalidateProvLoomData();
+  return useMutation({
+    mutationFn: (params: { rawYaml: string; sourceHint?: RuleSource }) =>
+      detectionApi.importRule(scope, params.rawYaml, "web-console", params.sourceHint),
+    onSuccess: () => void invalidate(),
+  });
+}
+
+export function useTestRuleMutation(scope: AccessScopeContext) {
+  return useMutation({
+    mutationFn: (body: RuleTestRequest) => detectionApi.testRule(scope, body),
+  });
+}
+
+export function useUpdateSignalStatusMutation(scope: AccessScopeContext) {
+  const invalidate = useInvalidateProvLoomData();
+  return useMutation({
+    mutationFn: (params: { signalId: string; status: SignalStatus }) =>
+      detectionApi.updateSignalStatus(scope, params.signalId, params.status),
     onSuccess: () => void invalidate(),
   });
 }

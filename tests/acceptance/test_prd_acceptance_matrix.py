@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -26,8 +26,8 @@ from provloom.query.ops_interfaces import ReplayRequest, SampleImportRequest
 from provloom.runtime import ProvLoomRuntime
 
 WINDOW = TimeRange(
-    start_time=datetime(2026, 11, 18, 7, 0, tzinfo=timezone.utc),
-    end_time=datetime(2026, 11, 18, 9, 0, tzinfo=timezone.utc),
+    start_time=datetime(2026, 11, 18, 7, 0, tzinfo=UTC),
+    end_time=datetime(2026, 11, 18, 9, 0, tzinfo=UTC),
 )
 SCOPE = AccessScope(tenant_id="default")
 
@@ -110,8 +110,8 @@ class PrdAcceptanceMatrixTests(unittest.TestCase):
         )
 
         wide_window = TimeRange(
-            start_time=datetime(2026, 11, 1, 0, 0, tzinfo=timezone.utc),
-            end_time=datetime(2026, 11, 19, 0, 0, tzinfo=timezone.utc),
+            start_time=datetime(2026, 11, 1, 0, 0, tzinfo=UTC),
+            end_time=datetime(2026, 11, 19, 0, 0, tzinfo=UTC),
         )
         all_events = rt.query_service.search_events(
             SCOPE, wide_window, EventSearchFilter(include_fallback=True), PageSpec(limit=50)
