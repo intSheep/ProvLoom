@@ -5,6 +5,9 @@ import type {
   NormalizationStatus,
   PipelineStage,
   ResolutionState,
+  RuleSeverity,
+  RuleStatus,
+  SignalStatus,
 } from "../../api/types";
 
 const ENTITY_TYPE_TONE: Record<EntityType, string> = {
@@ -101,4 +104,42 @@ export function StagePill({ stage }: { stage: PipelineStage }) {
       {stage}
     </span>
   );
+}
+
+const SEVERITY_TONE: Record<RuleSeverity, string> = {
+  CRITICAL: "border-red-500/70 text-red-500 bg-red-500/15 font-semibold",
+  HIGH: "border-orange-500/60 text-orange-500 bg-orange-500/10",
+  MEDIUM: "border-amber-500/60 text-amber-500 bg-amber-500/10",
+  LOW: "border-sky-500/50 text-sky-500 bg-sky-500/10",
+  INFORMATIONAL: "border-slate-500/50 text-slate-400 bg-slate-500/10",
+};
+
+export function RuleSeverityPill({ severity }: { severity: RuleSeverity }) {
+  return <span className={`${basePill} ${SEVERITY_TONE[severity]}`}>{severity}</span>;
+}
+
+export function RuleStatusPill({ status }: { status: RuleStatus }) {
+  const cls =
+    status === "ENABLED"
+      ? "border-emerald-500/50 text-emerald-500 bg-emerald-500/10"
+      : status === "DISABLED"
+        ? "border-slate-500/50 text-slate-400 bg-slate-500/10"
+        : status === "UNSUPPORTED"
+          ? "pl-pill-candidate bg-amber-500/10"
+          : "border-red-500/60 text-red-500 bg-red-500/10";
+  return <span className={`${basePill} ${cls}`}>{status}</span>;
+}
+
+export function SignalStatusPill({ status }: { status: SignalStatus }) {
+  const cls =
+    status === "NEW"
+      ? "border-blue-500/60 text-blue-500 bg-blue-500/10"
+      : status === "OPEN"
+        ? "border-amber-500/60 text-amber-500 bg-amber-500/10"
+        : status === "ACKNOWLEDGED"
+          ? "border-purple-500/60 text-purple-500 bg-purple-500/10"
+          : status === "RESOLVED"
+            ? "border-emerald-500/50 text-emerald-500 bg-emerald-500/10"
+            : "border-slate-500/50 text-slate-400 bg-slate-500/10";
+  return <span className={`${basePill} ${cls}`}>{status}</span>;
 }

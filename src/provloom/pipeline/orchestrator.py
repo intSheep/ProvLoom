@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Sequence
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from provloom.config import CorrelationConfig
@@ -107,7 +107,7 @@ class DefaultPipelineOrchestrator(PipelineOrchestrator):
                         error_message=str(exc),
                         raw_snippet=raw_ev.raw_payload[:500],
                         retryable=True,
-                        occurred_at=datetime.now(timezone.utc),
+                        occurred_at=datetime.now(UTC),
                     )
                 )
             return False, str(exc)
@@ -138,7 +138,7 @@ class DefaultPipelineOrchestrator(PipelineOrchestrator):
                         error_message=str(exc),
                         raw_snippet=raw_ev.raw_payload[:500],
                         retryable=True,
-                        occurred_at=datetime.now(timezone.utc),
+                        occurred_at=datetime.now(UTC),
                     )
                 )
             return False, str(exc)

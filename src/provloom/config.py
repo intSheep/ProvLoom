@@ -20,6 +20,15 @@ class CorrelationConfig:
 
 
 @dataclass(frozen=True)
+class DetectionConfig:
+    max_matches_per_rule: int = 500
+    max_execution_seconds: float = 30.0
+    candidate_grouping_gap_seconds: float = 3600.0
+    extra_rules_dir: str | None = None
+    execution_token: str | None = None
+
+
+@dataclass(frozen=True)
 class AppConfig:
     env: str = "development"
     database_url: str = "postgresql+psycopg://provloom:provloom@localhost:5432/provloom"
@@ -28,9 +37,11 @@ class AppConfig:
     default_tenant: str = "default"
     query_guards: QueryGuardConfig = QueryGuardConfig()
     correlation: CorrelationConfig = CorrelationConfig()
+    detection: DetectionConfig = DetectionConfig()
 
     @classmethod
     def from_env(cls) -> AppConfig:
+        exec_token = os.getenv("PROVLOOM_DETECTION_EXEC_TOKEN") or None
         return cls(
             env=os.getenv("PROVLOOM_ENV", "development"),
             database_url=os.getenv("PROVLOOM_DATABASE_URL", "sqlite:///./.provloom_dev.db"),
@@ -38,5 +49,11 @@ class AppConfig:
             query_guards=QueryGuardConfig(
                 max_page_limit=int(os.getenv("PROVLOOM_MAX_PAGE_LIMIT", "500")),
                 max_graph_depth=int(os.getenv("PROVLOOM_MAX_GRAPH_DEPTH", "6")),
+            ),
+            detection=DetectionConfig(
+                max_matches_per_rule=int(os.getenv("PROVLOOM_DETECTION_MAX_MATCHES", "500")),
+                max_execution_seconds=float(os.getenv("PROVLOOM_DETECTION_MAX_SECONDS", "30.0")),
+                extra_rules_dir=os.getenv("PROVLOOM_RULES_DIR") or None,
+                execution_token=exec_token,
             ),
         )

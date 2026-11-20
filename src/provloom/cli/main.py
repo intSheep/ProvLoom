@@ -3,12 +3,15 @@ from __future__ import annotations
 import argparse
 import json
 from collections.abc import Sequence
+from dataclasses import asdict
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from uuid import UUID
 
 import uvicorn
 
 from provloom.config import AppConfig
-from provloom.domain.common import AccessScope
+from provloom.domain.common import AccessScope, TimeRange
 from provloom.query.ops_interfaces import ReplayRequest, SampleImportRequest
 from provloom.runtime import ProvLoomRuntime
 
@@ -34,6 +37,14 @@ def build_parser() -> argparse.ArgumentParser:
     serve = sub.add_parser("serve", help="Run HTTP Query API and Web Debug Console")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
+
+    detect = sub.add_parser("detect", help="Run enabled Sigma and Custom detection rules")
+    detect.add_argument("--tenant", default="default")
+    detect.add_argument("--rule-id", help="Optional single rule_id to execute")
+
+    imp_rule = sub.add_parser("import-rule", help="Import a Sigma or Custom YAML detection rule")
+    imp_rule.add_argument("--tenant", default="default")
+    imp_rule.add_argument("--path", required=True)
 
     return parser
 
@@ -75,6 +86,36 @@ def main(argv: Sequence[str] | None = None) -> int:
             req=ReplayRequest(batch_ids=batch_ids),
         )
         print(json.dumps(rep.__dict__, indent=2))
+        return 0
+
+    if args.command == "detect":
+        scope = AccessScope(tenant_id=str(args.tenant))
+        bounds = rt.ops_service.get_dataset_time_bounds(scope)
+        now = datetime.now(UTC)
+        window = (
+            TimeRange(
+                start_time=bounds.start_time - timedelta(minutes=1),
+                end_time=bounds.end_time + timedelta(minutes=1),
+            )
+            if bounds is not None
+            else TimeRange(start_time=now - timedelta(days=7), end_time=now + timedelta(minutes=1))
+        )
+        exec_res = (
+            rt.detection_service.execute_rule(scope, str(args.rule_id), window)
+            if args.rule_id
+            else rt.detection_service.execute_rule_batch(scope, window)
+        )
+        print(json.dumps(asdict(exec_res), default=str, indent=2))
+        return 0
+
+    if args.command == "import-rule":
+        rule_path = Path(str(args.path))
+        view = rt.detection_service.import_detection_rule(
+            scope=AccessScope(tenant_id=str(args.tenant)),
+            raw_yaml=rule_path.read_text(encoding="utf-8"),
+            source_reference=f"file://{rule_path.name}",
+        )
+        print(json.dumps(asdict(view), default=str, indent=2))
         return 0
 
     return 1

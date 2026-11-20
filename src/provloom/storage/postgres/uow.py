@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import Callable
+import re
+from collections.abc import Callable
 
 from sqlalchemy import Connection, Engine, create_engine, delete, event, select, update
 from sqlalchemy.pool import StaticPool
 
 from provloom.domain.enums import PipelineStage, RawProcessStatus
 from provloom.storage.interfaces import UnitOfWork
+from provloom.storage.postgres.detection_repo import SqlDetectionRepository
 from provloom.storage.postgres.entity_repo import SqlEntityRepository
 from provloom.storage.postgres.event_repo import SqlNormalizedEventRepository
 from provloom.storage.postgres.graph_repo import SqlGraphRepository
@@ -24,6 +26,23 @@ from provloom.storage.postgres.tables import (
 )
 
 
+def _sqlite_regexp(pattern: str | None, flags_str: str | None, value: str | None) -> int:
+    if pattern is None or value is None:
+        return 0
+    flags = 0
+    if flags_str:
+        if "i" in flags_str:
+            flags |= re.IGNORECASE
+        if "m" in flags_str:
+            flags |= re.MULTILINE
+        if "s" in flags_str:
+            flags |= re.DOTALL
+    try:
+        return 1 if re.search(pattern, str(value), flags) is not None else 0
+    except re.error:
+        return 0
+
+
 def create_db_engine(database_url: str, echo: bool = False) -> Engine:
     kwargs: dict[str, object] = {"echo": echo}
     if database_url.startswith("sqlite"):
@@ -39,6 +58,7 @@ def create_db_engine(database_url: str, echo: bool = False) -> Engine:
             cursor = dbapi_conn.cursor()  # type: ignore[attr-defined]
             cursor.execute("PRAGMA foreign_keys=ON")
             cursor.close()
+            dbapi_conn.create_function("provloom_regexp", 3, _sqlite_regexp)  # type: ignore[attr-defined]
 
     return engine
 
@@ -59,6 +79,7 @@ class SqlUnitOfWork(UnitOfWork):
         self.normalized_events = SqlNormalizedEventRepository(self._conn)
         self.entities = SqlEntityRepository(self._conn)
         self.graph = SqlGraphRepository(self._conn)
+        self.detection = SqlDetectionRepository(self._conn)
         return self
 
     def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
@@ -83,6 +104,7 @@ class SqlUnitOfWork(UnitOfWork):
 
     def purge_derived_data(self, tenant_scope: str) -> None:
         assert self._conn is not None
+        self.detection.purge_tenant_detection_results(tenant_scope)
         tenant_rel_ids = select(relations.c.relation_id).where(
             relations.c.tenant_scope == tenant_scope
         )

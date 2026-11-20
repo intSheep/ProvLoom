@@ -6,6 +6,8 @@ from pathlib import Path
 from sqlalchemy import Engine
 
 from provloom.config import AppConfig
+from provloom.detection.rules.registry import BuiltinRuleRegistry
+from provloom.detection.service import DefaultDetectionService
 from provloom.ingestion.gateway import DefaultIngestionGateway
 from provloom.normalization.engine import DefaultMappingRegistry, DefaultNormalizationService
 from provloom.observability.prometheus import PrometheusTelemetry
@@ -32,6 +34,7 @@ class ProvLoomRuntime:
     replay_service: DefaultReplayService
     query_service: DefaultQueryService
     ops_service: DefaultOpsDebugService
+    detection_service: DefaultDetectionService
 
     @classmethod
     def build(
@@ -72,6 +75,17 @@ class ProvLoomRuntime:
             guards=cfg.query_guards,
             examples_dir=examples_dir,
         )
+        rule_registry = BuiltinRuleRegistry(
+            mapping_specs=mappings.list_specs(),
+            extra_rules_dir=cfg.detection.extra_rules_dir,
+        )
+        detection_svc = DefaultDetectionService(
+            uow_factory=uow_factory,
+            rule_registry=rule_registry,
+            telemetry=telemetry,
+            guards=cfg.query_guards,
+            detection_config=cfg.detection,
+        )
         return cls(
             config=cfg,
             engine=engine,
@@ -82,4 +96,5 @@ class ProvLoomRuntime:
             replay_service=replay,
             query_service=query_svc,
             ops_service=ops_svc,
+            detection_service=detection_svc,
         )

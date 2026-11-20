@@ -267,6 +267,15 @@ export interface PipelineMetricsSnapshot {
   entity_merges_total: number;
   deterministic_relations_total: number;
   candidate_relations_total: number;
+  detection_rules_total: number;
+  detection_rules_supported_total: number;
+  detection_rules_unsupported_total: number;
+  detection_executions_total: number;
+  detection_matches_total: number;
+  signals_created_total: number;
+  signals_deduplicated_total: number;
+  signals_aggregated_total: number;
+  candidate_groups_created_total: number;
 }
 
 export interface MappingSpecSummary {
@@ -278,4 +287,211 @@ export interface MappingSpecSummary {
   category_uid: number;
   class_uid: number;
   activity_id: number;
+}
+
+// --- Detection Layer API (/api/v1/detection/*) ---
+
+export type RuleSource = "SIGMA" | "CUSTOM";
+export type RuleStatus = "ENABLED" | "DISABLED" | "UNSUPPORTED" | "ERROR";
+export type RuleSeverity = "INFORMATIONAL" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type DetectionType = "EVENT" | "RELATION";
+export type ExecutionMode = "BATCH" | "INCREMENTAL";
+export type ExecutionStatus = "RUNNING" | "COMPLETED" | "PARTIAL_FAILURE" | "FAILED";
+export type SignalStatus = "NEW" | "OPEN" | "ACKNOWLEDGED" | "RESOLVED" | "SUPPRESSED";
+
+export interface LogsourceDto {
+  category: string | null;
+  product: string | null;
+  service: string | null;
+}
+
+export interface RuleCompatibilityDto {
+  parse_success: boolean;
+  mapping_success: boolean;
+  data_coverage: boolean;
+  compile_success: boolean;
+  execution_success: boolean | null;
+  mapped_class_uids: number[];
+  field_mappings: Record<string, string>;
+  uncovered_fields: string[];
+  unsupported_reasons: string[];
+}
+
+export interface DetectionRuleDto {
+  rule_id: string;
+  rule_name: string;
+  source: RuleSource;
+  source_reference: string;
+  version: string;
+  description: string;
+  severity: RuleSeverity;
+  attack_tags: string[];
+  logsource: LogsourceDto;
+  detection_type: DetectionType;
+  raw_content: string;
+  status: RuleStatus;
+  compatibility: RuleCompatibilityDto;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DetectionRuleDetailDto {
+  rule: DetectionRuleDto;
+  compiled_sql: string | null;
+  parsed_summary: Record<string, unknown> | null;
+}
+
+export interface EvidenceReferenceDto {
+  event_id: string | null;
+  raw_event_id: string | null;
+  relation_id: string | null;
+  source_id: string;
+  original_event_uid: string | null;
+  observed_at: string | null;
+}
+
+export interface RuleMatchDto {
+  match_id: string;
+  rule_id: string;
+  rule_name: string;
+  rule_version: string;
+  severity: RuleSeverity;
+  detection_type: DetectionType;
+  primary_event_id: string | null;
+  matched_event_ids: string[];
+  primary_entity_id: string | null;
+  related_entity_ids: string[];
+  matched_fields: string[];
+  matched_values: Record<string, unknown>;
+  evidence_references: EvidenceReferenceDto[];
+  source_ids: string[];
+  matched_at: string;
+  execution_id: string;
+}
+
+export interface RuleTestRequest {
+  time_range: TimeRange;
+  raw_yaml?: string | null;
+  rule_id?: string | null;
+  max_matches?: number;
+}
+
+export interface RuleTestResponseDto {
+  rule: DetectionRuleDto;
+  parsed_summary: Record<string, unknown> | null;
+  field_mappings: Record<string, string>;
+  compiled_sql: string | null;
+  matches: RuleMatchDto[];
+  failure_reason: string | null;
+  duration_ms: number;
+}
+
+export interface RuleExecutionFailureDto {
+  rule_id: string;
+  stage: string;
+  error_message: string;
+}
+
+export interface DetectionExecutionDto {
+  execution_id: string;
+  tenant_scope: string;
+  mode: ExecutionMode;
+  status: ExecutionStatus;
+  time_range: TimeRange;
+  rule_ids: string[];
+  rules_evaluated: number;
+  matches_created: number;
+  matches_deduplicated: number;
+  signals_created: number;
+  signals_updated: number;
+  candidate_groups_created: number;
+  duration_ms: number;
+  failures: RuleExecutionFailureDto[];
+  started_at: string;
+  completed_at: string | null;
+}
+
+export interface RuleMatchSearchRequest {
+  time_range: TimeRange;
+  rule_id?: string | null;
+  detection_type?: DetectionType | null;
+  severity?: RuleSeverity | null;
+  entity_id?: string | null;
+  limit?: number;
+  cursor?: string | null;
+}
+
+export interface SignalDto {
+  signal_id: string;
+  signal_type: string;
+  title: string;
+  severity: RuleSeverity;
+  status: SignalStatus;
+  primary_entity_id: string | null;
+  related_entity_ids: string[];
+  rule_match_ids: string[];
+  event_ids: string[];
+  evidence_refs: EvidenceReferenceDto[];
+  source_ids: string[];
+  attack_tags: string[];
+  first_seen_at: string;
+  last_seen_at: string;
+  occurrence_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SignalSearchRequest {
+  time_range: TimeRange;
+  status?: SignalStatus | null;
+  severity?: RuleSeverity | null;
+  entity_id?: string | null;
+  signal_type?: string | null;
+  limit?: number;
+  cursor?: string | null;
+}
+
+export interface SignalEvidenceDetailDto {
+  event_id: string;
+  raw_event_id: string;
+  source_id: string;
+  ocsf_class_uid: number;
+  event_time: string;
+  original_event_uid: string | null;
+  ocsf_payload: Record<string, unknown>;
+  raw_payload: string;
+  relation_id: string | null;
+  relation_type: RelationType | null;
+  certainty: Certainty | null;
+}
+
+export interface CandidateGroupDto {
+  group_id: string;
+  group_key: string;
+  signal_ids: string[];
+  rule_match_ids: string[];
+  shared_entity_ids: string[];
+  grouping_rule_id: string;
+  grouping_basis: Record<string, unknown>;
+  certainty: Certainty;
+  unresolved_ambiguities: string[];
+  source_ids: string[];
+  first_seen_at: string;
+  last_seen_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CandidateGroupSearchRequest {
+  time_range: TimeRange;
+  entity_id?: string | null;
+  certainty?: Certainty | null;
+  limit?: number;
+  cursor?: string | null;
+}
+
+export interface CandidateGroupMembersDto {
+  group: CandidateGroupDto;
+  signals: SignalDto[];
+  rule_matches: RuleMatchDto[];
 }

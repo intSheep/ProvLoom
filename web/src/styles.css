@@ -259,6 +259,44 @@ dialog.pl-dialog::backdrop {
   background-color: color-mix(in srgb, var(--pl-accent) 7%, transparent);
 }
 
+/* Accessible single-row scrollable tablist with forced-colors-safe border underline */
+.pl-tablist {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--pl-border);
+  background-color: var(--pl-surface);
+  border-radius: 0.5rem 0.5rem 0 0;
+  scroll-snap-type: inline proximity;
+}
+
+.pl-tab {
+  position: relative;
+  flex: none;
+  scroll-snap-align: start;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--pl-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pl-tab:hover {
+  color: var(--pl-text);
+}
+
+.pl-tab[aria-selected="true"] {
+  color: var(--pl-accent);
+}
+
+.pl-tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  border-block-end: 3px solid var(--pl-accent);
+}
+
 /* Epistemic & Provisional visual invariants */
 .pl-pill-provisional {
   border-style: dashed !important;

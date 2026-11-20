@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from provloom.domain.enums import BatchStatus, PipelineStage, RawProcessStatus
@@ -54,7 +54,7 @@ class DefaultIngestionGateway(IngestionGateway):
         t0 = time.perf_counter()
         resolved_adapter = adapter or self.get_adapter(batch_spec.adapter_type)
         batch_id = uuid4()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         total = 0
         accepted = 0
         duplicate = 0
@@ -87,7 +87,7 @@ class DefaultIngestionGateway(IngestionGateway):
                         source_type=batch_spec.source_type,
                         raw_fingerprint=fp,
                         raw_payload=item.raw_payload,
-                        ingested_at=datetime.now(timezone.utc),
+                        ingested_at=datetime.now(UTC),
                         process_status=RawProcessStatus.PENDING,
                         external_event_uid=item.external_event_uid,
                         raw_metadata=item.raw_metadata,
@@ -109,7 +109,7 @@ class DefaultIngestionGateway(IngestionGateway):
                         stage=PipelineStage.INGEST,
                         error_code="ADAPTER_READ_ERROR",
                         error_message=str(exc),
-                        occurred_at=datetime.now(timezone.utc),
+                        occurred_at=datetime.now(UTC),
                         raw_snippet=batch_spec.source_uri,
                         retryable=False,
                     )

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from threading import Lock
 
-from prometheus_client import CollectorRegistry, Counter, Histogram, generate_latest
+from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram, generate_latest
 
 from provloom.domain.enums import Certainty, EntityType, PipelineStage, RelationType
 from provloom.observability.interfaces import PipelineMetricsSnapshot, PipelineTelemetry
@@ -55,6 +55,63 @@ class PrometheusTelemetry(PipelineTelemetry):
             "provloom_query_duration_seconds",
             "Read query service execution latency",
             ["operation"],
+            registry=self.registry,
+        )
+        self._det_rules_total = Gauge(
+            "detection_rules_total",
+            "Total registered detection rules",
+            registry=self.registry,
+        )
+        self._det_rules_supported = Gauge(
+            "detection_rules_supported_total",
+            "Total supported executable detection rules",
+            registry=self.registry,
+        )
+        self._det_rules_unsupported = Gauge(
+            "detection_rules_unsupported_total",
+            "Total unsupported or errored detection rules",
+            registry=self.registry,
+        )
+        self._det_executions = Counter(
+            "detection_executions_total",
+            "Total detection execution runs by status",
+            ["status"],
+            registry=self.registry,
+        )
+        self._det_matches = Counter(
+            "detection_matches_total",
+            "Total newly created RuleMatches",
+            registry=self.registry,
+        )
+        self._det_exec_duration = Histogram(
+            "detection_execution_duration_seconds",
+            "Detection execution latency in seconds",
+            registry=self.registry,
+        )
+        self._signals_created = Counter(
+            "signals_created_total",
+            "Total newly created Signals",
+            registry=self.registry,
+        )
+        self._signals_deduplicated = Counter(
+            "signals_deduplicated_total",
+            "Total deduplicated Signal match attachments",
+            registry=self.registry,
+        )
+        self._signals_aggregated = Counter(
+            "signals_aggregated_total",
+            "Total Signal aggregations across additional RuleMatches",
+            registry=self.registry,
+        )
+        self._cand_groups_created = Counter(
+            "candidate_groups_created_total",
+            "Total newly created CandidateGroups",
+            registry=self.registry,
+        )
+        self._det_failures = Counter(
+            "detection_failures_total",
+            "Total detection rule failures by stage (parse/mapping/compile/execution)",
+            ["stage"],
             registry=self.registry,
         )
 
@@ -122,6 +179,57 @@ class PrometheusTelemetry(PipelineTelemetry):
 
     def observe_query_latency(self, operation: str, seconds: float) -> None:
         self._query_latency.labels(operation=operation).observe(seconds)
+
+    def set_detection_rule_counts(self, total: int, supported: int, unsupported: int) -> None:
+        self._det_rules_total.set(total)
+        self._det_rules_supported.set(supported)
+        self._det_rules_unsupported.set(unsupported)
+        with self._lock:
+            self._snap = replace(
+                self._snap,
+                detection_rules_total=total,
+                detection_rules_supported_total=supported,
+                detection_rules_unsupported_total=unsupported,
+            )
+
+    def record_detection_execution(
+        self,
+        status: str,
+        duration_seconds: float,
+        matches_created: int,
+        signals_created: int,
+        signals_deduplicated: int,
+        signals_aggregated: int,
+        candidate_groups_created: int,
+    ) -> None:
+        self._det_executions.labels(status=status).inc()
+        self._det_exec_duration.observe(max(duration_seconds, 0.0))
+        if matches_created > 0:
+            self._det_matches.inc(matches_created)
+        if signals_created > 0:
+            self._signals_created.inc(signals_created)
+        if signals_deduplicated > 0:
+            self._signals_deduplicated.inc(signals_deduplicated)
+        if signals_aggregated > 0:
+            self._signals_aggregated.inc(signals_aggregated)
+        if candidate_groups_created > 0:
+            self._cand_groups_created.inc(candidate_groups_created)
+        with self._lock:
+            self._snap = replace(
+                self._snap,
+                detection_executions_total=self._snap.detection_executions_total + 1,
+                detection_matches_total=self._snap.detection_matches_total + matches_created,
+                signals_created_total=self._snap.signals_created_total + signals_created,
+                signals_deduplicated_total=self._snap.signals_deduplicated_total
+                + signals_deduplicated,
+                signals_aggregated_total=self._snap.signals_aggregated_total + signals_aggregated,
+                candidate_groups_created_total=self._snap.candidate_groups_created_total
+                + candidate_groups_created,
+            )
+
+    def record_detection_failure(self, stage: str, count: int = 1) -> None:
+        if count > 0:
+            self._det_failures.labels(stage=stage).inc(count)
 
     def snapshot(self) -> PipelineMetricsSnapshot:
         with self._lock:

@@ -5,6 +5,17 @@ from datetime import datetime
 from typing import Protocol
 from uuid import UUID
 
+from provloom.detection.domain.candidate_group import CandidateGroup
+from provloom.detection.domain.rule import (
+    DetectionExecution,
+    DetectionRule,
+    DetectionType,
+    RuleSeverity,
+    RuleSource,
+    RuleStatus,
+)
+from provloom.detection.domain.rule_match import RuleMatch
+from provloom.detection.domain.signal import Signal, SignalEvidenceDetail, SignalStatus
 from provloom.domain.common import AccessScope, PageResult, PageSpec, TimeRange
 from provloom.domain.entity_models import (
     Entity,
@@ -13,6 +24,7 @@ from provloom.domain.entity_models import (
     EntityMergeAudit,
 )
 from provloom.domain.enums import (
+    Certainty,
     Direction,
     EntityType,
     PipelineStage,
@@ -174,11 +186,124 @@ class GraphRepository(Protocol):
     ) -> PageResult[RelationEvidenceDetail]: ...
 
 
+class EventSqlSelector(Protocol):
+    def build_select(
+        self,
+        dialect_name: str,
+        scope: AccessScope,
+        time_range: TimeRange,
+        limit: int,
+        event_ids: Sequence[UUID] | None = None,
+    ) -> object: ...
+
+
+class DetectionRepository(Protocol):
+    def upsert_rule(
+        self, tenant_scope: str, rule: DetectionRule, preserve_status: bool = False
+    ) -> DetectionRule: ...
+    def get_rule(self, tenant_scope: str, rule_id: str) -> DetectionRule | None: ...
+    def list_all_rules(
+        self, tenant_scope: str, status: RuleStatus | None = None
+    ) -> Sequence[DetectionRule]: ...
+    def list_rules(
+        self,
+        tenant_scope: str,
+        source: RuleSource | None,
+        status: RuleStatus | None,
+        severity: RuleSeverity | None,
+        attack_tag: str | None,
+        query_text: str | None,
+        page: PageSpec,
+    ) -> PageResult[DetectionRule]: ...
+    def update_rule_status(
+        self,
+        tenant_scope: str,
+        rule_id: str,
+        status: RuleStatus,
+        updated_at: datetime,
+    ) -> DetectionRule | None: ...
+
+    def execute_compiled_event_query(
+        self,
+        query: EventSqlSelector,
+        scope: AccessScope,
+        time_range: TimeRange,
+        limit: int,
+        event_ids: Sequence[UUID] | None = None,
+    ) -> Sequence[NormalizedEvent]: ...
+    def resolve_event_entities(
+        self, tenant_scope: str, event_ids: Sequence[UUID]
+    ) -> dict[UUID, tuple[UUID | None, tuple[UUID, ...]]]: ...
+
+    def save_execution(self, execution: DetectionExecution) -> None: ...
+    def get_execution(
+        self, scope: AccessScope, execution_id: UUID
+    ) -> DetectionExecution | None: ...
+    def list_executions(
+        self, scope: AccessScope, page: PageSpec
+    ) -> PageResult[DetectionExecution]: ...
+
+    def insert_rule_match_if_absent(self, match: RuleMatch) -> tuple[RuleMatch, bool]: ...
+    def get_rule_match(self, scope: AccessScope, match_id: UUID) -> RuleMatch | None: ...
+    def get_rule_matches_by_ids(
+        self, scope: AccessScope, match_ids: Sequence[UUID]
+    ) -> Sequence[RuleMatch]: ...
+    def search_rule_matches(
+        self,
+        scope: AccessScope,
+        time_range: TimeRange,
+        rule_id: str | None,
+        detection_type: DetectionType | None,
+        severity: RuleSeverity | None,
+        entity_id: UUID | None,
+        page: PageSpec,
+    ) -> PageResult[RuleMatch]: ...
+
+    def get_signal_by_dedup_key(self, tenant_scope: str, dedup_key: str) -> Signal | None: ...
+    def save_signal(self, signal: Signal) -> None: ...
+    def update_signal_status(
+        self,
+        scope: AccessScope,
+        signal_id: UUID,
+        status: SignalStatus,
+        updated_at: datetime,
+    ) -> Signal | None: ...
+    def get_signal(self, scope: AccessScope, signal_id: UUID) -> Signal | None: ...
+    def list_signals_in_window(
+        self, scope: AccessScope, time_range: TimeRange
+    ) -> Sequence[Signal]: ...
+    def search_signals(
+        self,
+        scope: AccessScope,
+        time_range: TimeRange,
+        status: SignalStatus | None,
+        severity: RuleSeverity | None,
+        entity_id: UUID | None,
+        signal_type: str | None,
+        page: PageSpec,
+    ) -> PageResult[Signal]: ...
+    def get_signal_evidence(
+        self, scope: AccessScope, signal_id: UUID
+    ) -> Sequence[SignalEvidenceDetail]: ...
+
+    def upsert_candidate_group(self, group: CandidateGroup) -> bool: ...
+    def get_candidate_group(self, scope: AccessScope, group_id: UUID) -> CandidateGroup | None: ...
+    def search_candidate_groups(
+        self,
+        scope: AccessScope,
+        time_range: TimeRange,
+        entity_id: UUID | None,
+        certainty: Certainty | None,
+        page: PageSpec,
+    ) -> PageResult[CandidateGroup]: ...
+
+
 class UnitOfWork(Protocol):
     raw_events: RawEventRepository
     normalized_events: NormalizedEventRepository
     entities: EntityRepository
     graph: GraphRepository
+    detection: DetectionRepository
 
     def purge_derived_data(self, tenant_scope: str) -> None: ...
     def __enter__(self) -> UnitOfWork: ...

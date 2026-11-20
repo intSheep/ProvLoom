@@ -16,7 +16,8 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/events", badge: "03", label: "OCSF 事件台", desc: "标准化检索与三栏对照" },
   { to: "/entities", badge: "04", label: "实体生命周期", desc: "作用域归一与合并审计" },
   { to: "/graph", badge: "05", label: "溯源关系图谱", desc: "多跳遍历与证据链反查" },
-  { to: "/playground", badge: "06", label: "API 与映射字典", desc: "契约沙盒与 YAML 规则" },
+  { to: "/detection", badge: "06", label: "检测与线索台", desc: "Sigma 编译、命中与 Signal" },
+  { to: "/playground", badge: "07", label: "API 与映射字典", desc: "契约沙盒与 YAML 规则" },
 ];
 
 export function ConsoleShell() {

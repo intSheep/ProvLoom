@@ -1,0 +1,27 @@
+title: Windows Remote Network or Interactive Logon
+id: 6d4b1e8c-91b2-4e45-8c01-300200000001
+status: stable
+version: 1.0.0
+description: Detects network (Type 3) or remote interactive (Type 10) logons from non-loopback endpoints.
+references:
+  - https://github.com/SigmaHQ/sigma/tree/master/rules/windows/builtin/security
+tags:
+  - attack.lateral_movement
+  - attack.valid_accounts
+  - attack.t1078
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4624
+    LogonType:
+      - 3
+      - 10
+  filter_local:
+    IpAddress:
+      - '127.0.0.1'
+      - '::1'
+      - '-'
+  condition: selection and not filter_local
+level: low

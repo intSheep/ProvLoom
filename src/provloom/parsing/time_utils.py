@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from provloom.domain.errors import LogParseError
 
@@ -10,7 +10,7 @@ def parse_utc_timestamp(value: object) -> datetime:
         ts = float(value)
         if ts > 1e12:
             ts /= 1000.0
-        return datetime.fromtimestamp(ts, tz=timezone.utc)
+        return datetime.fromtimestamp(ts, tz=UTC)
 
     if not isinstance(value, str) or not value.strip():
         raise LogParseError(f"Missing or empty timestamp: {value!r}")
@@ -20,7 +20,7 @@ def parse_utc_timestamp(value: object) -> datetime:
         ts = float(raw)
         if ts > 1e12:
             ts /= 1000.0
-        return datetime.fromtimestamp(ts, tz=timezone.utc)
+        return datetime.fromtimestamp(ts, tz=UTC)
 
     iso_candidate = raw[:-1] + "+00:00" if raw.endswith("Z") else raw
     try:
@@ -36,5 +36,5 @@ def parse_utc_timestamp(value: object) -> datetime:
             raise LogParseError(f"Unsupported timestamp format: {raw!r}") from None
 
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc)
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)

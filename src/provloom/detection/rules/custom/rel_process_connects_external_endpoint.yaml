@@ -1,0 +1,23 @@
+rule_type: provloom_custom
+rule_id: custom-rel-proc-connects-external
+rule_name: Scripting Process Deterministic External Connection
+version: "1.0.0"
+description: Detects a resolved scripting interpreter process with a verified DETERMINISTIC CONNECTS_TO edge to a network endpoint.
+severity: high
+attack_tags:
+  - attack.command_and_control
+  - attack.t1071
+logsource:
+  category: provenance_graph
+  product: provloom
+detection_type: RELATION
+relation_spec:
+  src_entity_type: PROCESS
+  relation_type: CONNECTS_TO
+  dst_entity_type: NETWORK_ENDPOINT
+  deterministic_only: true
+  min_evidence_count: 1
+  src_predicates:
+    - field: display_label
+      op: regex
+      value: '(powershell|pwsh|cmd|wscript|cscript|curl|wget)\.exe'

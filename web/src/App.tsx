@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ConsoleShell } from "./components/layout/ConsoleShell";
 import { ApiPlaygroundPage } from "./pages/ApiPlaygroundPage";
+import { DetectionPage } from "./pages/DetectionPage";
 import { EntityInspectorPage } from "./pages/EntityInspectorPage";
 import { IngestionDebugPage } from "./pages/IngestionDebugPage";
 import { OcsfExplorerPage } from "./pages/OcsfExplorerPage";
@@ -49,6 +50,7 @@ export function App() {
                   </Suspense>
                 }
               />
+              <Route path="/detection" element={<DetectionPage />} />
               <Route path="/playground" element={<ApiPlaygroundPage />} />
               <Route path="*" element={<Navigate to="/overview" replace />} />
             </Route>

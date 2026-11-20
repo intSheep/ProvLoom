@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from provloom.domain.common import AccessScope, PageSpec, TimeRange
@@ -19,8 +19,8 @@ class DomainContractTests(unittest.TestCase):
         self.assertTrue(unrestricted.permits_source("zeek"))
 
     def test_time_range_requires_utc_and_valid_bounds(self) -> None:
-        t1 = datetime(2026, 11, 18, 8, 0, tzinfo=timezone.utc)
-        t2 = datetime(2026, 11, 18, 9, 0, tzinfo=timezone.utc)
+        t1 = datetime(2026, 11, 18, 8, 0, tzinfo=UTC)
+        t2 = datetime(2026, 11, 18, 9, 0, tzinfo=UTC)
         tr = TimeRange(start_time=t1, end_time=t2)
         self.assertEqual(tr.start_time, t1)
 
