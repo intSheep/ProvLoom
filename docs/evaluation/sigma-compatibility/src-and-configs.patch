@@ -1,0 +1,2585 @@
+diff --git a/configs/mappings/app_api_activity_6003.yaml b/configs/mappings/app_api_activity_6003.yaml
+index 7d61c31..286b646 100644
+--- a/configs/mappings/app_api_activity_6003.yaml
++++ b/configs/mappings/app_api_activity_6003.yaml
+@@ -1,6 +1,6 @@
+ rule_id: app_api_activity_6003
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: app
+   event_code: api_call
+@@ -13,7 +13,7 @@ fields:
+   device.hostname: hostname
+   actor.user.name: username
+   actor.user.domain: domain
+-  service.name: service_name
+-  service.port: listen_port
++  api.service.name: service_name
++  unmapped.listen_port: listen_port
+   api.operation: operation
+   src_endpoint.ip: src_ip
+diff --git a/configs/mappings/app_lifecycle_6002.yaml b/configs/mappings/app_lifecycle_6002.yaml
+index 3262026..2ac75bb 100644
+--- a/configs/mappings/app_lifecycle_6002.yaml
++++ b/configs/mappings/app_lifecycle_6002.yaml
+@@ -1,6 +1,6 @@
+ rule_id: app_lifecycle_6002
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: app
+   event_code: service_start
+@@ -12,5 +12,5 @@ fields:
+   metadata.original_uid: event_uid
+   device.hostname: hostname
+   app.name: service_name
+-  service.name: service_name
+-  service.port: listen_port
++  unmapped.service_name: service_name
++  unmapped.listen_port: listen_port
+diff --git a/configs/mappings/app_web_resource_6001.yaml b/configs/mappings/app_web_resource_6001.yaml
+index 9eca376..e68f6d2 100644
+--- a/configs/mappings/app_web_resource_6001.yaml
++++ b/configs/mappings/app_web_resource_6001.yaml
+@@ -1,6 +1,6 @@
+ rule_id: app_web_resource_6001
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: app
+   event_code: web_access
+@@ -13,7 +13,7 @@ fields:
+   device.hostname: hostname
+   actor.user.name: username
+   actor.user.domain: domain
+-  service.name: service_name
+-  service.port: listen_port
+-  web_resources.path: resource_path
++  unmapped.service_name: service_name
++  unmapped.listen_port: listen_port
++  web_resources.url_string: resource_path
+   src_endpoint.ip: src_ip
+diff --git a/configs/mappings/asset_inventory_5001.yaml b/configs/mappings/asset_inventory_5001.yaml
+index 203c31b..007e9f1 100644
+--- a/configs/mappings/asset_inventory_5001.yaml
++++ b/configs/mappings/asset_inventory_5001.yaml
+@@ -1,6 +1,6 @@
+ rule_id: asset_inventory_5001
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: asset
+   event_code: inventory
+@@ -14,10 +14,10 @@ fields:
+   device.hostname: hostname
+   device.ip: ip
+   device.os.name: os
+-  device.is_nat_shared: is_nat_shared
+-  device.valid_from: valid_from
+-  device.valid_to: valid_to
+-  container.uid: container_id
+-  container.runtime: runtime
+-  service.name: service_name
+-  service.port: listen_port
++  unmapped.is_nat_shared: is_nat_shared
++  unmapped.valid_from: valid_from
++  unmapped.valid_to: valid_to
++  unmapped.container_id: container_id
++  unmapped.runtime: runtime
++  unmapped.service_name: service_name
++  unmapped.listen_port: listen_port
+diff --git a/configs/mappings/auth_logon_3002.yaml b/configs/mappings/auth_logon_3002.yaml
+index d8064ba..90dda9f 100644
+--- a/configs/mappings/auth_logon_3002.yaml
++++ b/configs/mappings/auth_logon_3002.yaml
+@@ -1,6 +1,6 @@
+ rule_id: auth_logon_3002
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: auth
+   event_code: "4624"
+diff --git a/configs/mappings/firewall_flow_4001.yaml b/configs/mappings/firewall_flow_4001.yaml
+index 84638cb..a3870e6 100644
+--- a/configs/mappings/firewall_flow_4001.yaml
++++ b/configs/mappings/firewall_flow_4001.yaml
+@@ -1,6 +1,6 @@
+ rule_id: firewall_flow_4001
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: firewall
+   event_code: flow
+diff --git a/configs/mappings/sysmon_dns_4003.yaml b/configs/mappings/sysmon_dns_4003.yaml
+index 451114d..a923b23 100644
+--- a/configs/mappings/sysmon_dns_4003.yaml
++++ b/configs/mappings/sysmon_dns_4003.yaml
+@@ -1,6 +1,6 @@
+ rule_id: sysmon_dns_4003
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: sysmon
+   event_code: "22"
+@@ -15,4 +15,4 @@ fields:
+   actor.process.pid: ProcessId
+   actor.process.file.path: Image
+   query.hostname: QueryName
+-  answers: QueryResults
++  answers.rdata: QueryResults
+diff --git a/configs/mappings/sysmon_file_create_1001.yaml b/configs/mappings/sysmon_file_create_1001.yaml
+index 313755c..b5c4d40 100644
+--- a/configs/mappings/sysmon_file_create_1001.yaml
++++ b/configs/mappings/sysmon_file_create_1001.yaml
+@@ -1,6 +1,6 @@
+ rule_id: sysmon_file_create_1001
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: sysmon
+   event_code: "11"
+@@ -16,4 +16,4 @@ fields:
+   actor.process.pid: ProcessId
+   actor.process.file.path: Image
+   file.path: TargetFilename
+-  file.hashes.sha256: sha256
++  file.hashes.value: sha256
+diff --git a/configs/mappings/sysmon_file_read_1001.yaml b/configs/mappings/sysmon_file_read_1001.yaml
+index f22a7d2..39c899c 100644
+--- a/configs/mappings/sysmon_file_read_1001.yaml
++++ b/configs/mappings/sysmon_file_read_1001.yaml
+@@ -1,6 +1,6 @@
+ rule_id: sysmon_file_read_1001
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: sysmon
+   event_code: file_read
+@@ -15,4 +15,4 @@ fields:
+   actor.process.pid: ProcessId
+   actor.process.file.path: Image
+   file.path: TargetFilename
+-  file.hashes.sha256: sha256
++  file.hashes.value: sha256
+diff --git a/configs/mappings/sysmon_network_connect_4001.yaml b/configs/mappings/sysmon_network_connect_4001.yaml
+index 697678d..0421270 100644
+--- a/configs/mappings/sysmon_network_connect_4001.yaml
++++ b/configs/mappings/sysmon_network_connect_4001.yaml
+@@ -1,6 +1,6 @@
+ rule_id: sysmon_network_connect_4001
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: sysmon
+   event_code: "3"
+diff --git a/configs/mappings/sysmon_process_create_1007.yaml b/configs/mappings/sysmon_process_create_1007.yaml
+index 6fd4d22..0669f1f 100644
+--- a/configs/mappings/sysmon_process_create_1007.yaml
++++ b/configs/mappings/sysmon_process_create_1007.yaml
+@@ -1,6 +1,6 @@
+ rule_id: sysmon_process_create_1007
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: sysmon
+   event_code: "1"
+diff --git a/configs/mappings/sysmon_process_terminate_1007.yaml b/configs/mappings/sysmon_process_terminate_1007.yaml
+index d8f443d..83952d4 100644
+--- a/configs/mappings/sysmon_process_terminate_1007.yaml
++++ b/configs/mappings/sysmon_process_terminate_1007.yaml
+@@ -1,6 +1,6 @@
+ rule_id: sysmon_process_terminate_1007
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: sysmon
+   event_code: "5"
+diff --git a/configs/mappings/zeek_conn_4001.yaml b/configs/mappings/zeek_conn_4001.yaml
+index d06be34..c9e484f 100644
+--- a/configs/mappings/zeek_conn_4001.yaml
++++ b/configs/mappings/zeek_conn_4001.yaml
+@@ -1,6 +1,6 @@
+ rule_id: zeek_conn_4001
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: zeek_json
+   event_code: conn
+diff --git a/configs/mappings/zeek_dns_4003.yaml b/configs/mappings/zeek_dns_4003.yaml
+index f642567..57543e8 100644
+--- a/configs/mappings/zeek_dns_4003.yaml
++++ b/configs/mappings/zeek_dns_4003.yaml
+@@ -1,6 +1,6 @@
+ rule_id: zeek_dns_4003
+ rule_version: "1.0.0"
+-ocsf_version: "1.3.0"
++ocsf_version: "1.4.0"
+ match:
+   parser_id: zeek_json
+   event_code: dns
+@@ -16,5 +16,5 @@ fields:
+   dst_endpoint.port: id.resp_p
+   connection_info.protocol_name: proto
+   query.hostname: query
+-  answers: answers
++  answers.rdata: answers
+   rcode: rcode_name
+diff --git a/configs/settings.example.yaml b/configs/settings.example.yaml
+index 03589f3..16878f9 100644
+--- a/configs/settings.example.yaml
++++ b/configs/settings.example.yaml
+@@ -6,7 +6,7 @@ database:
+   echo_sql: false
+ 
+ ocsf:
+-  version: "1.3.0"
++  version: "1.4.0"
+   mappings_dir: configs/mappings
+ 
+ correlation:
+diff --git a/src/provloom/api/static/index.html b/src/provloom/api/static/index.html
+index 1ecb0b4..683b051 100644
+--- a/src/provloom/api/static/index.html
++++ b/src/provloom/api/static/index.html
+@@ -147,7 +147,7 @@
+         <!-- 3. OCSF Event Explorer -->
+         <section id="tab-events" class="view-panel" hidden>
+           <div class="panel-header">
+-            <h2>OCSF v1.3.0 事件检索与映射对照</h2>
++            <h2>OCSF v1.4.0 事件检索与映射对照</h2>
+             <div class="filter-bar">
+               <select id="flt-event-class" aria-label="OCSF Class Filter">
+                 <option value="">全部 OCSF Class</option>
+diff --git a/src/provloom/config.py b/src/provloom/config.py
+index b7c87e9..ae76263 100644
+--- a/src/provloom/config.py
++++ b/src/provloom/config.py
+@@ -32,7 +32,7 @@ class DetectionConfig:
+ class AppConfig:
+     env: str = "development"
+     database_url: str = "postgresql+psycopg://provloom:provloom@localhost:5432/provloom"
+-    ocsf_version: str = "1.3.0"
++    ocsf_version: str = "1.4.0"
+     mappings_dir: str = "configs/mappings"
+     default_tenant: str = "default"
+     query_guards: QueryGuardConfig = QueryGuardConfig()
+diff --git a/src/provloom/detection/compiler/__init__.py b/src/provloom/detection/compiler/__init__.py
+index f5a67e0..5025108 100644
+--- a/src/provloom/detection/compiler/__init__.py
++++ b/src/provloom/detection/compiler/__init__.py
+@@ -2,6 +2,7 @@ from __future__ import annotations
+ 
+ from provloom.detection.compiler.ocsf_pipeline import (
+     KNOWN_OCSF_V13_FIELDS,
++    KNOWN_OCSF_V14_FIELDS,
+     apply_ocsf_pipeline,
+     build_provloom_ocsf_pipeline,
+     evaluate_data_coverage,
+@@ -17,6 +18,7 @@ from provloom.detection.compiler.sigma_parser import ParsedRuleEnvelope, parse_r
+ 
+ __all__ = [
+     "KNOWN_OCSF_V13_FIELDS",
++    "KNOWN_OCSF_V14_FIELDS",
+     "CompiledEventQuery",
+     "CompiledRuleArtifact",
+     "ParsedRuleEnvelope",
+diff --git a/src/provloom/detection/compiler/ocsf_pipeline.py b/src/provloom/detection/compiler/ocsf_pipeline.py
+index 0ba6106..e3d234f 100644
+--- a/src/provloom/detection/compiler/ocsf_pipeline.py
++++ b/src/provloom/detection/compiler/ocsf_pipeline.py
+@@ -1,7 +1,15 @@
+ from __future__ import annotations
+ 
+ from collections.abc import Sequence
++from dataclasses import dataclass
++from typing import Any, ClassVar
+ 
++from sigma.conditions import (
++    ConditionAND,
++    ConditionItem,
++    ConditionNOT,
++)
++from sigma.exceptions import SigmaRuleLocation
+ from sigma.pipelines.ocsf.ocsf import ocsf_pipeline as upstream_ocsf_pipeline
+ from sigma.processing.conditions import (
+     LogsourceCondition,
+@@ -14,18 +22,23 @@ from sigma.processing.transformations import (
+     AddConditionTransformation,
+     FieldMappingTransformation,
+ )
++from sigma.processing.transformations.base import DetectionItemTransformation
+ from sigma.rule import SigmaRule
++from sigma.rule.detection import SigmaDetection, SigmaDetectionItem, SigmaDetections
++from sigma.types import SigmaExists, SigmaNull, SigmaNumber, SigmaString
+ 
+ from provloom.normalization.interfaces import MappingSpecSummary
+ 
+-# Canonical OCSF v1.3.0 fields supported by the SQL Detection Backend.
+-KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
++# Canonical OCSF v1.4.0 scalar fields supported by the SQL Detection Backend
++# (pinned to ocsf/ocsf-schema tag 1.4.0, commit 6109cc5e834c1adfee67dda6c9bcfa5e37f79012).
++KNOWN_OCSF_V14_FIELDS: frozenset[str] = frozenset(
+     {
+         # Top-level / envelope attributes
+         "class_uid",
+         "category_uid",
+         "activity_id",
+         "type_uid",
++        "severity_id",
+         "source_id",
+         "ocsf_version",
+         "original_event_uid",
+@@ -35,15 +48,21 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
+         "metadata.log_name",
+         "metadata.log_provider",
+         "unmapped.EventID",
+-        # Device / Host / Asset (1007, 1001, 4001, 5001, 600x)
++        "unmapped.is_nat_shared",
++        "unmapped.valid_from",
++        "unmapped.valid_to",
++        "unmapped.container_id",
++        "unmapped.runtime",
++        "unmapped.service_name",
++        "unmapped.listen_port",
++        # Device / Host / Container
+         "device.uid",
+         "device.hostname",
+         "device.ip",
+         "device.os.name",
+-        "device.is_nat_shared",
+         "container.uid",
+         "container.runtime",
+-        # Actor & Process (1007, 1001, 4001, 4003)
++        # Actor & Process (1007, 1001, 1009, 4001, 4003)
+         "actor.user.name",
+         "actor.user.domain",
+         "actor.user.uid",
+@@ -60,7 +79,9 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
+         "process.file.name",
+         "process.file.desc",
+         "process.file.internal_name",
+-        "process.file.hashes.sha256",
++        "process.file.hashes.algorithm_id",
++        "process.file.hashes.algorithm",
++        "process.file.hashes.value",
+         "process.parent_process.uid",
+         "process.parent_process.pid",
+         "process.parent_process.cmd_line",
+@@ -70,9 +91,14 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
+         "file.path",
+         "file.name",
+         "file.created_time",
+-        "file.hashes.sha256",
+-        "file_result.file.path",
+-        "file_result.file.name",
++        "file.hashes.algorithm_id",
++        "file.hashes.algorithm",
++        "file.hashes.value",
++        # Script Activity (1009) — script_content is long_string object; text is in .value
++        "script.script_content.value",
++        "script.file.path",
++        "script.uid",
++        "script.name",
+         # Network & Firewall (4001)
+         "src_endpoint.ip",
+         "src_endpoint.port",
+@@ -85,34 +111,47 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
+         "disposition",
+         "traffic.bytes_in",
+         "traffic.bytes_out",
+-        # DNS Activity (4003)
++        # DNS Activity (4003) — answers is dns_answer[]; answer value is in .rdata
+         "query.hostname",
+         "query.type",
+-        "answers",
++        "answers.rdata",
+         "rcode",
+         # Authentication / IAM (3002)
+         "user.uid",
+         "user.name",
+         "user.domain",
+         "logon_type_id",
+-        # Service & Application Activity (6001, 6002, 6003)
+         "service.name",
+-        "service.port",
++        # Application Activity (6001, 6002, 6003)
+         "app.name",
+         "api.operation",
+-        "web_resources.path",
+-        # PowerShell / Script / Registry / Service extensions
+-        "script.script_content",
+-        "script.file.path",
++        "api.service.name",
++        "web_resources.url_string",
++        # Windows Registry / Service extensions
+         "reg_key.path",
+         "win_service.name",
+         "win_service.cmd_line",
+     }
+ )
+ 
+-ARRAY_OCSF_FIELDS: frozenset[str] = frozenset({"answers"})
++# Historical alias retained for external imports.
++KNOWN_OCSF_V13_FIELDS: frozenset[str] = KNOWN_OCSF_V14_FIELDS
++
++# OCSF object-array fields: field_path -> (array_path, leaf_attr, allow_legacy_str)
++# allow_legacy_str=True on answers.rdata is a historical compatibility path for
++# pre-1.4.0 string-array/scalar DNS answers before tenant replay.
++OBJECT_ARRAY_OCSF_FIELDS: dict[str, tuple[tuple[str, ...], str, bool]] = {
++    "answers.rdata": (("answers",), "rdata", True),
++    "file.hashes.algorithm_id": (("file", "hashes"), "algorithm_id", False),
++    "file.hashes.algorithm": (("file", "hashes"), "algorithm", False),
++    "file.hashes.value": (("file", "hashes"), "value", False),
++    "process.file.hashes.algorithm_id": (("process", "file", "hashes"), "algorithm_id", False),
++    "process.file.hashes.algorithm": (("process", "file", "hashes"), "algorithm", False),
++    "process.file.hashes.value": (("process", "file", "hashes"), "value", False),
++    "web_resources.url_string": (("web_resources",), "url_string", False),
++}
+ 
+-# Default field coverage from ProvLoom's built-in OCSF v1.3.0 YAML mappings by class_uid.
++# Default field coverage from ProvLoom's built-in OCSF v1.4.0 YAML mappings by class_uid.
+ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
+     1001: frozenset(
+         {
+@@ -127,7 +166,9 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
+             "actor.process.pid",
+             "actor.process.file.path",
+             "file.path",
+-            "file.hashes.sha256",
++            "file.hashes.algorithm_id",
++            "file.hashes.algorithm",
++            "file.hashes.value",
+             "unmapped.EventID",
+         }
+     ),
+@@ -208,7 +249,7 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
+             "dst_endpoint.port",
+             "connection_info.protocol_name",
+             "query.hostname",
+-            "answers",
++            "answers.rdata",
+             "rcode",
+             "unmapped.EventID",
+         }
+@@ -224,11 +265,13 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
+             "device.hostname",
+             "device.ip",
+             "device.os.name",
+-            "device.is_nat_shared",
+-            "container.uid",
+-            "container.runtime",
+-            "service.name",
+-            "service.port",
++            "unmapped.is_nat_shared",
++            "unmapped.valid_from",
++            "unmapped.valid_to",
++            "unmapped.container_id",
++            "unmapped.runtime",
++            "unmapped.service_name",
++            "unmapped.listen_port",
+         }
+     ),
+     6001: frozenset(
+@@ -241,10 +284,10 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
+             "device.hostname",
+             "actor.user.name",
+             "actor.user.domain",
+-            "service.name",
+-            "service.port",
+-            "web_resources.path",
++            "web_resources.url_string",
+             "src_endpoint.ip",
++            "unmapped.service_name",
++            "unmapped.listen_port",
+         }
+     ),
+     6002: frozenset(
+@@ -256,8 +299,8 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
+             "metadata.original_uid",
+             "device.hostname",
+             "app.name",
+-            "service.name",
+-            "service.port",
++            "unmapped.service_name",
++            "unmapped.listen_port",
+         }
+     ),
+     6003: frozenset(
+@@ -270,10 +313,10 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
+             "device.hostname",
+             "actor.user.name",
+             "actor.user.domain",
+-            "service.name",
+-            "service.port",
++            "api.service.name",
+             "api.operation",
+             "src_endpoint.ip",
++            "unmapped.listen_port",
+         }
+     ),
+ }
+@@ -282,6 +325,8 @@ _CATEGORY_TO_OCSF_CONDITION: dict[str, dict[str, int]] = {
+     "process_creation": {"class_uid": 1007, "activity_id": 1},
+     "process_termination": {"class_uid": 1007, "activity_id": 2},
+     "process_access": {"class_uid": 1007, "activity_id": 99},
++    "ps_script": {"class_uid": 1009, "activity_id": 1},
++    "ps_module": {"class_uid": 1009, "activity_id": 1},
+     "file_event": {"class_uid": 1001, "activity_id": 1},
+     "file_access": {"class_uid": 1001, "activity_id": 2},
+     "file_change": {"class_uid": 1001},
+@@ -302,11 +347,117 @@ def _make_fmap(mapping: dict[str, str]) -> dict[str | None, str | list[str]]:
+     return {k: v for k, v in mapping.items()}
+ 
+ 
++_HASH_FIELD_TO_ALGO_ID: dict[str, int] = {
++    "md5": 1,
++    "MD5": 1,
++    "sha1": 2,
++    "SHA1": 2,
++    "sha256": 3,
++    "SHA256": 3,
++    "sha512": 4,
++    "SHA512": 4,
++}
++
++
++class _NegatableSigmaDetection(SigmaDetection):
++    """SigmaDetection subclass that preserves negation for multi-item algorithm+value rewrites."""
++
++    def __init__(
++        self,
++        detection_items: list[SigmaDetectionItem | SigmaDetection],
++        source: SigmaRuleLocation | None = None,
++        item_linking: type[ConditionAND | Any] | None = None,
++        *,
++        negated: bool = False,
++    ) -> None:
++        super().__init__(detection_items=detection_items, source=source, item_linking=item_linking)
++        self.negated = negated
++
++    def postprocess(
++        self,
++        detections: SigmaDetections,
++        parent: SigmaDetection | SigmaDetectionItem | ConditionItem | None = None,
++        source: SigmaRuleLocation | None = None,
++    ) -> ConditionItem | Any | None:
++        cond = super().postprocess(detections, parent, source)
++        if self.negated and cond is not None:
++            not_cond = ConditionNOT([cond])
++            not_cond.parent = parent
++            not_cond.source = self.source
++            cond.parent = not_cond
++            return not_cond
++        return cond
++
++
++@dataclass
++class _ScopedHashAlgorithmTransformation(DetectionItemTransformation):
++    """Expand Sigma hash fields (md5/sha1/sha256/sha512) into (algorithm_id AND value) pairs."""
++
++    prefix: str
++    _HASH_MAP: ClassVar[dict[str, int]] = _HASH_FIELD_TO_ALGO_ID
++
++    def apply_detection_item(
++        self, detection_item: SigmaDetectionItem
++    ) -> SigmaDetection | SigmaDetectionItem | None:
++        orig_field = detection_item.field
++        if orig_field is None or orig_field not in self._HASH_MAP:
++            return detection_item
++
++        alg_id = self._HASH_MAP[orig_field]
++        alg_item = SigmaDetectionItem(
++            field=f"{self.prefix}.algorithm_id",
++            modifiers=[],
++            value=[SigmaNumber(alg_id)],
++            source=detection_item.source,
++            auto_modifiers=False,
++        )
++        vals = list(detection_item.value)
++        if not vals or (len(vals) == 1 and isinstance(vals[0], SigmaNull)):
++            val_item = SigmaDetectionItem(
++                field=f"{self.prefix}.value",
++                modifiers=[],
++                value=[SigmaString("*")],
++                source=detection_item.source,
++                auto_modifiers=False,
++            )
++            negated = not bool(detection_item.negated)
++        elif len(vals) == 1 and isinstance(vals[0], SigmaExists):
++            val_item = SigmaDetectionItem(
++                field=f"{self.prefix}.value",
++                modifiers=[],
++                value=[SigmaExists(True)],
++                source=detection_item.source,
++                auto_modifiers=False,
++            )
++            negated = (not bool(vals[0].exists)) ^ bool(detection_item.negated)
++        else:
++            val_item = SigmaDetectionItem(
++                field=f"{self.prefix}.value",
++                modifiers=[],
++                value=vals,
++                value_linking=detection_item.value_linking,
++                negated=False,
++                source=detection_item.source,
++                auto_modifiers=False,
++            )
++            negated = bool(detection_item.negated)
++
++        if self._pipeline is not None:
++            self._pipeline.field_mappings.setdefault(orig_field, set()).add(f"{self.prefix}.value")
++
++        return _NegatableSigmaDetection(
++            detection_items=[alg_item, val_item],
++            source=detection_item.source,
++            item_linking=ConditionAND,
++            negated=negated,
++        )
++
++
+ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+-    """Composes ProvLoom OCSF v1.3.0 canonical field mappings with pySigma-pipeline-ocsf."""
+-    v13_items: list[ProcessingItem] = [
++    """Composes ProvLoom OCSF v1.4.0 field mappings with sanitized pySigma-pipeline-ocsf."""
++    v14_items: list[ProcessingItem] = [
+         ProcessingItem(
+-            identifier=f"provloom_ocsf_v13_cat_{category}_{field}",
++            identifier=f"provloom_ocsf_v14_cat_{category}_{field}",
+             transformation=AddConditionTransformation({field: val}),
+             rule_conditions=[LogsourceCondition(category=category)],
+         )
+@@ -314,9 +465,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+         for field, val in sorted(cond_map.items())
+     ]
+ 
+-    v13_items.append(
++    v14_items.append(
+         ProcessingItem(
+-            identifier="provloom_ocsf_v13_win_security_auth_class",
++            identifier="provloom_ocsf_v14_win_security_auth_class",
+             transformation=AddConditionTransformation({"class_uid": 3002}),
+             rule_conditions=[
+                 LogsourceCondition(product="windows"),
+@@ -326,9 +477,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+             ],
+         )
+     )
+-    v13_items.append(
++    v14_items.append(
+         ProcessingItem(
+-            identifier="provloom_ocsf_v13_win_security_auth_fail_class",
++            identifier="provloom_ocsf_v14_win_security_auth_fail_class",
+             transformation=AddConditionTransformation({"class_uid": 3002}),
+             rule_conditions=[
+                 LogsourceCondition(product="windows"),
+@@ -357,7 +508,8 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+                 "Hostname": "device.hostname",
+                 "CurrentDirectory": "process.working_directory",
+                 "OriginalFileName": "process.file.internal_name",
+-                "sha256": "process.file.hashes.sha256",
++                "Description": "process.file.desc",
++                "LogonId": "process.session.uid",
+                 "EventID": "unmapped.EventID",
+             },
+         ),
+@@ -388,12 +540,39 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+                 "EventID": "unmapped.EventID",
+             },
+         ),
++        (
++            "ps_script",
++            [LogsourceCondition(category="ps_script")],
++            {
++                "ScriptBlockText": "script.script_content.value",
++                "Path": "script.file.path",
++                "ScriptBlockId": "script.uid",
++                "Computer": "device.hostname",
++                "EventID": "unmapped.EventID",
++            },
++        ),
++        (
++            "ps_module",
++            [LogsourceCondition(category="ps_module")],
++            {
++                "Payload": "script.script_content.value",
++                "Computer": "device.hostname",
++                "EventID": "unmapped.EventID",
++            },
++        ),
+     ]
+ 
++    v14_items.append(
++        ProcessingItem(
++            identifier="provloom_ocsf_v14_hashes_process_creation",
++            transformation=_ScopedHashAlgorithmTransformation(prefix="process.file.hashes"),
++            rule_conditions=[LogsourceCondition(category="process_creation")],
++        )
++    )
+     for ident, conds, fmap in category_field_maps:
+-        v13_items.append(
++        v14_items.append(
+             ProcessingItem(
+-                identifier=f"provloom_ocsf_v13_fields_{ident}",
++                identifier=f"provloom_ocsf_v14_fields_{ident}",
+                 transformation=FieldMappingTransformation(_make_fmap(fmap)),
+                 rule_conditions=conds,
+             )
+@@ -407,22 +586,28 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+         "Computer": "device.hostname",
+         "TargetFilename": "file.path",
+         "FileName": "file.path",
+-        "sha256": "file.hashes.sha256",
+         "EventID": "unmapped.EventID",
+     }
+     for file_cat in ("file_event", "file_access", "file_change", "file_delete"):
+-        v13_items.append(
++        v14_items.append(
++            ProcessingItem(
++                identifier=f"provloom_ocsf_v14_hashes_{file_cat}",
++                transformation=_ScopedHashAlgorithmTransformation(prefix="file.hashes"),
++                rule_conditions=[LogsourceCondition(category=file_cat)],
++            )
++        )
++        v14_items.append(
+             ProcessingItem(
+-                identifier=f"provloom_ocsf_v13_fields_{file_cat}",
++                identifier=f"provloom_ocsf_v14_fields_{file_cat}",
+                 transformation=FieldMappingTransformation(_make_fmap(file_fmap)),
+                 rule_conditions=[LogsourceCondition(category=file_cat)],
+             )
+         )
+ 
+     for net_cat in ("network_connection", "firewall"):
+-        v13_items.append(
++        v14_items.append(
+             ProcessingItem(
+-                identifier=f"provloom_ocsf_v13_fields_{net_cat}",
++                identifier=f"provloom_ocsf_v14_fields_{net_cat}",
+                 transformation=FieldMappingTransformation(
+                     _make_fmap(
+                         {
+@@ -455,9 +640,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+         )
+ 
+     for dns_cat in ("dns", "dns_query"):
+-        v13_items.append(
++        v14_items.append(
+             ProcessingItem(
+-                identifier=f"provloom_ocsf_v13_fields_{dns_cat}",
++                identifier=f"provloom_ocsf_v14_fields_{dns_cat}",
+                 transformation=FieldMappingTransformation(
+                     _make_fmap(
+                         {
+@@ -467,9 +652,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+                             "Computer": "device.hostname",
+                             "QueryName": "query.hostname",
+                             "query": "query.hostname",
+-                            "QueryResults": "answers",
+-                            "answers": "answers",
+-                            "answer": "answers",
++                            "QueryResults": "answers.rdata",
++                            "answers": "answers.rdata",
++                            "answer": "answers.rdata",
+                             "rcode_name": "rcode",
+                             "record_type": "query.type",
+                             "SourceIp": "src_endpoint.ip",
+@@ -495,16 +680,16 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+         "ServiceName": "service.name",
+         "EventID": "unmapped.EventID",
+     }
+-    v13_items.append(
++    v14_items.append(
+         ProcessingItem(
+-            identifier="provloom_ocsf_v13_fields_authentication",
++            identifier="provloom_ocsf_v14_fields_authentication",
+             transformation=FieldMappingTransformation(auth_map),
+             rule_conditions=[LogsourceCondition(category="authentication")],
+         )
+     )
+-    v13_items.append(
++    v14_items.append(
+         ProcessingItem(
+-            identifier="provloom_ocsf_v13_fields_windows_security",
++            identifier="provloom_ocsf_v14_fields_windows_security",
+             transformation=FieldMappingTransformation(auth_map),
+             rule_conditions=[
+                 LogsourceCondition(product="windows"),
+@@ -514,20 +699,19 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+     )
+ 
+     for web_cat in ("webserver", "web_access"):
+-        v13_items.append(
++        v14_items.append(
+             ProcessingItem(
+-                identifier=f"provloom_ocsf_v13_fields_{web_cat}",
++                identifier=f"provloom_ocsf_v14_fields_{web_cat}",
+                 transformation=FieldMappingTransformation(
+                     _make_fmap(
+                         {
+-                            "cs-uri-stem": "web_resources.path",
+-                            "cs-uri": "web_resources.path",
+-                            "resource_path": "web_resources.path",
++                            "cs-uri-stem": "web_resources.url_string",
++                            "cs-uri": "web_resources.url_string",
++                            "resource_path": "web_resources.url_string",
+                             "c-ip": "src_endpoint.ip",
+                             "src_ip": "src_endpoint.ip",
+                             "username": "actor.user.name",
+                             "hostname": "device.hostname",
+-                            "service_name": "service.name",
+                         }
+                     )
+                 ),
+@@ -535,57 +719,92 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+             )
+         )
+ 
+-    for app_cat in ("application", "api_activity"):
+-        v13_items.append(
+-            ProcessingItem(
+-                identifier=f"provloom_ocsf_v13_fields_{app_cat}",
+-                transformation=FieldMappingTransformation(
+-                    _make_fmap(
+-                        {
+-                            "operation": "api.operation",
+-                            "service_name": "service.name",
+-                            "username": "actor.user.name",
+-                            "domain": "actor.user.domain",
+-                            "hostname": "device.hostname",
+-                            "src_ip": "src_endpoint.ip",
+-                            "EventID": "unmapped.EventID",
+-                        }
+-                    )
+-                ),
+-                rule_conditions=[LogsourceCondition(category=app_cat)],
+-            )
++    v14_items.append(
++        ProcessingItem(
++            identifier="provloom_ocsf_v14_fields_application",
++            transformation=FieldMappingTransformation(
++                _make_fmap(
++                    {
++                        "service_name": "app.name",
++                        "hostname": "device.hostname",
++                        "EventID": "unmapped.EventID",
++                    }
++                )
++            ),
++            rule_conditions=[LogsourceCondition(category="application")],
++        )
++    )
++    v14_items.append(
++        ProcessingItem(
++            identifier="provloom_ocsf_v14_fields_api_activity",
++            transformation=FieldMappingTransformation(
++                _make_fmap(
++                    {
++                        "operation": "api.operation",
++                        "service_name": "api.service.name",
++                        "username": "actor.user.name",
++                        "domain": "actor.user.domain",
++                        "hostname": "device.hostname",
++                        "src_ip": "src_endpoint.ip",
++                        "EventID": "unmapped.EventID",
++                    }
++                )
++            ),
++            rule_conditions=[LogsourceCondition(category="api_activity")],
+         )
++    )
+ 
+-    # Layer sanitized upstream pySigma-pipeline-ocsf items for additional categories.
++    # Layer sanitized upstream pySigma-pipeline-ocsf items only for unhandled categories,
++    # excluding upstream collisions and non-OCSF-v1.4.0 paths.
+     upstream: ProcessingPipeline = upstream_ocsf_pipeline()
+     upstream._clear_pipeline()
+     handled_categories = set(_CATEGORY_TO_OCSF_CONDITION.keys())
++    invalid_upstream_pairs: frozenset[tuple[str, str]] = frozenset(
++        {
++            ("Image", "reg_key.path"),
++            ("Image", "file.name"),
++            ("Image", "query.hostname"),
++            ("ParentImage", "file.name"),
++            ("ScriptBlockText", "script.script_content"),
++            ("Payload", "script.script_content"),
++            ("answer", "answer.rdata"),
++        }
++    )
+     sanitized_upstream_items: list[ProcessingItem] = []
+     for item in upstream.items:
+         ident = item.identifier or ""
++        r_conds = (
++            list(item.rule_conditions.values())
++            if isinstance(item.rule_conditions, dict)
++            else list(item.rule_conditions)
++        )
++        cat_conds = [
++            c.category
++            for c in r_conds
++            if isinstance(c, LogsourceCondition) and c.category is not None
++        ]
+         if isinstance(item.transformation, AddConditionTransformation):
+-            cat_conds = [
+-                c.category
+-                for c in item.rule_conditions
+-                if isinstance(c, LogsourceCondition) and c.category is not None
+-            ]
+             if any(c in handled_categories for c in cat_conds):
+                 continue
+             if ident.startswith("ocsf_windows_security_"):
+                 continue
+             sanitized_upstream_items.append(item)
+         elif isinstance(item.transformation, FieldMappingTransformation):
++            if any(c in handled_categories for c in cat_conds):
++                continue
++            if ident == "ocsf_field_mappings_windows_security":
++                continue
+             cleaned_map: dict[str | None, str | list[str]] = {
+                 src: dst
+                 for src, dst in item.transformation.mapping.items()
+-                if isinstance(dst, str) and src != dst and not dst.startswith("unmapped.")
++                if isinstance(src, str)
++                and isinstance(dst, str)
++                and src != dst
++                and not dst.startswith("unmapped.")
++                and dst in KNOWN_OCSF_V14_FIELDS
++                and (src, dst) not in invalid_upstream_pairs
+             }
+             if cleaned_map:
+-                r_conds = (
+-                    list(item.rule_conditions.values())
+-                    if isinstance(item.rule_conditions, dict)
+-                    else list(item.rule_conditions)
+-                )
+                 d_conds = (
+                     list(item.detection_item_conditions.values())
+                     if isinstance(item.detection_item_conditions, dict)
+@@ -607,9 +826,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
+                 )
+ 
+     return ProcessingPipeline(
+-        name="ProvLoom OCSF v1.3.0 Pipeline",
++        name="ProvLoom OCSF v1.4.0 Pipeline",
+         priority=10,
+-        items=v13_items + sanitized_upstream_items,
++        items=v14_items + sanitized_upstream_items,
+     )
+ 
+ 
+@@ -645,6 +864,7 @@ def evaluate_data_coverage(
+         "category_uid",
+         "activity_id",
+         "type_uid",
++        "severity_id",
+         "source_id",
+         "ocsf_version",
+         "original_event_uid",
+diff --git a/src/provloom/detection/compiler/postgres_backend.py b/src/provloom/detection/compiler/postgres_backend.py
+index f8631a0..c38e9a2 100644
+--- a/src/provloom/detection/compiler/postgres_backend.py
++++ b/src/provloom/detection/compiler/postgres_backend.py
+@@ -20,6 +20,7 @@ from sigma.types import (
+     SigmaCasedString,
+     SigmaCompareExpression,
+     SigmaExists,
++    SigmaExpansion,
+     SigmaNull,
+     SigmaNumber,
+     SigmaRegularExpression,
+@@ -51,8 +52,8 @@ from sqlalchemy.dialects import postgresql
+ from sqlalchemy.dialects.postgresql import JSONB
+ 
+ from provloom.detection.compiler.ocsf_pipeline import (
+-    ARRAY_OCSF_FIELDS,
+-    KNOWN_OCSF_V13_FIELDS,
++    KNOWN_OCSF_V14_FIELDS,
++    OBJECT_ARRAY_OCSF_FIELDS,
+     apply_ocsf_pipeline,
+     evaluate_data_coverage,
+ )
+@@ -143,7 +144,7 @@ class _ParamCounter:
+ def _validate_ocsf_field(field: str) -> None:
+     if not _SAFE_OCSF_FIELD_RE.match(field):
+         raise ValueError(f"Unsafe field identifier: {field!r}")
+-    if field not in KNOWN_OCSF_V13_FIELDS:
++    if field not in KNOWN_OCSF_V14_FIELDS:
+         raise ValueError(f"Unmapped or unsupported OCSF field: {field!r}")
+ 
+ 
+@@ -165,7 +166,9 @@ def _extract_text_expr(field: str, dialect_name: str) -> ColumnElement[Any]:
+ 
+     parts = field.split(".")
+     if dialect_name == "postgresql":
+-        return normalized_events.c.ocsf_payload.op("#>>")(postgresql.array(parts))
++        return normalized_events.c.ocsf_payload.op("#>>", return_type=String)(
++            postgresql.array(parts)
++        )
+     json_path = "$." + ".".join(parts)
+     return cast(func.json_extract(normalized_events.c.ocsf_payload, json_path), String)
+ 
+@@ -182,7 +185,9 @@ def _extract_numeric_expr(field: str, dialect_name: str) -> ColumnElement[Any]:
+ 
+     parts = field.split(".")
+     if dialect_name == "postgresql":
+-        txt = normalized_events.c.ocsf_payload.op("#>>")(postgresql.array(parts))
++        txt = normalized_events.c.ocsf_payload.op("#>>", return_type=String)(
++            postgresql.array(parts)
++        )
+         return case(
+             (txt.op("~")(r"^-?[0-9]+(\.[0-9]+)?$"), cast(txt, Numeric)),
+             else_=None,
+@@ -256,6 +261,67 @@ def _sigma_string_to_sql(
+     )
+ 
+ 
++_LEADING_INLINE_FLAGS_RE = re.compile(r"^\(\?([iIms]+)\)")
++_PG_SINGLE_ATOM_DUP_RE = re.compile(
++    r"(\[(?:\^)?(?:\\.|[^\]\\])*\]|\\[A-Za-z0-9_.^$*+?()\[\]{}|\\-]|(?<!\\)\.|[A-Za-z0-9_/-])\{(\d+),(\d+)\}"
++)
++_PG_UNESCAPED_DUP_RE = re.compile(r"(?<!\\)\{(\d+)(?:,(\d*))?\}")
++
++
++def _normalize_postgres_regex(
++    pattern: str,
++    ignore_case: bool,
++    multiline: bool,
++    dotall: bool,
++) -> tuple[str, bool]:
++    # Merge leading (?ims) flags so PostgreSQL POSIX ARE never sees two (?...) directors.
++    while True:
++        m = _LEADING_INLINE_FLAGS_RE.match(pattern)
++        if m is None:
++            break
++        fl = m.group(1)
++        if "i" in fl.lower():
++            ignore_case = True
++        if "m" in fl:
++            multiline = True
++        if "s" in fl:
++            dotall = True
++        pattern = pattern[m.end() :]
++
++    # PostgreSQL POSIX ARE enforces DUPMAX=255 on {m,n}; decompose single-char/class atoms safely.
++    def _split_dup(match: re.Match[str]) -> str:
++        atom = match.group(1)
++        lo = int(match.group(2))
++        hi = int(match.group(3))
++        if hi <= 255 or lo > hi or hi > 4096:
++            return match.group(0)
++        parts_out: list[str] = []
++        qm, rm = divmod(lo, 255)
++        parts_out.extend([f"{atom}{{255}}"] * qm)
++        if rm > 0:
++            parts_out.append(f"{atom}{{{rm}}}")
++        qo, ro = divmod(hi - lo, 255)
++        parts_out.extend([f"{atom}{{0,255}}"] * qo)
++        if ro > 0:
++            parts_out.append(f"{atom}{{0,{ro}}}")
++        return "".join(parts_out) or f"{atom}{{0}}"
++
++    pattern = _PG_SINGLE_ATOM_DUP_RE.sub(_split_dup, pattern)
++    for dup_m in _PG_UNESCAPED_DUP_RE.finditer(pattern):
++        b1 = int(dup_m.group(1))
++        b2 = int(dup_m.group(2)) if dup_m.group(2) else 0
++        if b1 > 255 or b2 > 255:
++            raise ValueError(f"PostgreSQL POSIX regex repetition count exceeds 255 in {pattern!r}")
++
++    prefix = ""
++    if multiline and dotall:
++        prefix = "(?p)"
++    elif multiline:
++        prefix = "(?m)"
++    # Note: PostgreSQL ARE defaults to '.' matching newlines when (?m)/(?n) is absent.
++    return (prefix + pattern, ignore_case)
++
++
+ def _regex_to_sql(
+     col_expr: ColumnElement[Any],
+     pattern: str,
+@@ -266,20 +332,11 @@ def _regex_to_sql(
+     counter: _ParamCounter,
+ ) -> ColumnElement[bool]:
+     if dialect_name == "postgresql":
+-        prefix = ""
+-        if multiline or dotall:
+-            flags = ("m" if multiline else "") + ("n" if not multiline and dotall else "")
+-            if dotall and multiline:
+-                prefix = "(?p)"
+-            elif dotall:
+-                prefix = "(?s)"
+-            elif multiline:
+-                prefix = "(?m)"
+-            _ = flags
+-        op = "~*" if ignore_case else "~"
++        pg_pat, pg_ic = _normalize_postgres_regex(pattern, ignore_case, multiline, dotall)
++        op = "~*" if pg_ic else "~"
+         return and_(
+             col_expr.is_not(None),
+-            col_expr.op(op)(counter.next_param(prefix + pattern)),
++            col_expr.op(op)(counter.next_param(pg_pat)),
+         )
+ 
+     flag_str = ("i" if ignore_case else "") + ("m" if multiline else "") + ("s" if dotall else "")
+@@ -294,46 +351,346 @@ def _regex_to_sql(
+     )
+ 
+ 
+-def _apply_scalar_or_array(
+-    field: str,
++def _extract_elem_text_expr(
++    elem_expr: ColumnElement[Any],
++    elem_type_expr: ColumnElement[Any] | None,
++    leaf_key: str,
++    allow_legacy_str: bool,
++    dialect_name: str,
++) -> ColumnElement[Any]:
++    if dialect_name == "postgresql":
++        empty_text_arr = cast(
++            postgresql.array([], type_=postgresql.TEXT), postgresql.ARRAY(postgresql.TEXT)
++        )
++        if allow_legacy_str:
++            return case(
++                (
++                    func.jsonb_typeof(elem_expr) == "object",
++                    elem_expr.op("->>", return_type=String)(leaf_key),
++                ),
++                (
++                    func.jsonb_typeof(elem_expr) == "string",
++                    elem_expr.op("#>>", return_type=String)(empty_text_arr),
++                ),
++                else_=None,
++            )
++        return case(
++            (
++                func.jsonb_typeof(elem_expr) == "object",
++                elem_expr.op("->>", return_type=String)(leaf_key),
++            ),
++            else_=None,
++        )
++
++    assert elem_type_expr is not None
++    leaf_jpath = "$." + leaf_key
++    sq_obj_leaf_ok = and_(
++        elem_type_expr == "object",
++        func.json_type(elem_expr, leaf_jpath).in_(["text", "integer", "real"]),
++    )
++    if allow_legacy_str:
++        return case(
++            (sq_obj_leaf_ok, cast(func.json_extract(elem_expr, leaf_jpath), String)),
++            (elem_type_expr == "text", cast(elem_expr, String)),
++            else_=None,
++        )
++    return case(
++        (sq_obj_leaf_ok, cast(func.json_extract(elem_expr, leaf_jpath), String)),
++        else_=None,
++    )
++
++
++def _extract_elem_numeric_expr(
++    elem_expr: ColumnElement[Any],
++    elem_type_expr: ColumnElement[Any] | None,
++    leaf_key: str,
++    dialect_name: str,
++) -> ColumnElement[Any]:
++    if dialect_name == "postgresql":
++        txt = elem_expr.op("->>", return_type=String)(leaf_key)
++        return case(
++            (
++                and_(
++                    func.jsonb_typeof(elem_expr) == "object",
++                    txt.op("~")(r"^-?[0-9]+(\.[0-9]+)?$"),
++                ),
++                cast(txt, Numeric),
++            ),
++            else_=None,
++        )
++    assert elem_type_expr is not None
++    leaf_jpath = "$." + leaf_key
++    return case(
++        (
++            and_(
++                elem_type_expr == "object",
++                func.json_type(elem_expr, leaf_jpath).in_(["integer", "real"]),
++            ),
++            cast(func.json_extract(elem_expr, leaf_jpath), Float),
++        ),
++        else_=None,
++    )
++
++
++def _extract_elem_exists_expr(
++    elem_expr: ColumnElement[Any],
++    elem_type_expr: ColumnElement[Any] | None,
++    leaf_key: str,
++    allow_legacy_str: bool,
+     dialect_name: str,
+-    elem_predicate_fn: Callable[[ColumnElement[Any]], ColumnElement[bool]],
+ ) -> ColumnElement[bool]:
+-    scalar_col = _extract_text_expr(field, dialect_name)
+-    scalar_pred = elem_predicate_fn(scalar_col)
+-    if field not in ARRAY_OCSF_FIELDS:
+-        return scalar_pred
++    if dialect_name == "postgresql":
++        obj_has_key = and_(
++            func.jsonb_typeof(elem_expr) == "object",
++            elem_expr.op("#>")(postgresql.array([leaf_key])).is_not(None),
++        )
++        if allow_legacy_str:
++            return or_(obj_has_key, func.jsonb_typeof(elem_expr) == "string")
++        return obj_has_key
++
++    assert elem_type_expr is not None
++    leaf_jpath = "$." + leaf_key
++    obj_has_key = and_(
++        elem_type_expr == "object",
++        func.json_type(elem_expr, leaf_jpath).is_not(None),
++    )
++    if allow_legacy_str:
++        return or_(obj_has_key, elem_type_expr == "text")
++    return obj_has_key
+ 
+-    parts = field.split(".")
++
++def _extract_elem_bool_pred(
++    elem_expr: ColumnElement[Any],
++    elem_type_expr: ColumnElement[Any] | None,
++    leaf_key: str,
++    bval: bool,
++    dialect_name: str,
++    counter: _ParamCounter,
++) -> ColumnElement[bool]:
+     if dialect_name == "postgresql":
+-        pg_node = normalized_events.c.ocsf_payload.op("#>")(postgresql.array(parts))
+-        pg_arr = func.jsonb_array_elements_text(
++        leaf_node = elem_expr.op("#>")(postgresql.array([leaf_key]))
++        return and_(
++            func.jsonb_typeof(elem_expr) == "object",
++            leaf_node.is_not(None),
++            func.jsonb_typeof(leaf_node) == "boolean",
++            elem_expr.op("->>", return_type=String)(leaf_key)
++            == counter.next_param("true" if bval else "false"),
++        )
++    assert elem_type_expr is not None
++    leaf_jpath = "$." + leaf_key
++    return and_(
++        elem_type_expr == "object",
++        func.json_type(elem_expr, leaf_jpath) == ("true" if bval else "false"),
++    )
++
++
++def _compile_numeric_pred(
++    ncol: ColumnElement[Any],
++    val: SigmaNumber | SigmaCompareExpression,
++    counter: _ParamCounter,
++) -> ColumnElement[bool]:
++    if isinstance(val, SigmaNumber):
++        return and_(ncol.is_not(None), ncol == counter.next_param(val.number))
++    bound = counter.next_param(val.number.number)
++    op = val.op
++    if op == SigmaCompareExpression.CompareOperators.LT:
++        return and_(ncol.is_not(None), ncol < bound)
++    if op == SigmaCompareExpression.CompareOperators.LTE:
++        return and_(ncol.is_not(None), ncol <= bound)
++    if op == SigmaCompareExpression.CompareOperators.GT:
++        return and_(ncol.is_not(None), ncol > bound)
++    if op == SigmaCompareExpression.CompareOperators.GTE:
++        return and_(ncol.is_not(None), ncol >= bound)
++    if op == SigmaCompareExpression.CompareOperators.NEQ:
++        return and_(ncol.is_not(None), ncol != bound)
++    raise ValueError(f"Unsupported numeric comparison operator: {op}")
++
++
++def _wrap_array_exists(
++    arr_parts: tuple[str, ...],
++    dialect_name: str,
++    build_elem_pred_fn: Callable[
++        [ColumnElement[Any], ColumnElement[Any] | None], ColumnElement[bool]
++    ],
++    legacy_scalar_pred_fn: Callable[[ColumnElement[Any]], ColumnElement[bool]] | None = None,
++) -> ColumnElement[bool]:
++    if dialect_name == "postgresql":
++        pg_arr_node = normalized_events.c.ocsf_payload.op("#>")(postgresql.array(list(arr_parts)))
++        is_pg_arr = and_(pg_arr_node.is_not(None), func.jsonb_typeof(pg_arr_node) == "array")
++        pg_elems = func.jsonb_array_elements(
+             case(
+-                (func.jsonb_typeof(pg_node) == "array", pg_node),
++                (is_pg_arr, pg_arr_node),
+                 else_=cast(literal("[]"), JSONB),
+             )
+         ).table_valued("value")
+-        arr_pred = exists(
+-            select(literal(1)).select_from(pg_arr).where(elem_predicate_fn(pg_arr.c.value))
++        arr_pred: ColumnElement[bool] = exists(
++            select(literal(1))
++            .select_from(pg_elems)
++            .where(build_elem_pred_fn(pg_elems.c.value, None))
++        )
++        if legacy_scalar_pred_fn is None:
++            return arr_pred
++        pg_legacy_scalar = normalized_events.c.ocsf_payload.op("#>>", return_type=String)(
++            postgresql.array(list(arr_parts))
++        )
++        return or_(
++            arr_pred,
++            and_(
++                pg_arr_node.is_not(None),
++                func.jsonb_typeof(pg_arr_node) == "string",
++                legacy_scalar_pred_fn(pg_legacy_scalar),
++            ),
+         )
+-        return or_(arr_pred, scalar_pred)
+ 
+-    json_path = "$." + ".".join(parts)
+-    sq_arr = func.json_each(
++    arr_jpath = "$." + ".".join(arr_parts)
++    sq_jtype = func.json_type(normalized_events.c.ocsf_payload, arr_jpath)
++    sq_elems = func.json_each(
+         case(
+             (
+-                func.json_type(normalized_events.c.ocsf_payload, json_path) == "array",
+-                func.json_extract(normalized_events.c.ocsf_payload, json_path),
++                and_(sq_jtype.is_not(None), sq_jtype == "array"),
++                func.json_extract(normalized_events.c.ocsf_payload, arr_jpath),
+             ),
+             else_=literal("[]"),
+         )
+-    ).table_valued("value")
+-    arr_pred_sq = exists(
++    ).table_valued("value", "type")
++    arr_pred_sq: ColumnElement[bool] = exists(
+         select(literal(1))
+-        .select_from(sq_arr)
+-        .where(elem_predicate_fn(cast(sq_arr.c.value, String)))
++        .select_from(sq_elems)
++        .where(build_elem_pred_fn(sq_elems.c.value, sq_elems.c.type))
++    )
++    if legacy_scalar_pred_fn is None:
++        return arr_pred_sq
++    sq_legacy_scalar = cast(func.json_extract(normalized_events.c.ocsf_payload, arr_jpath), String)
++    return or_(
++        arr_pred_sq,
++        and_(
++            sq_jtype.is_not(None),
++            sq_jtype == "text",
++            legacy_scalar_pred_fn(sq_legacy_scalar),
++        ),
++    )
++
++
++def _apply_scalar_or_array(
++    field: str,
++    dialect_name: str,
++    elem_predicate_fn: Callable[[ColumnElement[Any]], ColumnElement[bool]],
++) -> ColumnElement[bool]:
++    if field not in OBJECT_ARRAY_OCSF_FIELDS:
++        scalar_col = _extract_text_expr(field, dialect_name)
++        return elem_predicate_fn(scalar_col)
++
++    arr_parts, leaf_key, allow_legacy_str = OBJECT_ARRAY_OCSF_FIELDS[field]
++    return _wrap_array_exists(
++        arr_parts,
++        dialect_name,
++        lambda ee, et: elem_predicate_fn(
++            _extract_elem_text_expr(ee, et, leaf_key, allow_legacy_str, dialect_name)
++        ),
++        legacy_scalar_pred_fn=elem_predicate_fn if allow_legacy_str else None,
+     )
+-    return or_(arr_pred_sq, scalar_pred)
++
++
++def _compile_field_exists_expr(
++    field: str,
++    exists_flag: bool,
++    dialect_name: str,
++) -> ColumnElement[bool]:
++    if field in {
++        "source_id",
++        "ocsf_version",
++        "original_event_uid",
++        "class_uid",
++        "category_uid",
++        "activity_id",
++        "type_uid",
++    }:
++        col = _extract_text_expr(field, dialect_name)
++        return col.is_not(None) if exists_flag else col.is_(None)
++
++    if field in OBJECT_ARRAY_OCSF_FIELDS:
++        arr_parts, leaf_key, allow_legacy_str = OBJECT_ARRAY_OCSF_FIELDS[field]
++        if dialect_name == "postgresql":
++            pg_arr_node = normalized_events.c.ocsf_payload.op("#>")(
++                postgresql.array(list(arr_parts))
++            )
++            is_pg_arr = and_(pg_arr_node.is_not(None), func.jsonb_typeof(pg_arr_node) == "array")
++            pg_elems = func.jsonb_array_elements(
++                case((is_pg_arr, pg_arr_node), else_=cast(literal("[]"), JSONB))
++            ).table_valued("value")
++            elem_has_key = (
++                or_(
++                    and_(
++                        func.jsonb_typeof(pg_elems.c.value) == "object",
++                        pg_elems.c.value.op("#>")(postgresql.array([leaf_key])).is_not(None),
++                    ),
++                    func.jsonb_typeof(pg_elems.c.value) == "string",
++                )
++                if allow_legacy_str
++                else and_(
++                    func.jsonb_typeof(pg_elems.c.value) == "object",
++                    pg_elems.c.value.op("#>")(postgresql.array([leaf_key])).is_not(None),
++                )
++            )
++            present_expr: ColumnElement[bool] = exists(
++                select(literal(1)).select_from(pg_elems).where(elem_has_key)
++            )
++            if allow_legacy_str:
++                present_expr = or_(
++                    present_expr,
++                    and_(pg_arr_node.is_not(None), func.jsonb_typeof(pg_arr_node) == "string"),
++                )
++            return present_expr if exists_flag else not_(present_expr)
++
++        arr_jpath = "$." + ".".join(arr_parts)
++        leaf_jpath = "$." + leaf_key
++        sq_jtype = func.json_type(normalized_events.c.ocsf_payload, arr_jpath)
++        sq_elems = func.json_each(
++            case(
++                (
++                    and_(sq_jtype.is_not(None), sq_jtype == "array"),
++                    func.json_extract(normalized_events.c.ocsf_payload, arr_jpath),
++                ),
++                else_=literal("[]"),
++            )
++        ).table_valued("value", "type")
++        sq_has_key = (
++            or_(
++                and_(
++                    sq_elems.c.type == "object",
++                    func.json_type(sq_elems.c.value, leaf_jpath).is_not(None),
++                ),
++                sq_elems.c.type == "text",
++            )
++            if allow_legacy_str
++            else and_(
++                sq_elems.c.type == "object",
++                func.json_type(sq_elems.c.value, leaf_jpath).is_not(None),
++            )
++        )
++        sq_present: ColumnElement[bool] = exists(
++            select(literal(1)).select_from(sq_elems).where(sq_has_key)
++        )
++        if allow_legacy_str:
++            sq_present = or_(sq_present, and_(sq_jtype.is_not(None), sq_jtype == "text"))
++        return sq_present if exists_flag else not_(sq_present)
++
++    # Sigma Spec: |exists checks field presence regardless of empty or JSON null value.
++    parts = field.split(".")
++    if dialect_name == "postgresql":
++        pg_node = normalized_events.c.ocsf_payload.op("#>")(postgresql.array(parts))
++        return pg_node.is_not(None) if exists_flag else pg_node.is_(None)
++    jpath = "$." + ".".join(parts)
++    jtype = func.json_type(normalized_events.c.ocsf_payload, jpath)
++    return jtype.is_not(None) if exists_flag else jtype.is_(None)
++
++
++def _compile_field_null_expr(field: str, dialect_name: str) -> ColumnElement[bool]:
++    if field in OBJECT_ARRAY_OCSF_FIELDS:
++        has_non_null = _apply_scalar_or_array(field, dialect_name, lambda col_e: col_e.is_not(None))
++        return not_(has_non_null)
++    col = _extract_text_expr(field, dialect_name)
++    return col.is_(None)
+ 
+ 
+ def _compile_sigma_field_value(
+@@ -345,15 +702,22 @@ def _compile_sigma_field_value(
+     _validate_ocsf_field(field)
+ 
+     if isinstance(val, SigmaNull):
+-        col = _extract_text_expr(field, dialect_name)
+-        return col.is_(None)
++        return _compile_field_null_expr(field, dialect_name)
+ 
+     if isinstance(val, SigmaExists):
+-        col = _extract_text_expr(field, dialect_name)
+-        return col.is_not(None) if bool(val.exists) else col.is_(None)
++        return _compile_field_exists_expr(field, bool(val.exists), dialect_name)
+ 
+     if isinstance(val, SigmaBool):
+         bval = bool(val.boolean)
++        if field in OBJECT_ARRAY_OCSF_FIELDS:
++            arr_parts, leaf_key, _ = OBJECT_ARRAY_OCSF_FIELDS[field]
++            return _wrap_array_exists(
++                arr_parts,
++                dialect_name,
++                lambda ee, et: _extract_elem_bool_pred(
++                    ee, et, leaf_key, bval, dialect_name, counter
++                ),
++            )
+         if dialect_name != "postgresql" and "." in field:
+             jpath = "$." + field
+             jtype = func.json_type(normalized_events.c.ocsf_payload, jpath)
+@@ -364,23 +728,29 @@ def _compile_sigma_field_value(
+             func.lower(col) == counter.next_param("true" if bval else "false"),
+         )
+ 
+-    if isinstance(val, SigmaNumber):
+-        ncol = _extract_numeric_expr(field, dialect_name)
+-        return and_(ncol.is_not(None), ncol == counter.next_param(val.number))
+-
+-    if isinstance(val, SigmaCompareExpression):
+-        ncol = _extract_numeric_expr(field, dialect_name)
+-        bound = counter.next_param(val.number.number)
+-        op = val.op
+-        if op == SigmaCompareExpression.CompareOperators.LT:
+-            return and_(ncol.is_not(None), ncol < bound)
+-        if op == SigmaCompareExpression.CompareOperators.LTE:
+-            return and_(ncol.is_not(None), ncol <= bound)
+-        if op == SigmaCompareExpression.CompareOperators.GT:
+-            return and_(ncol.is_not(None), ncol > bound)
+-        if op == SigmaCompareExpression.CompareOperators.GTE:
+-            return and_(ncol.is_not(None), ncol >= bound)
+-        raise ValueError(f"Unsupported numeric comparison operator: {op}")
++    if isinstance(val, (SigmaNumber, SigmaCompareExpression)):
++        if field in OBJECT_ARRAY_OCSF_FIELDS:
++            arr_parts, leaf_key, _ = OBJECT_ARRAY_OCSF_FIELDS[field]
++            return _wrap_array_exists(
++                arr_parts,
++                dialect_name,
++                lambda ee, et: _compile_numeric_pred(
++                    _extract_elem_numeric_expr(ee, et, leaf_key, dialect_name),
++                    val,
++                    counter,
++                ),
++            )
++        return _compile_numeric_pred(_extract_numeric_expr(field, dialect_name), val, counter)
++
++    if isinstance(val, SigmaExpansion):
++        if not val.values:
++            return false()
++        return or_(
++            *(
++                _compile_sigma_field_value(field, sub_v, dialect_name, counter)
++                for sub_v in val.values
++            )
++        )
+ 
+     if isinstance(val, SigmaRegularExpression):
+         rx_pattern = str(val.regexp)
+@@ -392,6 +762,8 @@ def _compile_sigma_field_value(
+         ic = SigmaRegularExpressionFlag.IGNORECASE in flags
+         ml = SigmaRegularExpressionFlag.MULTILINE in flags
+         da = SigmaRegularExpressionFlag.DOTALL in flags
++        if dialect_name == "postgresql":
++            _normalize_postgres_regex(rx_pattern, ic, ml, da)
+         return _apply_scalar_or_array(
+             field,
+             dialect_name,
+@@ -415,13 +787,169 @@ def _compile_sigma_field_value(
+     raise ValueError(f"Unsupported Sigma value type on field {field!r}: {type(val).__name__}")
+ 
+ 
++def _is_fusible_sigma_value(val: SigmaType) -> bool:
++    if isinstance(val, SigmaNull):
++        return False
++    if isinstance(val, SigmaExists):
++        return bool(val.exists)
++    if isinstance(val, SigmaExpansion):
++        return all(_is_fusible_sigma_value(sub_v) for sub_v in val.values)
++    return True
++
++
++def _single_array_path_of_sigma_node(node: object) -> tuple[str, ...] | None:
++    if isinstance(node, ConditionFieldEqualsValueExpression):
++        if node.field not in OBJECT_ARRAY_OCSF_FIELDS:
++            return None
++        if not _is_fusible_sigma_value(node.value):
++            return None
++        return OBJECT_ARRAY_OCSF_FIELDS[node.field][0]
++    if isinstance(node, (ConditionAND, ConditionOR)):
++        if not node.args:
++            return None
++        paths = {_single_array_path_of_sigma_node(arg) for arg in node.args}
++        if None in paths or len(paths) != 1:
++            return None
++        return next(iter(paths))
++    return None
++
++
++def _compile_array_elem_sigma_leaf(
++    field: str,
++    val: SigmaType,
++    elem_expr: ColumnElement[Any],
++    elem_type_expr: ColumnElement[Any] | None,
++    dialect_name: str,
++    counter: _ParamCounter,
++) -> ColumnElement[bool]:
++    _validate_ocsf_field(field)
++    _, leaf_key, allow_legacy_str = OBJECT_ARRAY_OCSF_FIELDS[field]
++
++    if isinstance(val, SigmaExists):
++        if not bool(val.exists):
++            raise ValueError(f"Cannot element-fuse negative exists on array field {field!r}")
++        return _extract_elem_exists_expr(
++            elem_expr, elem_type_expr, leaf_key, allow_legacy_str, dialect_name
++        )
++
++    if isinstance(val, SigmaBool):
++        return _extract_elem_bool_pred(
++            elem_expr, elem_type_expr, leaf_key, bool(val.boolean), dialect_name, counter
++        )
++
++    if isinstance(val, (SigmaNumber, SigmaCompareExpression)):
++        return _compile_numeric_pred(
++            _extract_elem_numeric_expr(elem_expr, elem_type_expr, leaf_key, dialect_name),
++            val,
++            counter,
++        )
++
++    if isinstance(val, SigmaExpansion):
++        if not val.values:
++            return false()
++        return or_(
++            *(
++                _compile_array_elem_sigma_leaf(
++                    field, sub_v, elem_expr, elem_type_expr, dialect_name, counter
++                )
++                for sub_v in val.values
++            )
++        )
++
++    elem_text = _extract_elem_text_expr(
++        elem_expr, elem_type_expr, leaf_key, allow_legacy_str, dialect_name
++    )
++    if isinstance(val, SigmaRegularExpression):
++        rx_pattern = str(val.regexp)
++        try:
++            re.compile(rx_pattern)
++        except re.error as exc:
++            raise ValueError(f"Invalid regular expression {rx_pattern!r}: {exc}") from exc
++        flags = val.flags or set()
++        ic = SigmaRegularExpressionFlag.IGNORECASE in flags
++        ml = SigmaRegularExpressionFlag.MULTILINE in flags
++        da = SigmaRegularExpressionFlag.DOTALL in flags
++        if dialect_name == "postgresql":
++            _normalize_postgres_regex(rx_pattern, ic, ml, da)
++        return _regex_to_sql(elem_text, rx_pattern, ic, ml, da, dialect_name, counter)
++
++    if isinstance(val, SigmaCasedString):
++        return _sigma_string_to_sql(elem_text, val, True, dialect_name, counter)
++
++    if isinstance(val, SigmaString):
++        return _sigma_string_to_sql(elem_text, val, False, dialect_name, counter)
++
++    raise ValueError(f"Unsupported Sigma value type on array field {field!r}: {type(val).__name__}")
++
++
++def _compile_array_elem_sigma_node(
++    node: object,
++    elem_expr: ColumnElement[Any],
++    elem_type_expr: ColumnElement[Any] | None,
++    dialect_name: str,
++    counter: _ParamCounter,
++) -> ColumnElement[bool]:
++    if isinstance(node, ConditionAND):
++        children = [
++            _compile_array_elem_sigma_node(arg, elem_expr, elem_type_expr, dialect_name, counter)
++            for arg in node.args
++        ]
++        return and_(*children) if children else true()
++    if isinstance(node, ConditionOR):
++        children = [
++            _compile_array_elem_sigma_node(arg, elem_expr, elem_type_expr, dialect_name, counter)
++            for arg in node.args
++        ]
++        return or_(*children) if children else false()
++    if isinstance(node, ConditionFieldEqualsValueExpression):
++        return _compile_array_elem_sigma_leaf(
++            node.field, node.value, elem_expr, elem_type_expr, dialect_name, counter
++        )
++    raise ValueError(f"Unsupported AST node inside array element fusion: {type(node).__name__}")
++
++
+ def _compile_sigma_node(
+     node: object,
+     dialect_name: str,
+     counter: _ParamCounter,
+ ) -> ColumnElement[bool]:
+     if isinstance(node, ConditionAND):
+-        children = [_compile_sigma_node(arg, dialect_name, counter) for arg in node.args]
++        fusible_groups: dict[tuple[str, ...], list[object]] = {}
++        order_tokens: list[tuple[str, object]] = []
++        for arg in node.args:
++            arr_path = _single_array_path_of_sigma_node(arg)
++            if arr_path is not None:
++                if arr_path not in fusible_groups:
++                    fusible_groups[arr_path] = []
++                    order_tokens.append(("group", arr_path))
++                fusible_groups[arr_path].append(arg)
++            else:
++                order_tokens.append(("single", arg))
++
++        children: list[ColumnElement[bool]] = []
++        for kind, payload in order_tokens:
++            if kind == "single":
++                children.append(_compile_sigma_node(payload, dialect_name, counter))
++                continue
++            assert isinstance(payload, tuple)
++            group = fusible_groups[payload]
++            if len(group) == 1:
++                children.append(_compile_sigma_node(group[0], dialect_name, counter))
++            else:
++
++                def _build_fused(
++                    ee: ColumnElement[Any],
++                    et: ColumnElement[Any] | None,
++                    g: list[object] = group,
++                ) -> ColumnElement[bool]:
++                    return and_(
++                        *(
++                            _compile_array_elem_sigma_node(sub, ee, et, dialect_name, counter)
++                            for sub in g
++                        )
++                    )
++
++                children.append(_wrap_array_exists(payload, dialect_name, _build_fused))
+         return and_(*children) if children else true()
+     if isinstance(node, ConditionOR):
+         children = [_compile_sigma_node(arg, dialect_name, counter) for arg in node.args]
+@@ -455,6 +983,53 @@ def _collect_sigma_ast_fields(
+         raise ValueError("Unbound keyword value expression without field is unsupported")
+ 
+ 
++_CUSTOM_CMP_OP_MAP: dict[PredicateOperator, Any] = {
++    PredicateOperator.LT: SigmaCompareExpression.CompareOperators.LT,
++    PredicateOperator.LTE: SigmaCompareExpression.CompareOperators.LTE,
++    PredicateOperator.GT: SigmaCompareExpression.CompareOperators.GT,
++    PredicateOperator.GTE: SigmaCompareExpression.CompareOperators.GTE,
++}
++
++
++def _predicate_to_sigma_value(pred: StructuredPredicate) -> SigmaType:
++    op = pred.op
++    val = pred.value
++    if op == PredicateOperator.EXISTS:
++        return SigmaExists(bool(val))
++    if op in _CUSTOM_CMP_OP_MAP:
++        num = float(val) if isinstance(val, float) else int(val)
++        return SigmaCompareExpression(SigmaNumber(num), _CUSTOM_CMP_OP_MAP[op])
++    if op == PredicateOperator.EQ:
++        if isinstance(val, bool):
++            return SigmaBool(val)
++        if isinstance(val, (int, float)):
++            return SigmaNumber(val)
++        return SigmaCasedString(str(val)) if pred.case_sensitive else SigmaString(str(val))
++    raw_s = str(val)
++    if op == PredicateOperator.CONTAINS:
++        return (
++            SigmaCasedString.from_str(f"*{raw_s}*")
++            if pred.case_sensitive
++            else SigmaString(f"*{raw_s}*")
++        )
++    if op == PredicateOperator.STARTSWITH:
++        return (
++            SigmaCasedString.from_str(f"{raw_s}*")
++            if pred.case_sensitive
++            else SigmaString(f"{raw_s}*")
++        )
++    if op == PredicateOperator.ENDSWITH:
++        return (
++            SigmaCasedString.from_str(f"*{raw_s}")
++            if pred.case_sensitive
++            else SigmaString(f"*{raw_s}")
++        )
++    if op == PredicateOperator.REGEX:
++        flags = set() if pred.case_sensitive else {SigmaRegularExpressionFlag.IGNORECASE}
++        return SigmaRegularExpression(raw_s, flags=flags)
++    raise ValueError(f"Unsupported operator: {op}")
++
++
+ def _compile_structured_predicate(
+     pred: StructuredPredicate,
+     dialect_name: str,
+@@ -465,32 +1040,7 @@ def _compile_structured_predicate(
+     val = pred.value
+ 
+     if op == PredicateOperator.EXISTS:
+-        col = _extract_text_expr(pred.field, dialect_name)
+-        return col.is_not(None) if bool(val) else col.is_(None)
+-
+-    if op in (
+-        PredicateOperator.GT,
+-        PredicateOperator.GTE,
+-        PredicateOperator.LT,
+-        PredicateOperator.LTE,
+-    ):
+-        ncol = _extract_numeric_expr(pred.field, dialect_name)
+-        bound = counter.next_param(float(val) if isinstance(val, float) else int(val))
+-        if op == PredicateOperator.GT:
+-            return and_(ncol.is_not(None), ncol > bound)
+-        if op == PredicateOperator.GTE:
+-            return and_(ncol.is_not(None), ncol >= bound)
+-        if op == PredicateOperator.LT:
+-            return and_(ncol.is_not(None), ncol < bound)
+-        return and_(ncol.is_not(None), ncol <= bound)
+-
+-    if op == PredicateOperator.EQ:
+-        if isinstance(val, bool):
+-            return _compile_sigma_field_value(pred.field, SigmaBool(val), dialect_name, counter)
+-        if isinstance(val, (int, float)):
+-            return _compile_sigma_field_value(pred.field, SigmaNumber(val), dialect_name, counter)
+-        sval = SigmaCasedString(str(val)) if pred.case_sensitive else SigmaString(str(val))
+-        return _compile_sigma_field_value(pred.field, sval, dialect_name, counter)
++        return _compile_field_exists_expr(pred.field, bool(val), dialect_name)
+ 
+     if op == PredicateOperator.NEQ:
+         eq_expr = _compile_structured_predicate(
+@@ -523,41 +1073,85 @@ def _compile_structured_predicate(
+         ]
+         return or_(*sub_preds)
+ 
+-    raw_s = str(val)
+-    if op == PredicateOperator.CONTAINS:
+-        s_obj: SigmaString | SigmaCasedString = (
+-            SigmaCasedString.from_str(f"*{raw_s}*")
+-            if pred.case_sensitive
+-            else SigmaString(f"*{raw_s}*")
+-        )
+-        return _compile_sigma_field_value(pred.field, s_obj, dialect_name, counter)
++    sigma_val = _predicate_to_sigma_value(pred)
++    return _compile_sigma_field_value(pred.field, sigma_val, dialect_name, counter)
+ 
+-    if op == PredicateOperator.STARTSWITH:
+-        s_obj = (
+-            SigmaCasedString.from_str(f"{raw_s}*")
+-            if pred.case_sensitive
+-            else SigmaString(f"{raw_s}*")
+-        )
+-        return _compile_sigma_field_value(pred.field, s_obj, dialect_name, counter)
+ 
+-    if op == PredicateOperator.ENDSWITH:
+-        s_obj = (
+-            SigmaCasedString.from_str(f"*{raw_s}")
+-            if pred.case_sensitive
+-            else SigmaString(f"*{raw_s}")
+-        )
+-        return _compile_sigma_field_value(pred.field, s_obj, dialect_name, counter)
++def _single_array_path_of_custom_node(node: CustomConditionNode) -> tuple[str, ...] | None:
++    if node.predicate is not None:
++        pred = node.predicate
++        if pred.field not in OBJECT_ARRAY_OCSF_FIELDS:
++            return None
++        if pred.op == PredicateOperator.NEQ:
++            return None
++        if pred.op == PredicateOperator.EXISTS and not bool(pred.value):
++            return None
++        return OBJECT_ARRAY_OCSF_FIELDS[pred.field][0]
++    if node.all_of:
++        paths = {_single_array_path_of_custom_node(c) for c in node.all_of}
++        if None in paths or len(paths) != 1:
++            return None
++        return next(iter(paths))
++    if node.any_of:
++        paths = {_single_array_path_of_custom_node(c) for c in node.any_of}
++        if None in paths or len(paths) != 1:
++            return None
++        return next(iter(paths))
++    return None
+ 
+-    if op == PredicateOperator.REGEX:
+-        flags = set() if pred.case_sensitive else {SigmaRegularExpressionFlag.IGNORECASE}
+-        return _compile_sigma_field_value(
+-            pred.field,
+-            SigmaRegularExpression(raw_s, flags=flags),
+-            dialect_name,
+-            counter,
+-        )
+ 
+-    raise ValueError(f"Unsupported operator: {op}")
++def _compile_array_elem_custom_node(
++    node: CustomConditionNode,
++    elem_expr: ColumnElement[Any],
++    elem_type_expr: ColumnElement[Any] | None,
++    dialect_name: str,
++    counter: _ParamCounter,
++) -> ColumnElement[bool]:
++    if node.predicate is not None:
++        pred = node.predicate
++        _validate_ocsf_field(pred.field)
++        if pred.op == PredicateOperator.IN:
++            val = pred.value
++            if not isinstance(val, list) or not val:
++                raise ValueError(f"'in' operator on {pred.field!r} requires a non-empty list")
++            return or_(
++                *(
++                    _compile_array_elem_custom_node(
++                        CustomConditionNode(
++                            predicate=StructuredPredicate(
++                                field=pred.field,
++                                op=PredicateOperator.EQ,
++                                value=item,
++                                case_sensitive=pred.case_sensitive,
++                            )
++                        ),
++                        elem_expr,
++                        elem_type_expr,
++                        dialect_name,
++                        counter,
++                    )
++                    for item in val
++                )
++            )
++        sigma_val = _predicate_to_sigma_value(pred)
++        return _compile_array_elem_sigma_leaf(
++            pred.field, sigma_val, elem_expr, elem_type_expr, dialect_name, counter
++        )
++    if node.all_of:
++        return and_(
++            *(
++                _compile_array_elem_custom_node(c, elem_expr, elem_type_expr, dialect_name, counter)
++                for c in node.all_of
++            )
++        )
++    if node.any_of:
++        return or_(
++            *(
++                _compile_array_elem_custom_node(c, elem_expr, elem_type_expr, dialect_name, counter)
++                for c in node.any_of
++            )
++        )
++    raise ValueError("Unsupported custom node inside array element fusion")
+ 
+ 
+ def _compile_custom_node(
+@@ -568,7 +1162,44 @@ def _compile_custom_node(
+     if node.predicate is not None:
+         return _compile_structured_predicate(node.predicate, dialect_name, counter)
+     if node.all_of:
+-        return and_(*(_compile_custom_node(c, dialect_name, counter) for c in node.all_of))
++        fusible_groups: dict[tuple[str, ...], list[CustomConditionNode]] = {}
++        order_tokens: list[tuple[str, tuple[str, ...] | CustomConditionNode]] = []
++        for child in node.all_of:
++            arr_path = _single_array_path_of_custom_node(child)
++            if arr_path is not None:
++                if arr_path not in fusible_groups:
++                    fusible_groups[arr_path] = []
++                    order_tokens.append(("group", arr_path))
++                fusible_groups[arr_path].append(child)
++            else:
++                order_tokens.append(("single", child))
++
++        exprs: list[ColumnElement[bool]] = []
++        for kind, payload in order_tokens:
++            if kind == "single":
++                assert isinstance(payload, CustomConditionNode)
++                exprs.append(_compile_custom_node(payload, dialect_name, counter))
++                continue
++            assert isinstance(payload, tuple)
++            group = fusible_groups[payload]
++            if len(group) == 1:
++                exprs.append(_compile_custom_node(group[0], dialect_name, counter))
++            else:
++
++                def _build_fused(
++                    ee: ColumnElement[Any],
++                    et: ColumnElement[Any] | None,
++                    g: list[CustomConditionNode] = group,
++                ) -> ColumnElement[bool]:
++                    return and_(
++                        *(
++                            _compile_array_elem_custom_node(sub, ee, et, dialect_name, counter)
++                            for sub in g
++                        )
++                    )
++
++                exprs.append(_wrap_array_exists(payload, dialect_name, _build_fused))
++        return and_(*exprs)
+     if node.any_of:
+         return or_(*(_compile_custom_node(c, dialect_name, counter) for c in node.any_of))
+     if node.not_node is not None:
+@@ -611,7 +1242,7 @@ def compile_sigma_event_query(
+     for ast in parsed_asts:
+         _collect_sigma_ast_fields(ast, all_fields, class_uids)
+ 
+-    unmapped = [f for f in dict.fromkeys(all_fields) if f not in KNOWN_OCSF_V13_FIELDS]
++    unmapped = [f for f in dict.fromkeys(all_fields) if f not in KNOWN_OCSF_V14_FIELDS]
+     if unmapped:
+         raise ValueError(
+             "Unmapped or unsupported OCSF field(s): " + ", ".join(repr(x) for x in unmapped)
+@@ -653,7 +1284,7 @@ def compile_custom_event_query(spec: CustomEventSpec) -> CompiledEventQuery:
+             _gather(node.not_node)
+ 
+     _gather(spec.condition)
+-    unmapped = [f for f in dict.fromkeys(fields) if f not in KNOWN_OCSF_V13_FIELDS]
++    unmapped = [f for f in dict.fromkeys(fields) if f not in KNOWN_OCSF_V14_FIELDS]
+     if unmapped:
+         raise ValueError(
+             "Unsupported OCSF field(s) in custom rule: " + ", ".join(repr(x) for x in unmapped)
+@@ -783,7 +1414,7 @@ def compile_rule_yaml(
+     if parsed.source == RuleSource.CUSTOM and parsed.custom_event_spec is not None:
+         ev_spec = parsed.custom_event_spec
+         fmap = {f: f for f in parsed.original_fields}
+-        unmapped_custom = [f for f in parsed.original_fields if f not in KNOWN_OCSF_V13_FIELDS]
++        unmapped_custom = [f for f in parsed.original_fields if f not in KNOWN_OCSF_V14_FIELDS]
+         if unmapped_custom:
+             compat = RuleCompatibility(
+                 parse_success=True,
+@@ -889,7 +1520,7 @@ def compile_rule_yaml(
+     assert parsed.sigma_rule is not None
+     transformed_sigma, field_mappings = apply_ocsf_pipeline(parsed.sigma_rule)
+     for orig_f in parsed.original_fields:
+-        if orig_f not in field_mappings and orig_f in KNOWN_OCSF_V13_FIELDS:
++        if orig_f not in field_mappings and orig_f in KNOWN_OCSF_V14_FIELDS:
+             field_mappings[orig_f] = orig_f
+ 
+     post_fields: list[str] = []
+@@ -927,7 +1558,7 @@ def compile_rule_yaml(
+             parsed_summary=parsed.parsed_ast_preview,
+         )
+ 
+-    unmapped_sigma = [f for f in dict.fromkeys(post_fields) if f not in KNOWN_OCSF_V13_FIELDS]
++    unmapped_sigma = [f for f in dict.fromkeys(post_fields) if f not in KNOWN_OCSF_V14_FIELDS]
+     mapping_reasons: list[str] = []
+     if unmapped_sigma:
+         mapping_reasons.extend(f"Unmapped Sigma field: {f!r}" for f in unmapped_sigma)
+diff --git a/src/provloom/detection/rules/sigma/proc_access_unsupported_calltrace.yml b/src/provloom/detection/rules/sigma/proc_access_unsupported_calltrace.yml
+index efa3a73..23f06e2 100644
+--- a/src/provloom/detection/rules/sigma/proc_access_unsupported_calltrace.yml
++++ b/src/provloom/detection/rules/sigma/proc_access_unsupported_calltrace.yml
+@@ -2,7 +2,7 @@ title: Malformed Unmapped CallTrace LSASS Access (Compatibility Reference)
+ id: 6d4b1e8c-91b2-4e45-8c01-100700009999
+ status: experimental
+ version: 1.0.0
+-description: Reference Sigma rule referencing raw CallTrace and GrantedAccess fields without OCSF v1.3.0 mapping to verify explicit UNSUPPORTED classification.
++description: Reference Sigma rule referencing raw CallTrace and GrantedAccess fields without OCSF v1.4.0 mapping to verify explicit UNSUPPORTED classification.
+ references:
+   - https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_access
+ tags:
+diff --git a/src/provloom/detection/service.py b/src/provloom/detection/service.py
+index ef64026..99d82e3 100644
+--- a/src/provloom/detection/service.py
++++ b/src/provloom/detection/service.py
+@@ -315,9 +315,14 @@ class DefaultDetectionService:
+                     matches = ()
+             except Exception as exc:
+                 self._telemetry.record_detection_failure("execution")
++                err_rule = replace(
++                    target_rule,
++                    status=RuleStatus.ERROR,
++                    compatibility=replace(target_rule.compatibility, execution_success=False),
++                )
+                 dur = (time.perf_counter() - t0) * 1000.0
+                 return RuleTestResult(
+-                    rule=target_rule,
++                    rule=err_rule,
+                     parsed_summary=art.parsed_summary,
+                     field_mappings=dict(art.rule.compatibility.field_mappings),
+                     compiled_sql=art.event_query.postgres_sql if art.event_query else None,
+@@ -454,60 +459,66 @@ class DefaultDetectionService:
+                     source_hint=rule.source,
+                 )
+                 try:
+-                    if rule.detection_type == DetectionType.EVENT and art.event_query is not None:
+-                        raw_matches = self._event_matcher.match_batch(
+-                            uow=uow,
+-                            scope=scope,
+-                            time_range=time_range,
+-                            rule=rule,
+-                            query=art.event_query,
+-                            execution_id=exec_id,
+-                            max_matches=limit,
+-                        )
+-                    elif (
+-                        rule.detection_type == DetectionType.RELATION
+-                        and art.relation_spec is not None
+-                    ):
+-                        raw_matches = self._relation_matcher.match_batch(
+-                            uow=uow,
+-                            scope=scope,
+-                            time_range=time_range,
+-                            rule=rule,
+-                            spec=art.relation_spec,
+-                            execution_id=exec_id,
+-                            max_matches=limit,
+-                        )
+-                    else:
+-                        raise DetectionExecutionError("Rule missing compiled matcher target")
+-
+-                    stored_matches: list[RuleMatch] = []
+-                    for m in raw_matches:
+-                        stored_m, was_created = uow.detection.insert_rule_match_if_absent(m)
+-                        stored_matches.append(stored_m)
+-                        if was_created:
+-                            matches_created += 1
++                    with uow.savepoint():
++                        if (
++                            rule.detection_type == DetectionType.EVENT
++                            and art.event_query is not None
++                        ):
++                            raw_matches = self._event_matcher.match_batch(
++                                uow=uow,
++                                scope=scope,
++                                time_range=time_range,
++                                rule=rule,
++                                query=art.event_query,
++                                execution_id=exec_id,
++                                max_matches=limit,
++                            )
++                        elif (
++                            rule.detection_type == DetectionType.RELATION
++                            and art.relation_spec is not None
++                        ):
++                            raw_matches = self._relation_matcher.match_batch(
++                                uow=uow,
++                                scope=scope,
++                                time_range=time_range,
++                                rule=rule,
++                                spec=art.relation_spec,
++                                execution_id=exec_id,
++                                max_matches=limit,
++                            )
+                         else:
+-                            matches_dedup += 1
+-
+-                    if stored_matches:
+-                        sig_stats = self._signal_gen.ingest_matches(
+-                            uow=uow, rule=rule, matches=stored_matches
+-                        )
+-                        sig_created += sig_stats.signals_created
+-                        sig_aggregated += sig_stats.signals_aggregated
+-                        sig_dedup += sig_stats.signals_deduplicated
+-
+-                    if rule.compatibility.execution_success is not True:
+-                        uow.detection.upsert_rule(
+-                            scope.tenant_id,
+-                            replace(
+-                                rule,
+-                                compatibility=replace(rule.compatibility, execution_success=True),
+-                                updated_at=datetime.now(UTC),
+-                            ),
+-                            preserve_status=True,
+-                        )
+-                    rules_evaluated += 1
++                            raise DetectionExecutionError("Rule missing compiled matcher target")
++
++                        stored_matches: list[RuleMatch] = []
++                        for m in raw_matches:
++                            stored_m, was_created = uow.detection.insert_rule_match_if_absent(m)
++                            stored_matches.append(stored_m)
++                            if was_created:
++                                matches_created += 1
++                            else:
++                                matches_dedup += 1
++
++                        if stored_matches:
++                            sig_stats = self._signal_gen.ingest_matches(
++                                uow=uow, rule=rule, matches=stored_matches
++                            )
++                            sig_created += sig_stats.signals_created
++                            sig_aggregated += sig_stats.signals_aggregated
++                            sig_dedup += sig_stats.signals_deduplicated
++
++                        if rule.compatibility.execution_success is not True:
++                            uow.detection.upsert_rule(
++                                scope.tenant_id,
++                                replace(
++                                    rule,
++                                    compatibility=replace(
++                                        rule.compatibility, execution_success=True
++                                    ),
++                                    updated_at=datetime.now(UTC),
++                                ),
++                                preserve_status=True,
++                            )
++                        rules_evaluated += 1
+                 except Exception as exc:
+                     failures.append(
+                         RuleExecutionFailure(
+diff --git a/src/provloom/domain/enums.py b/src/provloom/domain/enums.py
+index 047a819..50d8112 100644
+--- a/src/provloom/domain/enums.py
++++ b/src/provloom/domain/enums.py
+@@ -44,6 +44,7 @@ class OcsfClassUid(IntEnum):
+     BASE_EVENT = 0
+     FILE_ACTIVITY = 1001
+     PROCESS_ACTIVITY = 1007
++    SCRIPT_ACTIVITY = 1009
+     AUTHENTICATION = 3002
+     NETWORK_ACTIVITY = 4001
+     HTTP_ACTIVITY = 4002
+diff --git a/src/provloom/entity/extractors/ocsf_extractor.py b/src/provloom/entity/extractors/ocsf_extractor.py
+index c9990b7..9247e0d 100644
+--- a/src/provloom/entity/extractors/ocsf_extractor.py
++++ b/src/provloom/entity/extractors/ocsf_extractor.py
+@@ -31,6 +31,7 @@ class OcsfEntityExtractor(EntityExtractor):
+ 
+     def extract(self, event: NormalizedEvent) -> Sequence[EntityObservation]:
+         p = event.ocsf_payload
++        unm: dict[str, Any] = p["unmapped"] if isinstance(p.get("unmapped"), dict) else {}
+         ts = event.event_time
+         obs: list[EntityObservation] = []
+ 
+@@ -41,6 +42,8 @@ class OcsfEntityExtractor(EntityExtractor):
+ 
+         # 2. Container
+         cont = p.get("container")
++        if not isinstance(cont, dict) and unm.get("container_id"):
++            cont = {"uid": unm["container_id"], "runtime": unm.get("runtime")}
+         if isinstance(cont, dict) and cont.get("uid"):
+             cid = str(cont["uid"]).strip().lower()
+             keys = (
+@@ -105,7 +108,16 @@ class OcsfEntityExtractor(EntityExtractor):
+                 )
+             ]
+             hashes_raw = file_obj.get("hashes")
+-            hashes: dict[str, Any] = hashes_raw if isinstance(hashes_raw, dict) else {}
++            hashes: dict[str, Any] = {}
++            if isinstance(hashes_raw, list):
++                for fp in hashes_raw:
++                    if isinstance(fp, dict) and fp.get("value"):
++                        alg_id = fp.get("algorithm_id")
++                        alg_nm = str(fp.get("algorithm") or "").lower().replace("-", "")
++                        if alg_id == 3 or alg_nm == "sha256":
++                            hashes["sha256"] = str(fp["value"])
++            elif isinstance(hashes_raw, dict):
++                hashes = dict(hashes_raw)
+             if hashes.get("sha256"):
+                 fkeys.append(
+                     CandidateKey("sha256", str(hashes["sha256"]).lower(), is_authoritative=False)
+@@ -123,10 +135,21 @@ class OcsfEntityExtractor(EntityExtractor):
+ 
+         # 6. Service
+         svc_obj = p.get("service")
++        if not isinstance(svc_obj, dict):
++            api_raw = p.get("api")
++            if isinstance(api_raw, dict) and isinstance(api_raw.get("service"), dict):
++                svc_obj = api_raw["service"]
++            elif unm.get("service_name"):
++                svc_obj = {"name": unm["service_name"], "port": unm.get("listen_port")}
+         if isinstance(svc_obj, dict) and svc_obj.get("name"):
+             sname = str(svc_obj["name"])
+-            sport = svc_obj.get("port")
++            sport = (
++                svc_obj.get("port") if svc_obj.get("port") is not None else unm.get("listen_port")
++            )
+             skey = f"{sname.lower()}:{sport if sport is not None else '*'}"
++            svc_attrs = {k: v for k, v in svc_obj.items() if v is not None}
++            if sport is not None:
++                svc_attrs["port"] = sport
+             obs.append(
+                 EntityObservation(
+                     role="service",
+@@ -138,7 +161,7 @@ class OcsfEntityExtractor(EntityExtractor):
+                             "host_service", skey, is_authoritative=True, scope_role="host"
+                         ),
+                     ),
+-                    attributes={k: v for k, v in svc_obj.items() if v is not None},
++                    attributes=svc_attrs,
+                 )
+             )
+ 
+@@ -191,7 +214,13 @@ class OcsfEntityExtractor(EntityExtractor):
+             raw_answers = p.get("answers")
+             ans_list: list[str] = []
+             if isinstance(raw_answers, list):
+-                ans_list = [str(x).strip() for x in raw_answers]
++                for x in raw_answers:
++                    if isinstance(x, dict):
++                        rd = str(x.get("rdata") or "").strip()
++                        if rd:
++                            ans_list.append(rd)
++                    elif x is not None:
++                        ans_list.append(str(x).strip())
+             elif isinstance(raw_answers, str):
+                 ans_list = [s.strip() for s in raw_answers.replace(",", ";").split(";")]
+             idx = 0
+@@ -218,6 +247,9 @@ class OcsfEntityExtractor(EntityExtractor):
+         self, payload: dict[str, Any], event: NormalizedEvent
+     ) -> EntityObservation | None:
+         dev = payload.get("device") if isinstance(payload.get("device"), dict) else None
++        unm: dict[str, Any] = (
++            payload["unmapped"] if isinstance(payload.get("unmapped"), dict) else {}
++        )
+         dst_ep = (
+             payload.get("dst_endpoint") if isinstance(payload.get("dst_endpoint"), dict) else None
+         )
+@@ -234,12 +266,19 @@ class OcsfEntityExtractor(EntityExtractor):
+             asset_id = str(dev["uid"]) if dev.get("uid") else None
+             hostname = str(dev["hostname"]) if dev.get("hostname") else None
+             ip = str(dev["ip"]) if dev.get("ip") else None
+-            is_nat = bool(dev.get("is_nat_shared", False))
+-            if dev.get("valid_from"):
+-                vf = parse_utc_timestamp(dev["valid_from"])
+-            if dev.get("valid_to"):
+-                vt = parse_utc_timestamp(dev["valid_to"])
++            nat_val = (
++                dev["is_nat_shared"] if "is_nat_shared" in dev else unm.get("is_nat_shared", False)
++            )
++            is_nat = bool(nat_val)
++            raw_vf = dev.get("valid_from") or unm.get("valid_from")
++            raw_vt = dev.get("valid_to") or unm.get("valid_to")
++            if raw_vf:
++                vf = parse_utc_timestamp(raw_vf)
++            if raw_vt:
++                vt = parse_utc_timestamp(raw_vt)
+             attrs.update({k: v for k, v in dev.items() if v is not None})
++            if "is_nat_shared" in unm:
++                attrs["is_nat_shared"] = is_nat
+         elif (
+             event.class_uid == int(OcsfClassUid.AUTHENTICATION)
+             and dst_ep
+diff --git a/src/provloom/normalization/engine.py b/src/provloom/normalization/engine.py
+index 696da85..e483ed1 100644
+--- a/src/provloom/normalization/engine.py
++++ b/src/provloom/normalization/engine.py
+@@ -32,6 +32,83 @@ def _assign_dotted(target: dict[str, Any], dotted_path: str, value: Any) -> None
+     cur[parts[-1]] = value
+ 
+ 
++def _normalize_dns_answers(raw_val: Any) -> list[dict[str, Any]]:
++    items: list[dict[str, Any]] = []
++    if isinstance(raw_val, list):
++        for elem in raw_val:
++            if isinstance(elem, dict) and elem.get("rdata") is not None:
++                items.append(dict(elem))
++            elif elem is not None:
++                s = str(elem).strip()
++                if s:
++                    items.append({"rdata": s})
++    elif isinstance(raw_val, str):
++        for part in raw_val.replace(",", ";").split(";"):
++            s = part.strip()
++            if s:
++                items.append({"rdata": s})
++    return items
++
++
++def _ensure_file_object_defaults(file_obj: dict[str, Any]) -> None:
++    file_obj.setdefault("type_id", 1)
++    if not file_obj.get("name"):
++        raw_path = str(file_obj.get("path") or "").strip()
++        basename = raw_path.replace("/", "\\").rsplit("\\", 1)[-1]
++        file_obj["name"] = basename or "unknown"
++
++
++def _finalize_ocsf_v140_objects(payload: dict[str, Any], class_uid: int) -> None:
++    if class_uid in (1001, 1007, 1009, 5001):
++        payload.setdefault("device", {})
++    if class_uid in (1001, 1007, 1009, 6003):
++        payload.setdefault("actor", {})
++    if class_uid == 3002:
++        payload.setdefault("user", {})
++    if class_uid == 6001:
++        payload.setdefault("web_resources", [])
++    if class_uid == 6002:
++        payload.setdefault("app", {})
++
++    dev = payload.get("device")
++    if isinstance(dev, dict):
++        dev.setdefault("type_id", 0)
++        if isinstance(dev.get("os"), dict):
++            dev["os"].setdefault("type_id", 0)
++
++    conn = payload.get("connection_info")
++    if isinstance(conn, dict):
++        conn.setdefault("direction_id", 0)
++
++    top_file = payload.get("file")
++    if isinstance(top_file, dict):
++        _ensure_file_object_defaults(top_file)
++
++    for proc_holder in (payload.get("process"), (payload.get("actor") or {}).get("process")):
++        if isinstance(proc_holder, dict):
++            pfile = proc_holder.get("file")
++            if isinstance(pfile, dict):
++                _ensure_file_object_defaults(pfile)
++            parent = proc_holder.get("parent_process")
++            if isinstance(parent, dict) and isinstance(parent.get("file"), dict):
++                _ensure_file_object_defaults(parent["file"])
++
++    meta = payload.get("metadata")
++    if isinstance(meta, dict):
++        profiles: set[str] = {str(p) for p in (meta.get("profiles") or []) if isinstance(p, str)}
++        if (
++            class_uid in (3002, 4001, 4003, 6001, 6002, 6003) and payload.get("device") is not None
++        ) or (class_uid in (4001, 4003, 6001, 6002) and payload.get("actor") is not None):
++            profiles.add("host")
++        if any(
++            payload.get(k) is not None
++            for k in ("disposition", "disposition_id", "action", "action_id", "firewall_rule")
++        ):
++            profiles.add("security_control")
++        if profiles:
++            meta["profiles"] = sorted(profiles)
++
++
+ class YamlOcsfMapper(OcsfMapper):
+     def __init__(self, spec: MappingSpecSummary, field_map: dict[str, str]) -> None:
+         self._spec = spec
+@@ -55,6 +132,7 @@ class YamlOcsfMapper(OcsfMapper):
+             "class_uid": self._spec.class_uid,
+             "activity_id": self._spec.activity_id,
+             "type_uid": self._spec.class_uid * 100 + self._spec.activity_id,
++            "severity_id": 1,
+             "time": int(parsed.occurred_at.timestamp() * 1000),
+             "metadata": {
+                 "version": self._spec.ocsf_version,
+@@ -71,17 +149,37 @@ class YamlOcsfMapper(OcsfMapper):
+             if src_key in parsed.extracted_fields:
+                 consumed_keys.add(src_key)
+                 val = parsed.extracted_fields[src_key]
+-                if val is not None and val != "":
++                if val is None or val == "":
++                    continue
++                if ocsf_path in ("answers", "answers.rdata"):
++                    ans_objs = _normalize_dns_answers(val)
++                    if ans_objs:
++                        payload["answers"] = ans_objs
++                elif ocsf_path == "file.hashes.value":
++                    _assign_dotted(
++                        payload,
++                        "file.hashes",
++                        [{"algorithm_id": 3, "algorithm": "SHA-256", "value": str(val)}],
++                    )
++                elif ocsf_path == "web_resources.url_string":
++                    payload["web_resources"] = [{"name": str(val), "url_string": str(val)}]
++                else:
+                     _assign_dotted(payload, ocsf_path, val)
+ 
++        _finalize_ocsf_v140_objects(payload, self._spec.class_uid)
++
+         orig_uid = payload["metadata"].get("original_uid") or parsed.original_event_uid
+         if orig_uid is not None:
+             orig_uid = str(orig_uid)
+             payload["metadata"]["original_uid"] = orig_uid
+ 
+-        unmapped = {k: v for k, v in parsed.extracted_fields.items() if k not in consumed_keys}
+-        if unmapped:
+-            payload["unmapped"] = unmapped
++        explicit_unmapped = (
++            dict(payload["unmapped"]) if isinstance(payload.get("unmapped"), dict) else {}
++        )
++        rest_unmapped = {k: v for k, v in parsed.extracted_fields.items() if k not in consumed_keys}
++        merged_unmapped = {**explicit_unmapped, **rest_unmapped}
++        if merged_unmapped:
++            payload["unmapped"] = merged_unmapped
+ 
+         return NormalizedEvent(
+             event_id=ev_id,
+@@ -97,7 +195,7 @@ class YamlOcsfMapper(OcsfMapper):
+             mapping_rule_id=self._spec.rule_id,
+             original_event_uid=orig_uid,
+             ocsf_payload=payload,
+-            unmapped_fields=unmapped,
++            unmapped_fields=merged_unmapped,
+         )
+ 
+ 
+@@ -132,7 +230,7 @@ class DefaultMappingRegistry(MappingRegistry):
+             spec = MappingSpecSummary(
+                 rule_id=str(doc["rule_id"]),
+                 rule_version=str(doc.get("rule_version", "1.0.0")),
+-                ocsf_version=str(doc.get("ocsf_version", "1.3.0")),
++                ocsf_version=str(doc.get("ocsf_version", "1.4.0")),
+                 parser_id=str(match_cfg["parser_id"]),
+                 event_code=(
+                     str(match_cfg["event_code"])
+@@ -152,7 +250,7 @@ class DefaultNormalizationService(NormalizationService):
+     def __init__(
+         self,
+         registry: MappingRegistry,
+-        ocsf_version: str = "1.3.0",
++        ocsf_version: str = "1.4.0",
+     ) -> None:
+         self._registry = registry
+         self._fallback = FallbackNormalizer(ocsf_version=ocsf_version)
+diff --git a/src/provloom/normalization/fallback.py b/src/provloom/normalization/fallback.py
+index 9010e18..c8da2de 100644
+--- a/src/provloom/normalization/fallback.py
++++ b/src/provloom/normalization/fallback.py
+@@ -14,7 +14,7 @@ def build_deterministic_event_id(parsed: ParsedEnvelope) -> object:
+ class FallbackNormalizer:
+     """Wraps unsupported events into OCSF Base Event (class_uid=0) with zero silent drops."""
+ 
+-    def __init__(self, ocsf_version: str = "1.3.0") -> None:
++    def __init__(self, ocsf_version: str = "1.4.0") -> None:
+         self._version = ocsf_version
+ 
+     def wrap(self, parsed: ParsedEnvelope) -> NormalizedEvent:
+@@ -24,6 +24,8 @@ class FallbackNormalizer:
+             "category_uid": int(OcsfCategoryUid.UNCATEGORIZED),
+             "class_uid": int(OcsfClassUid.BASE_EVENT),
+             "activity_id": 0,
++            "type_uid": 0,
++            "severity_id": 0,
+             "time": int(parsed.occurred_at.timestamp() * 1000),
+             "metadata": {
+                 "version": self._version,
+diff --git a/src/provloom/storage/interfaces.py b/src/provloom/storage/interfaces.py
+index 1261304..db5216e 100644
+--- a/src/provloom/storage/interfaces.py
++++ b/src/provloom/storage/interfaces.py
+@@ -1,6 +1,7 @@
+ from __future__ import annotations
+ 
+ from collections.abc import Sequence
++from contextlib import AbstractContextManager
+ from datetime import datetime
+ from typing import Protocol
+ from uuid import UUID
+@@ -310,3 +311,4 @@ class UnitOfWork(Protocol):
+     def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None: ...
+     def commit(self) -> None: ...
+     def rollback(self) -> None: ...
++    def savepoint(self) -> AbstractContextManager[None]: ...
+diff --git a/src/provloom/storage/postgres/uow.py b/src/provloom/storage/postgres/uow.py
+index 002e4ef..0fdb71e 100644
+--- a/src/provloom/storage/postgres/uow.py
++++ b/src/provloom/storage/postgres/uow.py
+@@ -1,7 +1,8 @@
+ from __future__ import annotations
+ 
+ import re
+-from collections.abc import Callable
++from collections.abc import Callable, Iterator
++from contextlib import contextmanager
+ 
+ from sqlalchemy import Connection, Engine, create_engine, delete, event, select, update
+ from sqlalchemy.pool import StaticPool
+@@ -37,10 +38,7 @@ def _sqlite_regexp(pattern: str | None, flags_str: str | None, value: str | None
+             flags |= re.MULTILINE
+         if "s" in flags_str:
+             flags |= re.DOTALL
+-    try:
+-        return 1 if re.search(pattern, str(value), flags) is not None else 0
+-    except re.error:
+-        return 0
++    return 1 if re.search(pattern, str(value), flags) is not None else 0
+ 
+ 
+ def create_db_engine(database_url: str, echo: bool = False) -> Engine:
+@@ -102,6 +100,12 @@ class SqlUnitOfWork(UnitOfWork):
+         if self._conn is not None and self._tx.is_active:
+             self._tx.rollback()
+ 
++    @contextmanager
++    def savepoint(self) -> Iterator[None]:
++        assert self._conn is not None
++        with self._conn.begin_nested():
++            yield
++
+     def purge_derived_data(self, tenant_scope: str) -> None:
+         assert self._conn is not None
+         self.detection.purge_tenant_detection_results(tenant_scope)
