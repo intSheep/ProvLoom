@@ -1,0 +1,16 @@
+title: Semantic 14 - Unicode Paths, Windash Variants, and SQLi Literal Safety
+id: 11111111-0000-4000-8000-000000000014
+status: test
+level: high
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_unicode:
+    CommandLine|contains: 'C:\用户\管理员\载荷_v1.ps1'
+  sel_windash:
+    Image|endswith: '\powershell.exe'
+    CommandLine|windash|contains: ' -EncodedCommand '
+  sel_sqli_literal:
+    CommandLine|contains: "' OR '1'='1"
+  condition: 1 of sel_*

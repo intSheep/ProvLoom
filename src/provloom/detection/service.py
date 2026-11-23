@@ -315,9 +315,14 @@ class DefaultDetectionService:
                     matches = ()
             except Exception as exc:
                 self._telemetry.record_detection_failure("execution")
+                err_rule = replace(
+                    target_rule,
+                    status=RuleStatus.ERROR,
+                    compatibility=replace(target_rule.compatibility, execution_success=False),
+                )
                 dur = (time.perf_counter() - t0) * 1000.0
                 return RuleTestResult(
-                    rule=target_rule,
+                    rule=err_rule,
                     parsed_summary=art.parsed_summary,
                     field_mappings=dict(art.rule.compatibility.field_mappings),
                     compiled_sql=art.event_query.postgres_sql if art.event_query else None,
@@ -454,60 +459,66 @@ class DefaultDetectionService:
                     source_hint=rule.source,
                 )
                 try:
-                    if rule.detection_type == DetectionType.EVENT and art.event_query is not None:
-                        raw_matches = self._event_matcher.match_batch(
-                            uow=uow,
-                            scope=scope,
-                            time_range=time_range,
-                            rule=rule,
-                            query=art.event_query,
-                            execution_id=exec_id,
-                            max_matches=limit,
-                        )
-                    elif (
-                        rule.detection_type == DetectionType.RELATION
-                        and art.relation_spec is not None
-                    ):
-                        raw_matches = self._relation_matcher.match_batch(
-                            uow=uow,
-                            scope=scope,
-                            time_range=time_range,
-                            rule=rule,
-                            spec=art.relation_spec,
-                            execution_id=exec_id,
-                            max_matches=limit,
-                        )
-                    else:
-                        raise DetectionExecutionError("Rule missing compiled matcher target")
-
-                    stored_matches: list[RuleMatch] = []
-                    for m in raw_matches:
-                        stored_m, was_created = uow.detection.insert_rule_match_if_absent(m)
-                        stored_matches.append(stored_m)
-                        if was_created:
-                            matches_created += 1
+                    with uow.savepoint():
+                        if (
+                            rule.detection_type == DetectionType.EVENT
+                            and art.event_query is not None
+                        ):
+                            raw_matches = self._event_matcher.match_batch(
+                                uow=uow,
+                                scope=scope,
+                                time_range=time_range,
+                                rule=rule,
+                                query=art.event_query,
+                                execution_id=exec_id,
+                                max_matches=limit,
+                            )
+                        elif (
+                            rule.detection_type == DetectionType.RELATION
+                            and art.relation_spec is not None
+                        ):
+                            raw_matches = self._relation_matcher.match_batch(
+                                uow=uow,
+                                scope=scope,
+                                time_range=time_range,
+                                rule=rule,
+                                spec=art.relation_spec,
+                                execution_id=exec_id,
+                                max_matches=limit,
+                            )
                         else:
-                            matches_dedup += 1
+                            raise DetectionExecutionError("Rule missing compiled matcher target")
 
-                    if stored_matches:
-                        sig_stats = self._signal_gen.ingest_matches(
-                            uow=uow, rule=rule, matches=stored_matches
-                        )
-                        sig_created += sig_stats.signals_created
-                        sig_aggregated += sig_stats.signals_aggregated
-                        sig_dedup += sig_stats.signals_deduplicated
+                        stored_matches: list[RuleMatch] = []
+                        for m in raw_matches:
+                            stored_m, was_created = uow.detection.insert_rule_match_if_absent(m)
+                            stored_matches.append(stored_m)
+                            if was_created:
+                                matches_created += 1
+                            else:
+                                matches_dedup += 1
 
-                    if rule.compatibility.execution_success is not True:
-                        uow.detection.upsert_rule(
-                            scope.tenant_id,
-                            replace(
-                                rule,
-                                compatibility=replace(rule.compatibility, execution_success=True),
-                                updated_at=datetime.now(UTC),
-                            ),
-                            preserve_status=True,
-                        )
-                    rules_evaluated += 1
+                        if stored_matches:
+                            sig_stats = self._signal_gen.ingest_matches(
+                                uow=uow, rule=rule, matches=stored_matches
+                            )
+                            sig_created += sig_stats.signals_created
+                            sig_aggregated += sig_stats.signals_aggregated
+                            sig_dedup += sig_stats.signals_deduplicated
+
+                        if rule.compatibility.execution_success is not True:
+                            uow.detection.upsert_rule(
+                                scope.tenant_id,
+                                replace(
+                                    rule,
+                                    compatibility=replace(
+                                        rule.compatibility, execution_success=True
+                                    ),
+                                    updated_at=datetime.now(UTC),
+                                ),
+                                preserve_status=True,
+                            )
+                        rules_evaluated += 1
                 except Exception as exc:
                     failures.append(
                         RuleExecutionFailure(

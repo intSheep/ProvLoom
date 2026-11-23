@@ -1,0 +1,68 @@
+{
+  "sources": {
+    "ocsf_examples": {
+      "repo": "https://github.com/ocsf/examples",
+      "commit": "ce0589ece917e9b9c018b795c8979ffb42072cad"
+    },
+    "otrf_security_datasets": {
+      "repo": "https://github.com/OTRF/Security-Datasets",
+      "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87"
+    },
+    "splunk_attack_data": {
+      "repo": "https://github.com/splunk/attack_data",
+      "commit": "5879f5423e6c08df2b22b63f7b36e84866f9c51c"
+    }
+  },
+  "files": [
+    {
+      "path": "ocsf_examples/1_1_0_route53.ocsf",
+      "bytes": 2502,
+      "sha256": "abe84b23c6b0779dc3f7941d59946dff492e808ec4f4bbfbfddc844db23d865a"
+    },
+    {
+      "path": "ocsf_examples/OCSF_api_activity.json",
+      "bytes": 2470,
+      "sha256": "a544e75c197e08261929a56a341d88cc45fc32f2322803ef2b50c0ea0a983f0e"
+    },
+    {
+      "path": "ocsf_examples/OCSF_authentication.json",
+      "bytes": 2655,
+      "sha256": "530086216218dd4bd2a0b73ffacbc9adf6180ad1a4e7155e3d13e17573866206"
+    },
+    {
+      "path": "ocsf_examples/vpcflowlog.ocsf",
+      "bytes": 1435,
+      "sha256": "164949ce96f072591831a182c1c1572018031d62dbc6a4b8576c213269a75491"
+    },
+    {
+      "path": "otrf_security_datasets/cmd_bitsadmin_download_psh_script_slice.jsonl",
+      "bytes": 84313,
+      "sha256": "eb11366e91df9aa0567cdbaf553c70e80d877e7589d9f23be9b543b8b8e3764d"
+    },
+    {
+      "path": "otrf_security_datasets/psh_lsass_memory_dump_comsvcs_slice.jsonl",
+      "bytes": 59677,
+      "sha256": "9422c099d06f2aedb313aa6021686e4231507a5fecd1172a0a2e1bb59826cbea"
+    },
+    {
+      "path": "splunk_attack_data/T1021_001_mstsc_sysmon_xml_sample.log",
+      "bytes": 8603,
+      "sha256": "0c678048d66ebbc22aee7b284800fb1550c19bddf02303ead9c3b1258e9e1edc"
+    },
+    {
+      "path": "splunk_attack_data/T1021_001_zeek_conn.jsonl",
+      "bytes": 471,
+      "sha256": "57926a175cad5cf4a5df8aa208ad02d68ff07c8b65eb0b5138d8a8bfcc8e1590"
+    },
+    {
+      "path": "splunk_attack_data/T1053_005_sysmon_slice.jsonl",
+      "bytes": 1216825,
+      "sha256": "3a0c86117f38581241bb5a8a3dce9752ba7e975e667b2014d68f915045e02b03"
+    },
+    {
+      "path": "splunk_attack_data/T1053_005_win_security_4624_slice.jsonl",
+      "bytes": 55951,
+      "sha256": "e44372e5307c560a3e5766a4c0c71b799492c6c9f78c27e45fe59a5605e595e9"
+    }
+  ]
+}

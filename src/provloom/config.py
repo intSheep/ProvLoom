@@ -32,7 +32,7 @@ class DetectionConfig:
 class AppConfig:
     env: str = "development"
     database_url: str = "postgresql+psycopg://provloom:provloom@localhost:5432/provloom"
-    ocsf_version: str = "1.3.0"
+    ocsf_version: str = "1.4.0"
     mappings_dir: str = "configs/mappings"
     default_tenant: str = "default"
     query_guards: QueryGuardConfig = QueryGuardConfig()

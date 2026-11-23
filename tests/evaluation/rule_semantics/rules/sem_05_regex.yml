@@ -1,0 +1,13 @@
+title: Semantic 05 - Regex Case Sensitivity and Multiline Flags
+id: 11111111-0000-4000-8000-000000000005
+status: test
+level: high
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_strict:
+    CommandLine|re: 'Invoke-[A-Z][a-z]+Mimikatz'
+  sel_multiline_inline_i:
+    CommandLine|re|m: '(?i)^net\s+localgroup\s+administrators'
+  condition: 1 of sel_*

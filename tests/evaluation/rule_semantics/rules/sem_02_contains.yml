@@ -1,0 +1,13 @@
+title: Semantic 02 - Contains and Contains All with SQL Wildcard Literals
+id: 11111111-0000-4000-8000-000000000002
+status: test
+level: high
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    CommandLine|contains|all:
+      - '100%_stage'
+      - '-nop'
+  condition: selection

@@ -59,7 +59,7 @@ export function ConsoleShell() {
             />
             <strong className="text-[15px] tracking-tight">ProvLoom</strong>
             <span className="rounded border border-[var(--pl-border)] bg-[var(--pl-surface-alt)] px-2 py-0.5 text-[11px] font-mono-code text-[var(--pl-text-muted)]">
-              OCSF v1.3.0 · Provenance Workbench
+              OCSF v1.4.0 · Provenance Workbench
             </span>
           </div>
 

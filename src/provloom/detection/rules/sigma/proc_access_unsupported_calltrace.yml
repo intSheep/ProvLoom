@@ -2,7 +2,7 @@ title: Malformed Unmapped CallTrace LSASS Access (Compatibility Reference)
 id: 6d4b1e8c-91b2-4e45-8c01-100700009999
 status: experimental
 version: 1.0.0
-description: Reference Sigma rule referencing raw CallTrace and GrantedAccess fields without OCSF v1.3.0 mapping to verify explicit UNSUPPORTED classification.
+description: Reference Sigma rule referencing raw CallTrace and GrantedAccess fields without OCSF v1.4.0 mapping to verify explicit UNSUPPORTED classification.
 references:
   - https://github.com/SigmaHQ/sigma/tree/master/rules/windows/process_access
 tags:

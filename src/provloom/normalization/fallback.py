@@ -14,7 +14,7 @@ def build_deterministic_event_id(parsed: ParsedEnvelope) -> object:
 class FallbackNormalizer:
     """Wraps unsupported events into OCSF Base Event (class_uid=0) with zero silent drops."""
 
-    def __init__(self, ocsf_version: str = "1.3.0") -> None:
+    def __init__(self, ocsf_version: str = "1.4.0") -> None:
         self._version = ocsf_version
 
     def wrap(self, parsed: ParsedEnvelope) -> NormalizedEvent:
@@ -24,6 +24,8 @@ class FallbackNormalizer:
             "category_uid": int(OcsfCategoryUid.UNCATEGORIZED),
             "class_uid": int(OcsfClassUid.BASE_EVENT),
             "activity_id": 0,
+            "type_uid": 0,
+            "severity_id": 0,
             "time": int(parsed.occurred_at.timestamp() * 1000),
             "metadata": {
                 "version": self._version,

@@ -172,7 +172,7 @@ detection:
             assert evidences is not None and len(evidences) >= 1
             for ev in evidences:
                 self.assertTrue(len(ev.raw_payload) > 10)
-                self.assertEqual(ev.ocsf_payload["metadata"]["version"], "1.3.0")
+                self.assertEqual(ev.ocsf_payload["metadata"]["version"], "1.4.0")
                 ev_detail = rt.query_service.get_event(SCOPE, ev.event_id, include_raw=True)
                 assert ev_detail is not None and ev_detail.raw is not None
                 self.assertEqual(ev_detail.raw.raw_event_id, ev.raw_event_id)

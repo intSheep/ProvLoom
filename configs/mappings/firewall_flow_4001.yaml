@@ -1,6 +1,6 @@
 rule_id: firewall_flow_4001
 rule_version: "1.0.0"
-ocsf_version: "1.3.0"
+ocsf_version: "1.4.0"
 match:
   parser_id: firewall
   event_code: flow

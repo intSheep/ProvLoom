@@ -1,6 +1,6 @@
 rule_id: app_api_activity_6003
 rule_version: "1.0.0"
-ocsf_version: "1.3.0"
+ocsf_version: "1.4.0"
 match:
   parser_id: app
   event_code: api_call
@@ -13,7 +13,7 @@ fields:
   device.hostname: hostname
   actor.user.name: username
   actor.user.domain: domain
-  service.name: service_name
-  service.port: listen_port
+  api.service.name: service_name
+  unmapped.listen_port: listen_port
   api.operation: operation
   src_endpoint.ip: src_ip
