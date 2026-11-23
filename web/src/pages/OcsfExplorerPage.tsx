@@ -124,7 +124,7 @@ export function OcsfExplorerPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-base font-semibold m-0">OCSF v1.3.0 事件检索与三栏映射对照</h1>
+          <h1 className="text-base font-semibold m-0">OCSF v1.4.0 事件检索与三栏映射对照</h1>
           <p className="text-xs text-[var(--pl-text-muted)] m-0 mt-0.5">
             验证标准字段映射、unmapped_fields 扩展槽位与不支持事件 Passthrough 兜底（AC-02）。
           </p>

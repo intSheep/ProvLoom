@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from provloom.detection.compiler.ocsf_pipeline import (
     KNOWN_OCSF_V13_FIELDS,
+    KNOWN_OCSF_V14_FIELDS,
     apply_ocsf_pipeline,
     build_provloom_ocsf_pipeline,
     evaluate_data_coverage,
@@ -17,6 +18,7 @@ from provloom.detection.compiler.sigma_parser import ParsedRuleEnvelope, parse_r
 
 __all__ = [
     "KNOWN_OCSF_V13_FIELDS",
+    "KNOWN_OCSF_V14_FIELDS",
     "CompiledEventQuery",
     "CompiledRuleArtifact",
     "ParsedRuleEnvelope",

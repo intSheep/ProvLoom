@@ -1,0 +1,14 @@
+title: Semantic 15 - OCSF DNS answers[].rdata Object Array Matching
+id: 11111111-0000-4000-8000-000000000015
+status: test
+level: high
+logsource:
+  category: dns
+detection:
+  sel_exact:
+    answers: '198.51.100.77'
+  sel_contains:
+    QueryResults|contains: 'IEX ('
+  filter_sinkhole:
+    answers: '0.0.0.0'
+  condition: (sel_exact or sel_contains) and not filter_sinkhole

@@ -58,15 +58,16 @@ MVP 优先支持：本地 JSON / JSONL 文件、CSV 文件、Sysmon 事件样本
 
 ### 3.3 OCSF 标准化层
 
-以 OCSF 为首选标准（https://ocsf.io/）。优先支持：
-- Process Activity
-- File System Activity
-- Network Activity
-- Authentication
-- DNS Activity
-- Application Activity
+以 OCSF `v1.4.0`（官方 tag `1.4.0`, commit `6109cc5e834c1adfee67dda6c9bcfa5e37f79012`）为固定标准（https://ocsf.io/）。优先支持：
+- Process Activity (`1007`)
+- File System Activity (`1001`)
+- Script Activity (`1009`)
+- Network Activity (`4001`)
+- Authentication (`3002`)
+- DNS Activity (`4003`)
+- Application Activity (`6001` / `6002` / `6003`)
 
-要求：使用标准 OCSF 字段、保留 OCSF 版本信息、保留原始事件 ID、未映射字段放入扩展字段或保留原始数据、不支持的事件不能静默丢弃。
+要求：使用标准 OCSF `v1.4.0` 字段（含 `answers[].rdata`、`script.script_content.value` 等嵌套对象路径）、保持 `ocsf_version` 与 `metadata.version` 一致、保留原始事件 ID、未映射字段放入 `unmapped` 或保留原始数据、不支持的事件不能静默丢弃。
 
 ### 3.4 实体识别层
 

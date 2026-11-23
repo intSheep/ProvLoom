@@ -1,0 +1,13 @@
+title: Semantic 06 - Numeric Range and Inequality
+id: 11111111-0000-4000-8000-000000000006
+status: test
+level: medium
+logsource:
+  category: network_connection
+  product: windows
+detection:
+  sel_high_port:
+    DestinationPort|gt: 1024
+    DestinationPort|lte: 9000
+    DestinationPort|neq: 8080
+  condition: sel_high_port

@@ -1,0 +1,62 @@
+{
+  "policy": "Unlabeled background OS/domain telemetry in public capture files MUST be classified as UNKNOWN and NEVER counted as True Negatives (TN).",
+  "datasets": [
+    {
+      "dataset_id": "otrf_bitsadmin_t1197",
+      "source_repo": "https://github.com/OTRF/Security-Datasets",
+      "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
+      "fixture_path": "tests/evaluation/fixtures/public_datasets/otrf_security_datasets/cmd_bitsadmin_download_psh_script_slice.jsonl",
+      "source_type": "sysmon",
+      "adapter_type": "jsonl",
+      "expected_known_attack_hits": [
+        {
+          "rule_id": "d059842b-6b9d-4ed1-b5c3-5b89143c6ede",
+          "rule_file": "proc_creation_win_bitsadmin_download.yml",
+          "min_expected_matches": 1,
+          "attack_indicator": "bitsadmin.exe /transfer /Download ... https://raw.githubusercontent.com/.../T1197.md"
+        }
+      ]
+    },
+    {
+      "dataset_id": "otrf_lsass_comsvcs_t1003_001",
+      "source_repo": "https://github.com/OTRF/Security-Datasets",
+      "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
+      "fixture_path": "tests/evaluation/fixtures/public_datasets/otrf_security_datasets/psh_lsass_memory_dump_comsvcs_slice.jsonl",
+      "source_type": "sysmon",
+      "adapter_type": "jsonl",
+      "expected_known_attack_hits": [
+        {
+          "rule_id": "a5a2d357-1ab8-4675-a967-ef9990a59391",
+          "rule_file": "file_event_win_lsass_default_dump_file_names.yml",
+          "min_expected_matches": 1,
+          "attack_indicator": "C:\\Users\\wardog\\AppData\\Local\\Temp\\lsass-comsvcs.dmp"
+        }
+      ]
+    },
+    {
+      "dataset_id": "splunk_atomic_t1053_005_sysmon",
+      "source_repo": "https://github.com/splunk/attack_data",
+      "commit": "5879f5423e6c08df2b22b63f7b36e84866f9c51c",
+      "fixture_path": "tests/evaluation/fixtures/public_datasets/splunk_attack_data/T1053_005_sysmon_slice.jsonl",
+      "source_type": "sysmon",
+      "adapter_type": "jsonl",
+      "expected_known_attack_hits": [
+        {
+          "rule_id": "7047d730-036f-4f40-b9d8-1c63e36d5e62",
+          "rule_file": "file_event_win_powershell_drop_binary_or_script.yml",
+          "min_expected_matches": 2,
+          "attack_indicator": "powershell.exe dropping C:\\Users\\Public\\sandcat.exe and splunkd.exe"
+        }
+      ]
+    },
+    {
+      "dataset_id": "splunk_t1021_001_zeek_conn",
+      "source_repo": "https://github.com/splunk/attack_data",
+      "commit": "5879f5423e6c08df2b22b63f7b36e84866f9c51c",
+      "fixture_path": "tests/evaluation/fixtures/public_datasets/splunk_attack_data/T1021_001_zeek_conn.jsonl",
+      "source_type": "zeek_conn",
+      "adapter_type": "jsonl",
+      "expected_known_attack_hits": []
+    }
+  ]
+}

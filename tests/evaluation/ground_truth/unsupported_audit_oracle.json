@@ -1,0 +1,112 @@
+[
+  {
+    "index": 25,
+    "rule_id": "b1c50487-1967-4315-a026-6491686d860e",
+    "filename": "file_event_win_office_macro_files_from_susp_process.yml",
+    "semantic_audit_only": true,
+    "audit_note": "Rule requires ParentImage on file_event (Sysmon EID 11). ProvLoom's OCSF v1.4.0 file_event pipeline intentionally rejects ParentImage as UNSUPPORTED rather than accepting upstream pySigma-pipeline-ocsf's erroneous ParentImage -> file.name mapping.",
+    "cases": [
+      {
+        "test_event_id": "gt-25-tp-direct-wscript",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\wscript.exe",
+                "type_id": 1,
+                "name": "wscript.exe"
+              },
+              "uid": "proc-gt-25-tp-direct-wscript"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\alice\\Documents\\invoice.docm",
+            "name": "invoice.docm",
+            "type_id": 1
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-25-tp-direct-wscript"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Direct wscript.exe Image writing .docm matches selection_cmd branch 1.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-25-tp-parent-wscript-distortion-check",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files\\Microsoft Office\\WINWORD.EXE",
+                "type_id": 1,
+                "name": "WINWORD.EXE"
+              },
+              "parent_process": {
+                "file": {
+                  "path": "C:\\Windows\\System32\\wscript.exe",
+                  "type_id": 1,
+                  "name": "wscript.exe"
+                },
+                "uid": "proc-gt-25-tp-parent-wscript-distortion-check"
+              },
+              "uid": "proc-gt-25-tp-parent-wscript-distortion-check"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\alice\\Documents\\macro.docm",
+            "name": "macro.docm",
+            "type_id": 1
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-25-tp-parent-wscript-distortion-check"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Semantic oracle: ParentImage is \\wscript.exe and TargetFilename ends with .docm; if ParentImage is corrupted into file.name, this silently produces a False Negative!",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "gt-25-tn-benign-word-corrupted-filename-check",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "process": {
+              "file": {
+                "path": "C:\\Program Files\\Microsoft Office\\WINWORD.EXE",
+                "type_id": 1,
+                "name": "WINWORD.EXE"
+              },
+              "uid": "proc-gt-25-tn-benign-word-corrupted-filename-check"
+            }
+          },
+          "file": {
+            "path": "C:\\Users\\alice\\Documents\\notes.docm",
+            "name": "D:\\Archive\\wscript.exe",
+            "type_id": 1
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-gt-25-tn-benign-word-corrupted-filename-check"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Semantic oracle: neither Image nor ParentImage is a script host; if ParentImage is corrupted into file.name, file.name='D:\\Archive\\wscript.exe' produces a False Positive!",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  }
+]

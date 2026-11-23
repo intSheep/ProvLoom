@@ -1,0 +1,46 @@
+[
+  {
+    "change_id": "ORACLE-CHG-01",
+    "affected_case": "D13_case_sensitivity:sem-13-tn-2-lowercase-false-base64 -> sem-13-tp-4-base64-lowercase-default-case-insensitive",
+    "old_expectation": false,
+    "new_expectation": true,
+    "reason": "Round 1 erroneously assumed Sigma |base64 implies case-sensitive matching because the Base64 alphabet is case-sensitive. Per official Sigma Modifiers Specification v2.1.0 and pySigma v1.5.1 (SigmaBase64Modifier.modify -> SigmaString), |base64 only Base64-encodes the literal into an uncased SigmaString, which follows Sigma's default case-insensitive matching; only explicit |cased produces SigmaCasedString.",
+    "normative_basis": [
+      "https://sigmahq.io/sigma-specification/specification/sigma-appendix-modifiers.html",
+      "https://github.com/SigmaHQ/pySigma/blob/v1.5.1/sigma/modifiers.py"
+    ]
+  },
+  {
+    "change_id": "ORACLE-CHG-02",
+    "affected_case": "D15_array_fields & SigmaHQ #44 (net_dns_susp_txt_exec_strings.yml)",
+    "old_expectation": "Tested DNS answers as string[] or scalar string",
+    "new_expectation": "Standard suite uses OCSF v1.4.0 dns_answer[] objects ({'rdata': ...}) with negative sibling-attribute isolation cases; string[] / scalar cases moved to legacy_compat_oracle.json",
+    "reason": "In OCSF v1.3.0 and v1.4.0 (dictionary.json & objects/dns_answer.json), DNS answers is dns_answer[] with required string attribute rdata.",
+    "normative_basis": [
+      "https://github.com/ocsf/ocsf-schema/blob/1.4.0/dictionary.json",
+      "https://github.com/ocsf/ocsf-schema/blob/1.4.0/objects/dns_answer.json"
+    ]
+  },
+  {
+    "change_id": "ORACLE-CHG-03",
+    "affected_case": "SigmaHQ #17 & #18 (Script Activity 1009)",
+    "old_expectation": "Tested script.script_content as a flat string under OCSF 1.3.0 label",
+    "new_expectation": "Upgraded target contract to OCSF v1.4.0 (6109cc5e834c1adfee67dda6c9bcfa5e37f79012) where Script Activity (1009) is standard and script.script_content is a long_string object whose text resides at script.script_content.value; added negative sibling-attribute cases and malformed scalar robustness case",
+    "reason": "Script Activity (1009) was introduced in OCSF v1.4.0, and objects/long_string.json defines value as the required string attribute.",
+    "normative_basis": [
+      "https://github.com/ocsf/ocsf-schema/blob/1.4.0/events/system/script_activity.json",
+      "https://github.com/ocsf/ocsf-schema/blob/1.4.0/objects/script.json",
+      "https://github.com/ocsf/ocsf-schema/blob/1.4.0/objects/long_string.json"
+    ]
+  },
+  {
+    "change_id": "ORACLE-CHG-04",
+    "affected_case": "D06_numeric:sem-06-tn-3-malformed-nonnumeric & SigmaHQ #25 semantic_audit_only",
+    "old_expectation": "Included in semantic_oracle.json and sigmahq_ground_truth.json respectively",
+    "new_expectation": "Moved malformed non-numeric port case to robustness_oracle.json and #25's 3 rejection-audit cases to unsupported_audit_oracle.json",
+    "reason": "Separate standard OCSF v1.4.0 execution test cases from deliberately invalid robustness inputs and unsupported-rule rejection audits.",
+    "normative_basis": [
+      "https://github.com/ocsf/ocsf-schema/blob/1.4.0/dictionary.json"
+    ]
+  }
+]

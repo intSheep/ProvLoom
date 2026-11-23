@@ -1,0 +1,11 @@
+title: Semantic 04 - Endswith Suffix Match
+id: 11111111-0000-4000-8000-000000000004
+status: test
+level: medium
+logsource:
+  category: dns_query
+  product: windows
+detection:
+  selection:
+    QueryName|endswith: '.argotunnel.com'
+  condition: selection

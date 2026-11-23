@@ -1,0 +1,902 @@
+[
+  {
+    "index": 1,
+    "domain_group": "windows_process_creation",
+    "rule_id": "d059842b-6b9d-4ed1-b5c3-5b89143c6ede",
+    "title": "File Download Via Bitsadmin",
+    "status": "test",
+    "level": "medium",
+    "date": "2017-03-09",
+    "modified": "2023-02-15",
+    "version": "2023-02-15",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_bitsadmin_download.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_bitsadmin_download.yml",
+    "sha256": "26747eb1e298fb9243b12057545424ea3a51733c1dc9dc03dcbb2e32339e70bc",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 2,
+    "domain_group": "windows_process_creation",
+    "rule_id": "19b08b1c-861d-4e75-a1ef-ea0c1baf202b",
+    "title": "Suspicious Download Via Certutil.EXE",
+    "status": "test",
+    "level": "medium",
+    "date": "2023-02-15",
+    "modified": "2025-12-01",
+    "version": "2025-12-01",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_certutil_download.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_certutil_download.yml",
+    "sha256": "1262c65c22592b28f2c63906462f07f9c0d95e8fa065405505d18979a5f278af",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 3,
+    "domain_group": "windows_process_creation",
+    "rule_id": "39019a4e-317f-4ce3-ae63-309a8c6b53c5",
+    "title": "Suspicious Scheduled Task Creation Involving Temp Folder",
+    "status": "test",
+    "level": "high",
+    "date": "2021-03-11",
+    "modified": "2022-10-09",
+    "version": "2022-10-09",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_schtasks_creation_temp_folder.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_schtasks_creation_temp_folder.yml",
+    "sha256": "b89b0f16c8641b3c2f2ad4ad5d6571da14da3e5ebdf653663af38f1ee4ba932e",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 4,
+    "domain_group": "windows_process_creation",
+    "rule_id": "8a582fe2-0882-4b89-a82a-da6b2dc32937",
+    "title": "Suspicious WmiPrvSE Child Process",
+    "status": "test",
+    "level": "high",
+    "date": "2021-08-23",
+    "modified": "2023-11-10",
+    "version": "2023-11-10",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_wmiprvse_susp_child_processes.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_wmiprvse_susp_child_processes.yml",
+    "sha256": "09dd26e7b73fea2c6510c356585b40abed67719faf1f8b401f01a5eecf3c430c",
+    "logsource": {
+      "product": "windows",
+      "category": "process_creation"
+    }
+  },
+  {
+    "index": 5,
+    "domain_group": "windows_process_creation",
+    "rule_id": "01d2e2a1-5f09-44f7-9fc1-24faa7479b6d",
+    "title": "Uncommon Svchost Parent Process",
+    "status": "test",
+    "level": "medium",
+    "date": "2017-08-15",
+    "modified": "2026-10-19",
+    "version": "2026-10-19",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_svchost_uncommon_parent_process.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_svchost_uncommon_parent_process.yml",
+    "sha256": "e08650e2137a0d601e7673431920b2091794c2af02912e908b444975e9d76cac",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 6,
+    "domain_group": "windows_process_creation",
+    "rule_id": "8de1cbe8-d6f5-496d-8237-5f44a721c7a0",
+    "title": "Whoami.EXE Execution Anomaly",
+    "status": "test",
+    "level": "medium",
+    "date": "2021-08-12",
+    "modified": "2025-03-06",
+    "version": "2025-03-06",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_whoami_parent_anomaly.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_whoami_parent_anomaly.yml",
+    "sha256": "07a23606d2d8234926302a9aa167be225bf48ecd4ed21d1938c30a63a1ffdbeb",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 7,
+    "domain_group": "windows_process_creation",
+    "rule_id": "1a0d4aba-7668-4365-9ce4-6d79ab088dfd",
+    "title": "Ping Hex IP",
+    "status": "test",
+    "level": "high",
+    "date": "2018-03-23",
+    "modified": "2025-10-17",
+    "version": "2025-10-17",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_ping_hex_ip.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_ping_hex_ip.yml",
+    "sha256": "0837212b95716d60754f23caefa739a7e44c99e2bdaa4e2397ba00252d078267",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 8,
+    "domain_group": "windows_process_creation",
+    "rule_id": "5afee48e-67dd-4e03-a783-f74259dcf998",
+    "title": "Potential LSASS Process Dump Via Procdump",
+    "status": "stable",
+    "level": "high",
+    "date": "2018-10-30",
+    "modified": "2025-10-19",
+    "version": "2025-10-19",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_sysinternals_procdump_lsass.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_sysinternals_procdump_lsass.yml",
+    "sha256": "dacd01969733dedd537ce3db1702ef1c7fb2158e984cf682c2136030ef765ed3",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 9,
+    "domain_group": "windows_process_creation",
+    "rule_id": "f1086bf7-a0c4-4a37-9102-01e573caf4a0",
+    "title": "Renamed Whoami Execution",
+    "status": "test",
+    "level": "critical",
+    "date": "2021-08-12",
+    "modified": "2022-10-09",
+    "version": "2022-10-09",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_renamed_whoami.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_renamed_whoami.yml",
+    "sha256": "6202f588c35467a152e4fe1917be432a02d6e66b2d5b1ce637eb4f4489f80e61",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 10,
+    "domain_group": "windows_process_creation",
+    "rule_id": "d9367cbb-c2e0-47ce-bdc0-128cb6da898d",
+    "title": "HackTool - SharpLdapWhoami Execution",
+    "status": "test",
+    "level": "high",
+    "date": "2022-08-29",
+    "modified": "2023-02-04",
+    "version": "2023-02-04",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_hktl_sharpldapwhoami.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_hktl_sharpldapwhoami.yml",
+    "sha256": "bf0a9e66f402358eae2a0021cb57557c8154c8fc4d6ccb851813169cc7fbd692",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 11,
+    "domain_group": "windows_process_creation",
+    "rule_id": "d2b7a134-9c3e-4f8a-b56d-e0c1f8a29b47",
+    "title": "Suspicious Cross-User Process Spawn",
+    "status": "experimental",
+    "level": "medium",
+    "date": "2026-07-23",
+    "modified": "",
+    "version": "2026-07-23",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_susp_cross_user_process_spawn.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_susp_cross_user_process_spawn.yml",
+    "sha256": "f721b05ae209b8ee2a9c19484bb720f19d47b92cf9d011cfc06c660a13a1acd3",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 12,
+    "domain_group": "windows_process_creation",
+    "rule_id": "b730a276-6b63-41b8-bcf8-55930c8fc6ee",
+    "title": "Csc.EXE Execution Form Potentially Suspicious Parent",
+    "status": "test",
+    "level": "high",
+    "date": "2019-02-11",
+    "modified": "2026-03-23",
+    "version": "2026-03-23",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_csc_susp_parent.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/windows_process_creation/proc_creation_win_csc_susp_parent.yml",
+    "sha256": "2815016166e73f26df399c14b23d45124caa5a13659073df969bc8944177b53b",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 13,
+    "domain_group": "powershell",
+    "rule_id": "79f4ede3-402e-41c8-bc3e-ebbf5f162581",
+    "title": "HackTool - Empire PowerShell Launch Parameters",
+    "status": "test",
+    "level": "high",
+    "date": "2019-04-20",
+    "modified": "2023-02-21",
+    "version": "2023-02-21",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_hktl_empire_powershell_launch.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/powershell/proc_creation_win_hktl_empire_powershell_launch.yml",
+    "sha256": "c07f78a61ca91483c50399e74bab4793f5d5d49e872c413c62fe3e728cc17806",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 14,
+    "domain_group": "powershell",
+    "rule_id": "85b0b087-eddf-4a2b-b033-d771fa2b9775",
+    "title": "PowerShell Download and Execution Cradles",
+    "status": "test",
+    "level": "high",
+    "date": "2022-03-24",
+    "modified": "2025-07-18",
+    "version": "2025-07-18",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_powershell_download_iex.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/powershell/proc_creation_win_powershell_download_iex.yml",
+    "sha256": "dcfb0a19e7a46a3fe9db13e95770d4c97e4d0ce409f5a51938b93625150338d9",
+    "logsource": {
+      "product": "windows",
+      "category": "process_creation"
+    }
+  },
+  {
+    "index": 15,
+    "domain_group": "powershell",
+    "rule_id": "deb9b646-a508-44ee-b7c9-d8965921c6b6",
+    "title": "Powershell Token Obfuscation - Process Creation",
+    "status": "test",
+    "level": "high",
+    "date": "2022-12-27",
+    "modified": "2026-03-16",
+    "version": "2026-03-16",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_powershell_token_obfuscation.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/powershell/proc_creation_win_powershell_token_obfuscation.yml",
+    "sha256": "c4a8cdd73071dd8eb83be98957b34e826e18cd3947a74f6697f1719e501e3deb",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 16,
+    "domain_group": "powershell",
+    "rule_id": "88f680b8-070e-402c-ae11-d2914f2257f1",
+    "title": "PowerShell Base64 Encoded IEX Cmdlet",
+    "status": "test",
+    "level": "high",
+    "date": "2019-08-23",
+    "modified": "2023-04-06",
+    "version": "2023-04-06",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/process_creation/proc_creation_win_powershell_base64_iex.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/powershell/proc_creation_win_powershell_base64_iex.yml",
+    "sha256": "7d2d5e96ae03d6a5798f5bc3fa80190849826288a2f32ced56cea7cb31ea62fe",
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 17,
+    "domain_group": "powershell",
+    "rule_id": "189e3b02-82b2-4b90-9662-411eb64486d4",
+    "title": "Potential Invoke-Mimikatz PowerShell Script",
+    "status": "test",
+    "level": "high",
+    "date": "2022-09-28",
+    "modified": "",
+    "version": "2022-09-28",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/powershell/powershell_script/posh_ps_potential_invoke_mimikatz.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/powershell/posh_ps_potential_invoke_mimikatz.yml",
+    "sha256": "ffdef7d6ca47bfe873bf3142dde9b9d8d11e0a438c3a966c941670875df1027e",
+    "logsource": {
+      "category": "ps_script",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 18,
+    "domain_group": "powershell",
+    "rule_id": "a136cde0-61ad-4a61-9b82-8dc490e60dd2",
+    "title": "Invoke-Obfuscation CLIP+ Launcher - PowerShell Module",
+    "status": "test",
+    "level": "high",
+    "date": "2020-10-13",
+    "modified": "2024-04-05",
+    "version": "2024-04-05",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/powershell/powershell_module/posh_pm_invoke_obfuscation_clip.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/powershell/posh_pm_invoke_obfuscation_clip.yml",
+    "sha256": "ba33d250d6c51026a2c5ad38952fa4babc713b2f5a80a9ecb0f0d3870105a78f",
+    "logsource": {
+      "product": "windows",
+      "category": "ps_module",
+      "definition": "0ad03ef1-f21b-4a79-8ce8-e6900c54b65b"
+    }
+  },
+  {
+    "index": 19,
+    "domain_group": "powershell",
+    "rule_id": "3236fcd0-b7e3-4433-b4f8-86ad61a9af2d",
+    "title": "PowerShell Download Via Net.WebClient - PowerShell Classic",
+    "status": "test",
+    "level": "low",
+    "date": "2017-03-05",
+    "modified": "2026-04-28",
+    "version": "2026-04-28",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/powershell/powershell_classic/posh_pc_download_via_webclient.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/powershell/posh_pc_download_via_webclient.yml",
+    "sha256": "66bef8fdc9ecf4b3ca7b1375f06a30f987bc4728d19151f555f12dcbbbadb7ba",
+    "logsource": {
+      "product": "windows",
+      "category": "ps_classic_start"
+    }
+  },
+  {
+    "index": 20,
+    "domain_group": "file_activity",
+    "rule_id": "a5a2d357-1ab8-4675-a967-ef9990a59391",
+    "title": "LSASS Process Memory Dump Files",
+    "status": "test",
+    "level": "high",
+    "date": "2021-11-15",
+    "modified": "2024-10-08",
+    "version": "2024-10-08",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/file/file_event/file_event_win_lsass_default_dump_file_names.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/file_activity/file_event_win_lsass_default_dump_file_names.yml",
+    "sha256": "953dd396e9c0c469e4cc2dc3430240fd3c398fd573daaf90d72f5f2adc7f5e8c",
+    "logsource": {
+      "product": "windows",
+      "category": "file_event"
+    }
+  },
+  {
+    "index": 21,
+    "domain_group": "file_activity",
+    "rule_id": "69ca12af-119d-44ed-b50f-a47af0ebc364",
+    "title": "LSASS Process Memory Dump Creation Via Taskmgr.EXE",
+    "status": "test",
+    "level": "high",
+    "date": "2023-10-19",
+    "modified": "",
+    "version": "2023-10-19",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/file/file_event/file_event_win_taskmgr_lsass_dump.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/file_activity/file_event_win_taskmgr_lsass_dump.yml",
+    "sha256": "73247aaa9640ddc30f382da2a0718643f2f82403509db385c111205b611fb814",
+    "logsource": {
+      "category": "file_event",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 22,
+    "domain_group": "file_activity",
+    "rule_id": "7047d730-036f-4f40-b9d8-1c63e36d5e62",
+    "title": "Potential Binary Or Script Dropper Via PowerShell",
+    "status": "test",
+    "level": "medium",
+    "date": "2023-03-17",
+    "modified": "2025-07-04",
+    "version": "2025-07-04",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/file/file_event/file_event_win_powershell_drop_binary_or_script.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/file_activity/file_event_win_powershell_drop_binary_or_script.yml",
+    "sha256": "a575eb564a1c855740648220b84209d7dc1a01896cb70d12b21f0392bdd84d5a",
+    "logsource": {
+      "product": "windows",
+      "category": "file_event"
+    }
+  },
+  {
+    "index": 23,
+    "domain_group": "file_activity",
+    "rule_id": "06125661-3814-4e03-bfa2-1e4411c60ac3",
+    "title": "Backup Files Deleted",
+    "status": "test",
+    "level": "medium",
+    "date": "2022-01-02",
+    "modified": "2023-02-15",
+    "version": "2023-02-15",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/file/file_delete/file_delete_win_delete_backup_file.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/file_activity/file_delete_win_delete_backup_file.yml",
+    "sha256": "db1ccbcab8bc0c135ecf062739690a2a99b5d485d075e6c73365889e158d7189",
+    "logsource": {
+      "product": "windows",
+      "category": "file_delete"
+    }
+  },
+  {
+    "index": 24,
+    "domain_group": "file_activity",
+    "rule_id": "9f383dc0-fdeb-4d56-acbc-9f9f4f8f20f3",
+    "title": "Unusual File Modification by dns.exe",
+    "status": "test",
+    "level": "high",
+    "date": "2022-09-27",
+    "modified": "",
+    "version": "2022-09-27",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/file/file_change/file_change_win_unusual_modification_by_dns_exe.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/file_activity/file_change_win_unusual_modification_by_dns_exe.yml",
+    "sha256": "e1baac31527572b6d0f5fdb5c839ec6713ca39907fa6ec2dbbef61d8ef390849",
+    "logsource": {
+      "category": "file_change",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 25,
+    "domain_group": "file_activity",
+    "rule_id": "b1c50487-1967-4315-a026-6491686d860e",
+    "title": "Office Macro File Creation From Suspicious Process",
+    "status": "test",
+    "level": "high",
+    "date": "2022-01-23",
+    "modified": "2023-02-22",
+    "version": "2023-02-22",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/file/file_event/file_event_win_office_macro_files_from_susp_process.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/file_activity/file_event_win_office_macro_files_from_susp_process.yml",
+    "sha256": "eaeb0dc4e5064faecfbb1632c6c59f125c2987fb25f8c8193ff8ed0c2c920b39",
+    "logsource": {
+      "category": "file_event",
+      "product": "windows",
+      "definition": "Requirements: The \"ParentImage\" field is not available by default on EID 11 of Sysmon logs. To be able to use this rule to the full extent you need to enriche the log with additional ParentImage data"
+    }
+  },
+  {
+    "index": 26,
+    "domain_group": "file_activity",
+    "rule_id": "f01d1f70-cd41-42ec-9c0b-26dd9c22bf29",
+    "title": "Process Deletion of Its Own Executable",
+    "status": "test",
+    "level": "medium",
+    "date": "2024-09-03",
+    "modified": "",
+    "version": "2024-09-03",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/file/file_delete/file_delete_win_delete_own_image.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/file_activity/file_delete_win_delete_own_image.yml",
+    "sha256": "b517d48baf47f34db5c662d3c1f3dc4ca9a55e4cc23ab3599de9d6f12071db98",
+    "logsource": {
+      "product": "windows",
+      "category": "file_delete"
+    }
+  },
+  {
+    "index": 27,
+    "domain_group": "network_connection",
+    "rule_id": "a66bc059-c370-472c-a0d7-f8fd1bf9d583",
+    "title": "Network Connection Initiated By Eqnedt32.EXE",
+    "status": "test",
+    "level": "high",
+    "date": "2022-04-14",
+    "modified": "2024-05-31",
+    "version": "2024-05-31",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/network_connection/net_connection_win_eqnedt.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/network_connection/net_connection_win_eqnedt.yml",
+    "sha256": "b048bb87dca4cfdf8afc5583af741880c2308f9f05265db3be2705e2a4362a65",
+    "logsource": {
+      "category": "network_connection",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 28,
+    "domain_group": "network_connection",
+    "rule_id": "e81528db-fc02-45e8-8e98-4e84aba1f10b",
+    "title": "Network Connection Initiated Via Notepad.EXE",
+    "status": "test",
+    "level": "high",
+    "date": "2020-05-14",
+    "modified": "2024-02-02",
+    "version": "2024-02-02",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/network_connection/net_connection_win_notepad.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/network_connection/net_connection_win_notepad.yml",
+    "sha256": "ff5318a5ed4b30eca2dc9b339a48728d44aefc6a941b129bb3349febcb8e535e",
+    "logsource": {
+      "category": "network_connection",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 29,
+    "domain_group": "network_connection",
+    "rule_id": "1d08ac94-400d-4469-a82f-daee9a908849",
+    "title": "Communication To Ngrok Tunneling Service Initiated",
+    "status": "test",
+    "level": "high",
+    "date": "2022-11-03",
+    "modified": "2024-02-02",
+    "version": "2024-02-02",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/network_connection/net_connection_win_domain_ngrok_tunnel.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/network_connection/net_connection_win_domain_ngrok_tunnel.yml",
+    "sha256": "2170961cb4d53d7c032324e51f21817966507858ddb3fad31db6e60134034975",
+    "logsource": {
+      "category": "network_connection",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 30,
+    "domain_group": "network_connection",
+    "rule_id": "c3dbbc9f-ef1d-470a-a90a-d343448d5875",
+    "title": "Suspicious Non-Browser Network Communication With Telegram API",
+    "status": "test",
+    "level": "medium",
+    "date": "2023-05-19",
+    "modified": "",
+    "version": "2023-05-19",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/network_connection/net_connection_win_domain_telegram_api_non_browser_access.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/network_connection/net_connection_win_domain_telegram_api_non_browser_access.yml",
+    "sha256": "605dcf235d1976975ce194d4dac84905957cbbb67697052b2d1ea41106da883c",
+    "logsource": {
+      "product": "windows",
+      "category": "network_connection"
+    }
+  },
+  {
+    "index": 31,
+    "domain_group": "network_connection",
+    "rule_id": "0dba975d-a193-4ed1-a067-424df57570d1",
+    "title": "Uncommon Network Connection Initiated By Certutil.EXE",
+    "status": "test",
+    "level": "high",
+    "date": "2022-09-02",
+    "modified": "2024-05-31",
+    "version": "2024-05-31",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/network_connection/net_connection_win_certutil_initiated_connection.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/network_connection/net_connection_win_certutil_initiated_connection.yml",
+    "sha256": "2f3c61de042180cf7acc0f50483306fe869656a73dedfc0374f3e5f0a22df1bb",
+    "logsource": {
+      "category": "network_connection",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 32,
+    "domain_group": "network_connection",
+    "rule_id": "efafe0bf-4238-479e-af8f-797bd3490d2d",
+    "title": "Outbound Network Connection Initiated By Cmstp.EXE",
+    "status": "test",
+    "level": "high",
+    "date": "2022-08-30",
+    "modified": "2024-05-31",
+    "version": "2024-05-31",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/network_connection/net_connection_win_cmstp_initiated_connection.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/network_connection/net_connection_win_cmstp_initiated_connection.yml",
+    "sha256": "2f068a8fa0a2c7d1f94ef7e9fc3c7ea71369330d986910f5746956c41b27a62f",
+    "logsource": {
+      "category": "network_connection",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 33,
+    "domain_group": "network_connection",
+    "rule_id": "d7fb8f0e-bd5f-45c2-b467-19571c490d7e",
+    "title": "Cleartext Protocol Usage",
+    "status": "stable",
+    "level": "low",
+    "date": "2019-03-26",
+    "modified": "2022-10-10",
+    "version": "2022-10-10",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/network/firewall/net_firewall_cleartext_protocols.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/network_connection/net_firewall_cleartext_protocols.yml",
+    "sha256": "d703463915f669fbda8bd612cb01181e549f0bc42e2cdd0fe8b1f5d8cc0a38c8",
+    "logsource": {
+      "category": "firewall"
+    }
+  },
+  {
+    "index": 34,
+    "domain_group": "authentication",
+    "rule_id": "51e33403-2a37-4d66-a574-1fda1782cc31",
+    "title": "RDP Login from Localhost",
+    "status": "test",
+    "level": "high",
+    "date": "2019-01-28",
+    "modified": "2022-10-09",
+    "version": "2022-10-09",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/builtin/security/account_management/win_security_rdp_localhost_login.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/authentication/win_security_rdp_localhost_login.yml",
+    "sha256": "c68da48f26841d8eddfe7bc1322c9251092afb75531ae4cd4c4891a1358ad33a",
+    "logsource": {
+      "product": "windows",
+      "service": "security"
+    }
+  },
+  {
+    "index": 35,
+    "domain_group": "authentication",
+    "rule_id": "def8b624-e08f-4ae1-8612-1ba21190da6b",
+    "title": "Outgoing Logon with New Credentials",
+    "status": "test",
+    "level": "low",
+    "date": "2022-04-06",
+    "modified": "",
+    "version": "2022-04-06",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/builtin/security/account_management/win_security_susp_logon_newcredentials.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/authentication/win_security_susp_logon_newcredentials.yml",
+    "sha256": "b952b5b896c311c0fbbd939241b2d4e9df31e2d3cd0d9856ac089e24fb3277e3",
+    "logsource": {
+      "product": "windows",
+      "service": "security"
+    }
+  },
+  {
+    "index": 36,
+    "domain_group": "authentication",
+    "rule_id": "16f5d8ca-44bd-47c8-acbe-6fc95a16c12f",
+    "title": "RottenPotato Like Attack Pattern",
+    "status": "test",
+    "level": "high",
+    "date": "2019-11-15",
+    "modified": "2022-12-22",
+    "version": "2022-12-22",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/builtin/security/account_management/win_security_susp_rottenpotato.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/authentication/win_security_susp_rottenpotato.yml",
+    "sha256": "ee462c79983e771c677c99821de5d4ffc3fb9d47a36855b05937b411f0cc9934",
+    "logsource": {
+      "product": "windows",
+      "service": "security"
+    }
+  },
+  {
+    "index": 37,
+    "domain_group": "authentication",
+    "rule_id": "8eef149c-bd26-49f2-9e5a-9b00e3af499b",
+    "title": "Pass the Hash Activity 2",
+    "status": "stable",
+    "level": "medium",
+    "date": "2019-06-14",
+    "modified": "2022-10-05",
+    "version": "2022-10-05",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/builtin/security/account_management/win_security_pass_the_hash_2.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/authentication/win_security_pass_the_hash_2.yml",
+    "sha256": "a971776ecd3c551c13d9f30526e7975f5bb8428c38ff2625900a3bab6cc9821d",
+    "logsource": {
+      "product": "windows",
+      "service": "security",
+      "definition": "The successful use of PtH for lateral movement between workstations would trigger event ID 4624"
+    }
+  },
+  {
+    "index": 38,
+    "domain_group": "authentication",
+    "rule_id": "259a9cdf-c4dd-4fa2-b243-2269e5ab18a2",
+    "title": "External Remote RDP Logon from Public IP",
+    "status": "test",
+    "level": "medium",
+    "date": "2023-01-19",
+    "modified": "2026-11-03",
+    "version": "2026-11-03",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/builtin/security/account_management/win_security_successful_external_remote_rdp_login.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/authentication/win_security_successful_external_remote_rdp_login.yml",
+    "sha256": "aa48af306b892a47e3ef49687cf93b95ab2d93d00cdb405285b530c53e2a457f",
+    "logsource": {
+      "product": "windows",
+      "service": "security"
+    }
+  },
+  {
+    "index": 39,
+    "domain_group": "authentication",
+    "rule_id": "3e2f1b2c-4d5e-11ee-be56-0242ac120002",
+    "title": "Potential AS-REP Roasting via Kerberos TGT Requests",
+    "status": "experimental",
+    "level": "medium",
+    "date": "2025-05-22",
+    "modified": "2025-07-04",
+    "version": "2025-07-04",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/builtin/security/win_security_kerberos_asrep_roasting.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/authentication/win_security_kerberos_asrep_roasting.yml",
+    "sha256": "e7c520ac1b6c1875d080a44678d7534e83ea3a8944f12cb176b4bdc446877f48",
+    "logsource": {
+      "product": "windows",
+      "service": "security"
+    }
+  },
+  {
+    "index": 40,
+    "domain_group": "dns",
+    "rule_id": "a1d9eec5-33b2-4177-8d24-27fe754d0812",
+    "title": "Cloudflared Tunnels Related DNS Requests",
+    "status": "test",
+    "level": "medium",
+    "date": "2023-12-20",
+    "modified": "",
+    "version": "2023-12-20",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/dns_query/dns_query_win_cloudflared_communication.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/dns/dns_query_win_cloudflared_communication.yml",
+    "sha256": "fd13410291e35e7ed43ec6cdd069e7dd28321f40cdc0dd8386eb05548f3db53e",
+    "logsource": {
+      "category": "dns_query",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 41,
+    "domain_group": "dns",
+    "rule_id": "a21bcd7e-38ec-49ad-b69a-9ea17e69509e",
+    "title": "DNS Server Discovery Via LDAP Query",
+    "status": "test",
+    "level": "low",
+    "date": "2022-08-20",
+    "modified": "2023-09-18",
+    "version": "2023-09-18",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/dns_query/dns_query_win_dns_server_discovery_via_ldap_query.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/dns/dns_query_win_dns_server_discovery_via_ldap_query.yml",
+    "sha256": "430d7684c84aea221d38623057f0a38c55ed57293c01c0b75d9c291b82b5bb99",
+    "logsource": {
+      "product": "windows",
+      "category": "dns_query"
+    }
+  },
+  {
+    "index": 42,
+    "domain_group": "dns",
+    "rule_id": "36e037c4-c228-4866-b6a3-48eb292b9955",
+    "title": "DNS Query Request By Regsvr32.EXE",
+    "status": "test",
+    "level": "medium",
+    "date": "2019-10-25",
+    "modified": "2023-09-18",
+    "version": "2023-09-18",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/windows/dns_query/dns_query_win_regsvr32_dns_query.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/dns/dns_query_win_regsvr32_dns_query.yml",
+    "sha256": "008f8752a0c8ee6be1939f8c7e0f27e9bf6b7d6504f923ee5823f624e57ba075",
+    "logsource": {
+      "category": "dns_query",
+      "product": "windows"
+    }
+  },
+  {
+    "index": 43,
+    "domain_group": "dns",
+    "rule_id": "2975af79-28c4-4d2f-a951-9095f229df29",
+    "title": "Cobalt Strike DNS Beaconing",
+    "status": "test",
+    "level": "critical",
+    "date": "2018-05-10",
+    "modified": "2022-10-09",
+    "version": "2022-10-09",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/network/dns/net_dns_mal_cobaltstrike.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/dns/net_dns_mal_cobaltstrike.yml",
+    "sha256": "162bf82a6dc8b1d287b9f0c71e830cd339b8c47082f8064f68608b5a483b5517",
+    "logsource": {
+      "category": "dns"
+    }
+  },
+  {
+    "index": 44,
+    "domain_group": "dns",
+    "rule_id": "8ae51330-899c-4641-8125-e39f2e07da72",
+    "title": "DNS TXT Answer with Possible Execution Strings",
+    "status": "test",
+    "level": "high",
+    "date": "2018-08-08",
+    "modified": "2021-11-27",
+    "version": "2021-11-27",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/network/dns/net_dns_susp_txt_exec_strings.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/dns/net_dns_susp_txt_exec_strings.yml",
+    "sha256": "9a5e44aa6e074e7d681b52060dbe465b3ecaec828587f8c19c1a11387e91c120",
+    "logsource": {
+      "category": "dns"
+    }
+  },
+  {
+    "index": 45,
+    "domain_group": "dns",
+    "rule_id": "a8322756-015c-42e7-afb1-436e85ed3ff5",
+    "title": "DNS TOR Proxies",
+    "status": "test",
+    "level": "medium",
+    "date": "2021-08-15",
+    "modified": "2025-09-12",
+    "version": "2025-09-12",
+    "sigmahq_repo": "https://github.com/SigmaHQ/sigma",
+    "sigmahq_commit": "698f0912f571d5fac3bf8c51f5421139834a011",
+    "sigmahq_path": "rules/network/zeek/zeek_dns_torproxy.yml",
+    "local_fixture_path": "tests/evaluation/fixtures/sigmahq_rules/dns/zeek_dns_torproxy.yml",
+    "sha256": "c7337db6149aa534052d6735053797351f8dc1d5111931a02c0f143b75c746a3",
+    "logsource": {
+      "service": "dns",
+      "product": "zeek"
+    }
+  }
+]

@@ -1,0 +1,17 @@
+title: Semantic 13 - Plain, Base64 (Uncased Default), and Explicit Cased Modifiers
+id: 11111111-0000-4000-8000-000000000013
+status: test
+level: high
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_plain:
+    User: 'CORP\SecAdmin'
+  sel_cased:
+    CommandLine|cased|contains: 'SeDebugPrivilege'
+  sel_b64_default:
+    CommandLine|base64|contains: 'IEX'
+  sel_b64_cased:
+    ParentCommandLine|base64|cased|contains: 'IEX'
+  condition: 1 of sel_*

@@ -1,0 +1,1661 @@
+[
+  {
+    "dimension_id": "D01_exact_match",
+    "dimension_name": "Exact Field Match",
+    "rule_id": "11111111-0000-4000-8000-000000000001",
+    "filename": "sem_01_exact_match.yml",
+    "yaml": "title: Semantic 01 - Exact Field Match\nid: 11111111-0000-4000-8000-000000000001\nstatus: test\nlevel: medium\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  selection:\n    Image: 'C:\\Windows\\System32\\whoami.exe'\n    User: 'NT AUTHORITY\\SYSTEM'\n  condition: selection\n",
+    "cases": [
+      {
+        "test_event_id": "sem-01-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\whoami.exe",
+              "type_id": 1,
+              "name": "whoami.exe"
+            },
+            "uid": "proc-sem-01-tp-1"
+          },
+          "actor": {
+            "user": {
+              "name": "NT AUTHORITY\\SYSTEM"
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-01-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Both Image and User exactly match selection values.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-01-tp-2-casefold",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "c:\\windows\\system32\\WHOAMI.EXE",
+              "type_id": 1,
+              "name": "WHOAMI.EXE"
+            },
+            "uid": "proc-sem-01-tp-2-casefold"
+          },
+          "actor": {
+            "user": {
+              "name": "nt authority\\system"
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-01-tp-2-casefold"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Sigma default string equality is case-insensitive.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-01-tn-1-substring",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\whoami.exe.bak",
+              "type_id": 1,
+              "name": "whoami.exe.bak"
+            },
+            "uid": "proc-sem-01-tn-1-substring"
+          },
+          "actor": {
+            "user": {
+              "name": "NT AUTHORITY\\SYSTEM"
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-01-tn-1-substring"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Exact match must not match superstring with extra suffix.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-01-tn-2-wrong-activity",
+        "ocsf_event_class": "Process Activity (1007 - Terminate)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 2,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\whoami.exe",
+              "type_id": 1,
+              "name": "whoami.exe"
+            },
+            "uid": "proc-sem-01-tn-2-wrong-activity"
+          },
+          "actor": {
+            "user": {
+              "name": "NT AUTHORITY\\SYSTEM"
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-01-tn-2-wrong-activity"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: process_termination (activity_id=2) must not match process_creation (activity_id=1).",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D02_contains",
+    "dimension_name": "Contains & Contains|All",
+    "rule_id": "11111111-0000-4000-8000-000000000002",
+    "filename": "sem_02_contains.yml",
+    "yaml": "title: Semantic 02 - Contains and Contains All with SQL Wildcard Literals\nid: 11111111-0000-4000-8000-000000000002\nstatus: test\nlevel: high\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  selection:\n    CommandLine|contains|all:\n      - '100%_stage'\n      - '-nop'\n  condition: selection\n",
+    "cases": [
+      {
+        "test_event_id": "sem-02-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -NoP -File C:\\Temp\\100%_stage.ps1",
+            "uid": "proc-sem-02-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-02-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "CommandLine contains both literal '100%_stage' and '-nop'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-02-tn-1-partial-all",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -NoP -File C:\\Temp\\other.ps1",
+            "uid": "proc-sem-02-tn-1-partial-all"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-02-tn-1-partial-all"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "contains|all requires all listed substrings, missing '100%_stage'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-02-tn-2-sql-wildcard-boundary",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell.exe -NoP -File C:\\Temp\\100XXAstage.ps1",
+            "uid": "proc-sem-02-tn-2-sql-wildcard-boundary"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-02-tn-2-sql-wildcard-boundary"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: '%' and '_' in Sigma string are literal characters, not SQL LIKE wildcards.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D03_startswith",
+    "dimension_name": "Startswith",
+    "rule_id": "11111111-0000-4000-8000-000000000003",
+    "filename": "sem_03_startswith.yml",
+    "yaml": "title: Semantic 03 - Startswith Prefix Match\nid: 11111111-0000-4000-8000-000000000003\nstatus: test\nlevel: medium\nlogsource:\n  category: file_event\n  product: windows\ndetection:\n  selection:\n    TargetFilename|startswith: 'C:\\Users\\Public\\'\n  condition: selection\n",
+    "cases": [
+      {
+        "test_event_id": "sem-03-tp-1",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "file": {
+            "path": "C:\\Users\\Public\\Downloads\\agent.exe",
+            "type_id": 1,
+            "name": "agent.exe"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-03-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "file.path begins with 'C:\\Users\\Public\\'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-03-tn-1-midstring",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "file": {
+            "path": "D:\\Backup\\C:\\Users\\Public\\agent.exe",
+            "type_id": 1,
+            "name": "agent.exe"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-03-tn-1-midstring"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Prefix appears in middle of path, not at start.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-03-tn-2-empty",
+        "ocsf_event_class": "File System Activity (1001)",
+        "category_uid": 1,
+        "class_uid": 1001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "file": {
+            "path": "",
+            "type_id": 1,
+            "name": "unknown"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-03-tn-2-empty"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: empty string cannot match non-empty startswith prefix.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D04_endswith",
+    "dimension_name": "Endswith",
+    "rule_id": "11111111-0000-4000-8000-000000000004",
+    "filename": "sem_04_endswith.yml",
+    "yaml": "title: Semantic 04 - Endswith Suffix Match\nid: 11111111-0000-4000-8000-000000000004\nstatus: test\nlevel: medium\nlogsource:\n  category: dns_query\n  product: windows\ndetection:\n  selection:\n    QueryName|endswith: '.argotunnel.com'\n  condition: selection\n",
+    "cases": [
+      {
+        "test_event_id": "sem-04-tp-1",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "c2-node.v2.argotunnel.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-sem-04-tp-1"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "query.hostname ends with '.argotunnel.com'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-04-tn-1-bare-root",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "argotunnel.com"
+          },
+          "src_endpoint": {
+            "uid": "ep-sem-04-tn-1-bare-root"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: missing leading dot '.argotunnel.com' must not match bare domain.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-04-tn-2-trailing-tld",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "sub.argotunnel.com.evil.net"
+          },
+          "src_endpoint": {
+            "uid": "ep-sem-04-tn-2-trailing-tld"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Suffix is not at the end of query.hostname.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D05_regex",
+    "dimension_name": "Regular Expression (re, i, m, inline flags)",
+    "rule_id": "11111111-0000-4000-8000-000000000005",
+    "filename": "sem_05_regex.yml",
+    "yaml": "title: Semantic 05 - Regex Case Sensitivity and Multiline Flags\nid: 11111111-0000-4000-8000-000000000005\nstatus: test\nlevel: high\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  sel_strict:\n    CommandLine|re: 'Invoke-[A-Z][a-z]+Mimikatz'\n  sel_multiline_inline_i:\n    CommandLine|re|m: '(?i)^net\\s+localgroup\\s+administrators'\n  condition: 1 of sel_*\n",
+    "cases": [
+      {
+        "test_event_id": "sem-05-tp-1-cased-re",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell -c Invoke-CustomMimikatz",
+            "uid": "proc-sem-05-tp-1-cased-re"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-05-tp-1-cased-re"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches case-sensitive regex 'Invoke-[A-Z][a-z]+Mimikatz'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-05-tn-1-cased-re-mismatch",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell -c invoke-custommimikatz",
+            "uid": "proc-sem-05-tn-1-cased-re-mismatch"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-05-tn-1-cased-re-mismatch"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Sigma |re without |i is case-sensitive per Sigma specification.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-05-tp-2-multiline-inline-flag",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "echo start\nNET  LOCALGROUP  Administrators /add bob",
+            "uid": "proc-sem-05-tp-2-multiline-inline-flag"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-05-tp-2-multiline-inline-flag"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Boundary: |re|m combined with inline (?i) matches start of second line case-insensitively.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-05-tn-2-not-line-start",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "echo net localgroup administrators",
+            "uid": "proc-sem-05-tn-2-not-line-start"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-05-tn-2-not-line-start"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Anchored ^ must not match when preceded by 'echo ' on same line.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D06_numeric",
+    "dimension_name": "Numeric Comparisons (gt, gte, lt, lte, neq)",
+    "rule_id": "11111111-0000-4000-8000-000000000006",
+    "filename": "sem_06_numeric.yml",
+    "yaml": "title: Semantic 06 - Numeric Range and Inequality\nid: 11111111-0000-4000-8000-000000000006\nstatus: test\nlevel: medium\nlogsource:\n  category: network_connection\n  product: windows\ndetection:\n  sel_high_port:\n    DestinationPort|gt: 1024\n    DestinationPort|lte: 9000\n    DestinationPort|neq: 8080\n  condition: sel_high_port\n",
+    "cases": [
+      {
+        "test_event_id": "sem-06-tp-1-in-range",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "port": 4444,
+            "uid": "ep-sem-06-tp-1-in-range"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "4444 > 1024, <= 9000, and != 8080.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-06-tp-2-upper-boundary",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "port": 9000,
+            "uid": "ep-sem-06-tp-2-upper-boundary"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Boundary: 9000 satisfies lte: 9000.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-06-tn-1-lower-boundary",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "port": 1024,
+            "uid": "ep-sem-06-tn-1-lower-boundary"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: 1024 fails strict gt: 1024.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-06-tn-2-neq-excluded",
+        "ocsf_event_class": "Network Activity (4001)",
+        "category_uid": 4,
+        "class_uid": 4001,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "dst_endpoint": {
+            "port": 8080,
+            "uid": "ep-sem-06-tn-2-neq-excluded"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: 8080 excluded by DestinationPort|neq: 8080.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D07_boolean_and",
+    "dimension_name": "Boolean AND Composition",
+    "rule_id": "11111111-0000-4000-8000-000000000007",
+    "filename": "sem_07_and.yml",
+    "yaml": "title: Semantic 07 - Multi-Selection Conjunction (AND)\nid: 11111111-0000-4000-8000-000000000007\nstatus: test\nlevel: high\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  sel_parent:\n    ParentImage|endswith: '\\winword.exe'\n  sel_child:\n    Image|endswith: '\\cmd.exe'\n  sel_cli:\n    CommandLine|contains: '/c'\n  condition: sel_parent and sel_child and sel_cli\n",
+    "cases": [
+      {
+        "test_event_id": "sem-07-tp-1",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "cmd_line": "cmd.exe /c whoami",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Program Files\\Microsoft Office\\WINWORD.EXE",
+                "type_id": 1,
+                "name": "WINWORD.EXE"
+              },
+              "uid": "proc-sem-07-tp-1"
+            },
+            "uid": "proc-sem-07-tp-1"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-07-tp-1"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "All three conjuncts (sel_parent, sel_child, sel_cli) match.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-07-tn-1-missing-one",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "cmd_line": "cmd.exe /k dir",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Program Files\\Microsoft Office\\WINWORD.EXE",
+                "type_id": 1,
+                "name": "WINWORD.EXE"
+              },
+              "uid": "proc-sem-07-tn-1-missing-one"
+            },
+            "uid": "proc-sem-07-tn-1-missing-one"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-07-tn-1-missing-one"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Fails sel_cli ('/c' missing).",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D08_boolean_or",
+    "dimension_name": "Boolean OR & Wildcard Selection (1 of sel_*)",
+    "rule_id": "11111111-0000-4000-8000-000000000008",
+    "filename": "sem_08_or.yml",
+    "yaml": "title: Semantic 08 - Disjunction (OR and 1 of)\nid: 11111111-0000-4000-8000-000000000008\nstatus: test\nlevel: medium\nlogsource:\n  category: authentication\n  product: windows\ndetection:\n  sel_network_admin:\n    LogonType: 3\n    TargetUserName: 'Administrator'\n  sel_rdp_any:\n    LogonType: 10\n  condition: sel_network_admin or sel_rdp_any\n",
+    "cases": [
+      {
+        "test_event_id": "sem-08-tp-1-branch-a",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "logon_type_id": 3,
+          "user": {
+            "name": "Administrator"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-sem-08-tp-1-branch-a"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches first disjunct sel_network_admin.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-08-tp-2-branch-b",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "logon_type_id": 10,
+          "user": {
+            "name": "guest_operator"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-sem-08-tp-2-branch-b"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches second disjunct sel_rdp_any even with non-admin user.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-08-tn-1-neither",
+        "ocsf_event_class": "Authentication (3002)",
+        "category_uid": 3,
+        "class_uid": 3002,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "logon_type_id": 3,
+          "user": {
+            "name": "alice"
+          },
+          "dst_endpoint": {
+            "uid": "auth-dst-sem-08-tn-1-neither"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "LogonType 3 with non-Administrator user satisfies neither branch.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D09_boolean_not",
+    "dimension_name": "Boolean NOT & SQL Three-Valued Logic Safety",
+    "rule_id": "11111111-0000-4000-8000-000000000009",
+    "filename": "sem_09_not.yml",
+    "yaml": "title: Semantic 09 - Negation Over Optional Field\nid: 11111111-0000-4000-8000-000000000009\nstatus: test\nlevel: high\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  selection:\n    Image|endswith: '\\rundll32.exe'\n  exclusion:\n    ParentCommandLine|contains: 'legit_updater.dll'\n  condition: selection and not exclusion\n",
+    "cases": [
+      {
+        "test_event_id": "sem-09-tp-1-present-different",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\rundll32.exe",
+              "type_id": 1,
+              "name": "rundll32.exe"
+            },
+            "parent_process": {
+              "cmd_line": "cmd.exe /c evil.bat",
+              "uid": "proc-sem-09-tp-1-present-different"
+            },
+            "uid": "proc-sem-09-tp-1-present-different"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-09-tp-1-present-different"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "rundll32.exe with non-excluded ParentCommandLine must match.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-09-tp-2-missing-excluded-field",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\rundll32.exe",
+              "type_id": 1,
+              "name": "rundll32.exe"
+            },
+            "uid": "proc-sem-09-tp-2-missing-excluded-field"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-09-tp-2-missing-excluded-field"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Boundary (3VL): when ParentCommandLine is absent, exclusion is False, so 'not exclusion' MUST be True.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-09-tp-3-null-excluded-field",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\rundll32.exe",
+              "type_id": 1,
+              "name": "rundll32.exe"
+            },
+            "parent_process": {
+              "cmd_line": null,
+              "uid": "proc-sem-09-tp-3-null-excluded-field"
+            },
+            "uid": "proc-sem-09-tp-3-null-excluded-field"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-09-tp-3-null-excluded-field"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Boundary (3VL): when ParentCommandLine is JSON null, exclusion is False, so 'not exclusion' MUST be True.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-09-tn-1-excluded",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\rundll32.exe",
+              "type_id": 1,
+              "name": "rundll32.exe"
+            },
+            "parent_process": {
+              "cmd_line": "svchost.exe legit_updater.dll",
+              "uid": "proc-sem-09-tn-1-excluded"
+            },
+            "uid": "proc-sem-09-tn-1-excluded"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-09-tn-1-excluded"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "ParentCommandLine matches exclusion, so 'not exclusion' is False.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D10_selection_filter",
+    "dimension_name": "Selection + Multi-Filter (1 of filter_*)",
+    "rule_id": "11111111-0000-4000-8000-000000000010",
+    "filename": "sem_10_selection_filter.yml",
+    "yaml": "title: Semantic 10 - Selection with Compound Filters and Null Filter\nid: 11111111-0000-4000-8000-000000000010\nstatus: test\nlevel: high\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  selection:\n    Image|endswith: '\\svchost.exe'\n  filter_main_services:\n    ParentImage|endswith: '\\services.exe'\n  filter_main_null:\n    ParentImage: null\n  filter_main_empty:\n    ParentImage: ''\n  condition: selection and not 1 of filter_main_*\n",
+    "cases": [
+      {
+        "test_event_id": "sem-10-tp-1-rogue-parent",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Users\\Public\\loader.exe",
+                "type_id": 1,
+                "name": "loader.exe"
+              },
+              "uid": "proc-sem-10-tp-1-rogue-parent"
+            },
+            "uid": "proc-sem-10-tp-1-rogue-parent"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-10-tp-1-rogue-parent"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "svchost.exe spawned by loader.exe is not matched by any filter.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-10-tn-1-services-parent",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\System32\\services.exe",
+                "type_id": 1,
+                "name": "services.exe"
+              },
+              "uid": "proc-sem-10-tn-1-services-parent"
+            },
+            "uid": "proc-sem-10-tn-1-services-parent"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-10-tn-1-services-parent"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Filtered out by filter_main_services.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-10-tn-2-missing-parent",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "uid": "proc-sem-10-tn-2-missing-parent"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-10-tn-2-missing-parent"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: missing ParentImage triggers filter_main_null, suppressing alert.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-10-tn-3-empty-parent",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\svchost.exe",
+              "type_id": 1,
+              "name": "svchost.exe"
+            },
+            "parent_process": {
+              "file": {
+                "path": "",
+                "type_id": 1,
+                "name": "unknown"
+              },
+              "uid": "proc-sem-10-tn-3-empty-parent"
+            },
+            "uid": "proc-sem-10-tn-3-empty-parent"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-10-tn-3-empty-parent"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: empty string ParentImage '' triggers filter_main_empty.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D11_missing_field_exists",
+    "dimension_name": "Missing Field & Exists Modifier",
+    "rule_id": "11111111-0000-4000-8000-000000000011",
+    "filename": "sem_11_missing_field.yml",
+    "yaml": "title: Semantic 11 - Missing Field vs Exists True/False\nid: 11111111-0000-4000-8000-000000000011\nstatus: test\nlevel: medium\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  selection:\n    Image|endswith: '\\cmd.exe'\n    CommandLine|exists: true\n    ParentImage|exists: false\n  condition: selection\n",
+    "cases": [
+      {
+        "test_event_id": "sem-11-tp-1-cli-present-parent-absent",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "cmd_line": "cmd.exe /c set",
+            "uid": "proc-sem-11-tp-1-cli-present-parent-absent"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-11-tp-1-cli-present-parent-absent"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "CommandLine exists and ParentImage is absent.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-11-tp-2-cli-empty-string-still-exists",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "cmd_line": "",
+            "uid": "proc-sem-11-tp-2-cli-empty-string-still-exists"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-11-tp-2-cli-empty-string-still-exists"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Boundary: empty string '' is an existing non-null string value, so CommandLine|exists: true is True.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-11-tn-1-cli-absent",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "uid": "proc-sem-11-tn-1-cli-absent"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-11-tn-1-cli-absent"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "CommandLine is missing, failing CommandLine|exists: true.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-11-tn-2-parent-present",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\cmd.exe",
+              "type_id": 1,
+              "name": "cmd.exe"
+            },
+            "cmd_line": "cmd.exe",
+            "parent_process": {
+              "file": {
+                "path": "C:\\Windows\\explorer.exe",
+                "type_id": 1,
+                "name": "explorer.exe"
+              },
+              "uid": "proc-sem-11-tn-2-parent-present"
+            },
+            "uid": "proc-sem-11-tn-2-parent-present"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-11-tn-2-parent-present"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "ParentImage exists, failing ParentImage|exists: false.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D12_null_vs_empty",
+    "dimension_name": "Null Value vs Empty String Distinction",
+    "rule_id": "11111111-0000-4000-8000-000000000012",
+    "filename": "sem_12_null_value.yml",
+    "yaml": "title: Semantic 12 - Explicit Null Matching vs Empty String\nid: 11111111-0000-4000-8000-000000000012\nstatus: test\nlevel: low\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  selection:\n    Image|endswith: '\\werfault.exe'\n    User: null\n  condition: selection\n",
+    "cases": [
+      {
+        "test_event_id": "sem-12-tp-1-json-null",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WerFault.exe",
+              "type_id": 1,
+              "name": "WerFault.exe"
+            },
+            "uid": "proc-sem-12-tp-1-json-null"
+          },
+          "actor": {
+            "user": {
+              "name": null,
+              "uid": "user-sem-12-tp-1-json-null"
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-12-tp-1-json-null"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "actor.user.name is explicit JSON null, matching User: null.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-12-tp-2-key-missing",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WerFault.exe",
+              "type_id": 1,
+              "name": "WerFault.exe"
+            },
+            "uid": "proc-sem-12-tp-2-key-missing"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-12-tp-2-key-missing"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "actor.user.name is absent, matching Sigma null semantics.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-12-tn-1-empty-string",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WerFault.exe",
+              "type_id": 1,
+              "name": "WerFault.exe"
+            },
+            "uid": "proc-sem-12-tn-1-empty-string"
+          },
+          "actor": {
+            "user": {
+              "name": "",
+              "uid": "user-sem-12-tn-1-empty-string"
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-12-tn-1-empty-string"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: empty string '' is NOT null and must NOT match User: null.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-12-tn-2-literal-null-word",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WerFault.exe",
+              "type_id": 1,
+              "name": "WerFault.exe"
+            },
+            "uid": "proc-sem-12-tn-2-literal-null-word"
+          },
+          "actor": {
+            "user": {
+              "name": "null"
+            }
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-12-tn-2-literal-null-word"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Boundary: literal string 'null' must NOT be confused with JSON null.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D13_case_sensitivity",
+    "dimension_name": "Case Sensitivity (Plain vs |base64 vs |cased & |base64|cased)",
+    "rule_id": "11111111-0000-4000-8000-000000000013",
+    "filename": "sem_13_case_sensitivity.yml",
+    "yaml": "title: Semantic 13 - Plain, Base64 (Uncased Default), and Explicit Cased Modifiers\nid: 11111111-0000-4000-8000-000000000013\nstatus: test\nlevel: high\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  sel_plain:\n    User: 'CORP\\SecAdmin'\n  sel_cased:\n    CommandLine|cased|contains: 'SeDebugPrivilege'\n  sel_b64_default:\n    CommandLine|base64|contains: 'IEX'\n  sel_b64_cased:\n    ParentCommandLine|base64|cased|contains: 'IEX'\n  condition: 1 of sel_*\n",
+    "cases": [
+      {
+        "test_event_id": "sem-13-tp-1-plain-casefold",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "actor": {
+            "user": {
+              "name": "corp\\secadmin"
+            }
+          },
+          "process": {
+            "cmd_line": "whoami.exe",
+            "uid": "proc-sem-13-tp-1-plain-casefold"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-13-tp-1-plain-casefold"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Sigma Spec v2.1.0: plain string matching without |cased is case-insensitive by default.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-13-tp-2-cased-exact",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "token_tool.exe --enable SeDebugPrivilege",
+            "uid": "proc-sem-13-tp-2-cased-exact"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-13-tp-2-cased-exact"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Sigma Spec v2.1.0: exact case 'SeDebugPrivilege' matches |cased|contains.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-13-tn-1-cased-wrong-case",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "token_tool.exe --enable sedebugprivilege",
+            "uid": "proc-sem-13-tn-1-cased-wrong-case"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-13-tn-1-cased-wrong-case"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Sigma Spec v2.1.0: lowercase 'sedebugprivilege' must not match explicit |cased|contains.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-13-tp-3-base64-exact",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "powershell -e SUVY",
+            "uid": "proc-sem-13-tp-3-base64-exact"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-13-tp-3-base64-exact"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "'SUVY' is Base64('IEX') and matches CommandLine|base64|contains: 'IEX'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-13-tp-4-base64-lowercase-default-case-insensitive",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "app.exe --session-id suvy99",
+            "uid": "proc-sem-13-tp-4-base64-lowercase-default-case-insensitive"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-13-tp-4-base64-lowercase-default-case-insensitive"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Sigma Modifiers Spec v2.1.0 & pySigma v1.5.1 (SigmaBase64Modifier -> SigmaString): |base64 transforms 'IEX' -> 'SUVY' without implying |cased, so default case-insensitive matching matches 'suvy99'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-13-tp-5-base64-cased-exact",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "child.exe",
+            "parent_process": {
+              "cmd_line": "launcher.exe -p SUVY",
+              "uid": "proc-sem-13-tp-5-base64-cased-exact"
+            },
+            "uid": "proc-sem-13-tp-5-base64-cased-exact"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-13-tp-5-base64-cased-exact"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "pySigma v1.5.1: |base64|cased|contains produces SigmaCasedString('SUVY'), matching exact uppercase 'SUVY'.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-13-tn-2-base64-cased-lowercase-rejected",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "cmd_line": "child.exe",
+            "parent_process": {
+              "cmd_line": "launcher.exe -p suvy",
+              "uid": "proc-sem-13-tn-2-base64-cased-lowercase-rejected"
+            },
+            "uid": "proc-sem-13-tn-2-base64-cased-lowercase-rejected"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-13-tn-2-base64-cased-lowercase-rejected"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "pySigma v1.5.1: explicit |base64|cased|contains enforces case-sensitive matching and rejects lowercase 'suvy'.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D14_unicode_special_windash_sqli",
+    "dimension_name": "Unicode, Backslashes, Windash & SQL Injection Safety",
+    "rule_id": "11111111-0000-4000-8000-000000000014",
+    "filename": "sem_14_unicode_special_sqli.yml",
+    "yaml": "title: Semantic 14 - Unicode Paths, Windash Variants, and SQLi Literal Safety\nid: 11111111-0000-4000-8000-000000000014\nstatus: test\nlevel: high\nlogsource:\n  category: process_creation\n  product: windows\ndetection:\n  sel_unicode:\n    CommandLine|contains: 'C:\\用户\\管理员\\载荷_v1.ps1'\n  sel_windash:\n    Image|endswith: '\\powershell.exe'\n    CommandLine|windash|contains: ' -EncodedCommand '\n  sel_sqli_literal:\n    CommandLine|contains: \"' OR '1'='1\"\n  condition: 1 of sel_*\n",
+    "cases": [
+      {
+        "test_event_id": "sem-14-tp-1-unicode-path",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\pwsh.exe",
+              "type_id": 1,
+              "name": "pwsh.exe"
+            },
+            "cmd_line": "pwsh.exe -File C:\\用户\\管理员\\载荷_v1.ps1",
+            "uid": "proc-sem-14-tp-1-unicode-path"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-14-tp-1-unicode-path"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Matches UTF-8 CJK characters, backslashes, and literal underscore.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-14-tp-2-windash-slash",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+              "type_id": 1,
+              "name": "powershell.exe"
+            },
+            "cmd_line": "powershell.exe /EncodedCommand SQBFAFgA",
+            "uid": "proc-sem-14-tp-2-windash-slash"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-14-tp-2-windash-slash"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "|windash matches Windows '/' flag prefix variant.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-14-tp-3-windash-unicode-endash",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+              "type_id": 1,
+              "name": "powershell.exe"
+            },
+            "cmd_line": "powershell.exe –EncodedCommand SQBFAFgA",
+            "uid": "proc-sem-14-tp-3-windash-unicode-endash"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-14-tp-3-windash-unicode-endash"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Boundary: |windash matches Unicode en-dash (U+2013) flag obfuscation.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-14-tn-1-benign-event-not-sqli-matched",
+        "ocsf_event_class": "Process Activity (1007)",
+        "category_uid": 1,
+        "class_uid": 1007,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "process": {
+            "file": {
+              "path": "C:\\Windows\\System32\\notepad.exe",
+              "type_id": 1,
+              "name": "notepad.exe"
+            },
+            "cmd_line": "notepad.exe readme.txt",
+            "uid": "proc-sem-14-tn-1-benign-event-not-sqli-matched"
+          },
+          "device": {
+            "type_id": 0,
+            "uid": "dev-sem-14-tn-1-benign-event-not-sqli-matched"
+          },
+          "actor": {
+            "app_name": "synthetic-actor"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "SQLi safety: \"' OR '1'='1\" in rule is bound as a parameter and must NOT tautologically match benign events.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  },
+  {
+    "dimension_id": "D15_array_fields",
+    "dimension_name": "Array Fields (OCSF v1.4.0 DNS answers[].rdata Object Array)",
+    "rule_id": "11111111-0000-4000-8000-000000000015",
+    "filename": "sem_15_array_fields.yml",
+    "yaml": "title: Semantic 15 - OCSF DNS answers[].rdata Object Array Matching\nid: 11111111-0000-4000-8000-000000000015\nstatus: test\nlevel: high\nlogsource:\n  category: dns\ndetection:\n  sel_exact:\n    answers: '198.51.100.77'\n  sel_contains:\n    QueryResults|contains: 'IEX ('\n  filter_sinkhole:\n    answers: '0.0.0.0'\n  condition: (sel_exact or sel_contains) and not filter_sinkhole\n",
+    "cases": [
+      {
+        "test_event_id": "sem-15-tp-1-rdata-exact-multi-element",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "c2.example.net",
+            "type": "A"
+          },
+          "answers": [
+            {
+              "class": "IN",
+              "type": "A",
+              "ttl": 60,
+              "rdata": "93.184.216.34"
+            },
+            {
+              "class": "IN",
+              "type": "A",
+              "ttl": 60,
+              "rdata": "198.51.100.77"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-sem-15-tp-1-rdata-exact-multi-element"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "Second dns_answer object has rdata == '198.51.100.77' and no element matches filter_sinkhole ('0.0.0.0').",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-15-tp-2-rdata-contains",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "stage.example.net",
+            "type": "TXT"
+          },
+          "answers": [
+            {
+              "class": "IN",
+              "type": "TXT",
+              "ttl": 30,
+              "rdata": "IEX (New-Object Net.WebClient)"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-sem-15-tp-2-rdata-contains"
+          }
+        },
+        "expected_match": true,
+        "expected_reason": "dns_answer.rdata contains 'IEX (' via QueryResults -> answers.rdata.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-15-tn-1-rdata-negated-sinkhole",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "c2.example.net",
+            "type": "A"
+          },
+          "answers": [
+            {
+              "class": "IN",
+              "type": "A",
+              "rdata": "198.51.100.77"
+            },
+            {
+              "class": "IN",
+              "type": "A",
+              "rdata": "0.0.0.0"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-sem-15-tn-1-rdata-negated-sinkhole"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Second element rdata=='0.0.0.0' triggers filter_sinkhole, so 'not filter_sinkhole' excludes the event.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-15-tn-2-sibling-attribute-only",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "benign.example.org",
+            "type": "TXT"
+          },
+          "answers": [
+            {
+              "class": "198.51.100.77",
+              "type": "IEX (New-Object)",
+              "flags": [
+                "198.51.100.77",
+                "IEX ("
+              ],
+              "rdata": "v=spf1 -all"
+            }
+          ],
+          "src_endpoint": {
+            "uid": "ep-sem-15-tn-2-sibling-attribute-only"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "OCSF v1.4.0 dns_answer isolation: target strings appear ONLY in sibling attributes (class, type, flags), NOT in rdata ('v=spf1 -all').",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-15-tn-3-empty-array",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 6,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "nxdomain.example.org"
+          },
+          "answers": [],
+          "src_endpoint": {
+            "uid": "ep-sem-15-tn-3-empty-array"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Empty answers array [] has zero dns_answer elements and must not match.",
+        "ocsf_version": "1.4.0"
+      },
+      {
+        "test_event_id": "sem-15-tn-4-missing-answers",
+        "ocsf_event_class": "DNS Activity (4003)",
+        "category_uid": 4,
+        "class_uid": 4003,
+        "activity_id": 1,
+        "ocsf_fields": {
+          "query": {
+            "hostname": "query-only.example.org"
+          },
+          "src_endpoint": {
+            "uid": "ep-sem-15-tn-4-missing-answers"
+          }
+        },
+        "expected_match": false,
+        "expected_reason": "Missing answers field in DNS Query event must evaluate cleanly to NO_MATCH.",
+        "ocsf_version": "1.4.0"
+      }
+    ]
+  }
+]

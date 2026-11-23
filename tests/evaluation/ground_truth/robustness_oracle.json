@@ -1,0 +1,101 @@
+[
+  {
+    "test_id": "rob-01-port-nonnumeric-string",
+    "target_rule_source": "semantic_oracle",
+    "rule_id": "11111111-0000-4000-8000-000000000006",
+    "rule_file": "sem_06_numeric_compare.yml",
+    "schema_violation": "dst_endpoint.port is string 'not-an-integer' instead of OCSF port_t (integer_t)",
+    "case": {
+      "test_event_id": "rob-01-port-nonnumeric-string",
+      "ocsf_version": "1.4.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 4,
+      "class_uid": 4001,
+      "activity_id": 1,
+      "ocsf_fields": {
+        "dst_endpoint": {
+          "ip": "198.51.100.20",
+          "port": "not-an-integer"
+        }
+      },
+      "expected_match": false,
+      "expected_reason": "Malformed non-numeric port string is safely guarded before CAST(... AS NUMERIC), returning NO_MATCH without SQL error."
+    }
+  },
+  {
+    "test_id": "rob-02-dns-answers-integer",
+    "target_rule_source": "sigmahq",
+    "rule_id": "8ae51330-899c-4641-8125-e39f2e07da72",
+    "rule_file": "net_dns_susp_txt_exec_strings.yml",
+    "schema_violation": "answers is integer 12345 instead of dns_answer[]",
+    "case": {
+      "test_event_id": "rob-02-dns-answers-integer",
+      "ocsf_version": "1.4.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 4,
+      "class_uid": 4003,
+      "activity_id": 6,
+      "ocsf_fields": {
+        "query": {
+          "hostname": "txt.c2.example",
+          "type": "TXT"
+        },
+        "answers": 12345
+      },
+      "expected_match": false,
+      "expected_reason": "jsonb_typeof guard prevents jsonb_array_elements error on non-array answers."
+    }
+  },
+  {
+    "test_id": "rob-03-dns-answer-missing-rdata",
+    "target_rule_source": "sigmahq",
+    "rule_id": "8ae51330-899c-4641-8125-e39f2e07da72",
+    "rule_file": "net_dns_susp_txt_exec_strings.yml",
+    "schema_violation": "dns_answer object omits required rdata attribute",
+    "case": {
+      "test_event_id": "rob-03-dns-answer-missing-rdata",
+      "ocsf_version": "1.4.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 4,
+      "class_uid": 4003,
+      "activity_id": 6,
+      "ocsf_fields": {
+        "query": {
+          "hostname": "txt.c2.example",
+          "type": "TXT"
+        },
+        "answers": [
+          {
+            "class": "IN",
+            "type": "IEX"
+          }
+        ]
+      },
+      "expected_match": false,
+      "expected_reason": "Missing rdata yields NULL on elem->>'rdata', evaluating cleanly to NO_MATCH."
+    }
+  },
+  {
+    "test_id": "rob-04-script-content-raw-scalar",
+    "target_rule_source": "sigmahq",
+    "rule_id": "189e3b02-82b2-4b90-9662-411eb64486d4",
+    "rule_file": "posh_ps_potential_invoke_mimikatz.yml",
+    "schema_violation": "script.script_content is scalar string instead of OCSF v1.4.0 long_string object",
+    "case": {
+      "test_event_id": "rob-04-script-content-raw-scalar",
+      "ocsf_version": "1.4.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 1,
+      "class_uid": 1009,
+      "activity_id": 1,
+      "ocsf_fields": {
+        "script": {
+          "type_id": 2,
+          "script_content": "sekurlsa::logonpasswords"
+        }
+      },
+      "expected_match": false,
+      "expected_reason": "Standard query extracts script.script_content.value, returning NULL on malformed scalar script_content without error."
+    }
+  }
+]

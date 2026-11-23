@@ -67,7 +67,7 @@ export function EventTripleDiffModal({
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-[var(--pl-border)] bg-[var(--pl-surface-alt)]">
           <div className="min-w-0 space-y-1">
             <h3 id={titleId} className="text-sm font-semibold m-0 truncate">
-              事件三栏溯源对照 (Raw Log ↔ OCSF v1.3.0 ↔ Unmapped)
+              事件三栏溯源对照 (Raw Log ↔ OCSF v1.4.0 ↔ Unmapped)
             </h3>
             {event && (
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono-code text-[var(--pl-text-muted)]">

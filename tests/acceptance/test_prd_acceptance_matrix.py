@@ -136,7 +136,7 @@ class PrdAcceptanceMatrixTests(unittest.TestCase):
         )
         fb_detail = rt.query_service.get_event(SCOPE, fallback_summary.event_id)
         assert fb_detail is not None
-        self.assertEqual(fb_detail.normalized.ocsf_version, "1.3.0")
+        self.assertEqual(fb_detail.normalized.ocsf_version, "1.4.0")
         self.assertEqual(fb_detail.normalized.original_event_uid, "9999")
         self.assertEqual(fb_detail.normalized.unmapped_fields["ImageLoaded"], "C:\\Temp\\evil.dll")
 

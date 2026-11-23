@@ -31,6 +31,7 @@ class OcsfEntityExtractor(EntityExtractor):
 
     def extract(self, event: NormalizedEvent) -> Sequence[EntityObservation]:
         p = event.ocsf_payload
+        unm: dict[str, Any] = p["unmapped"] if isinstance(p.get("unmapped"), dict) else {}
         ts = event.event_time
         obs: list[EntityObservation] = []
 
@@ -41,6 +42,8 @@ class OcsfEntityExtractor(EntityExtractor):
 
         # 2. Container
         cont = p.get("container")
+        if not isinstance(cont, dict) and unm.get("container_id"):
+            cont = {"uid": unm["container_id"], "runtime": unm.get("runtime")}
         if isinstance(cont, dict) and cont.get("uid"):
             cid = str(cont["uid"]).strip().lower()
             keys = (
@@ -105,7 +108,16 @@ class OcsfEntityExtractor(EntityExtractor):
                 )
             ]
             hashes_raw = file_obj.get("hashes")
-            hashes: dict[str, Any] = hashes_raw if isinstance(hashes_raw, dict) else {}
+            hashes: dict[str, Any] = {}
+            if isinstance(hashes_raw, list):
+                for fp in hashes_raw:
+                    if isinstance(fp, dict) and fp.get("value"):
+                        alg_id = fp.get("algorithm_id")
+                        alg_nm = str(fp.get("algorithm") or "").lower().replace("-", "")
+                        if alg_id == 3 or alg_nm == "sha256":
+                            hashes["sha256"] = str(fp["value"])
+            elif isinstance(hashes_raw, dict):
+                hashes = dict(hashes_raw)
             if hashes.get("sha256"):
                 fkeys.append(
                     CandidateKey("sha256", str(hashes["sha256"]).lower(), is_authoritative=False)
@@ -123,10 +135,21 @@ class OcsfEntityExtractor(EntityExtractor):
 
         # 6. Service
         svc_obj = p.get("service")
+        if not isinstance(svc_obj, dict):
+            api_raw = p.get("api")
+            if isinstance(api_raw, dict) and isinstance(api_raw.get("service"), dict):
+                svc_obj = api_raw["service"]
+            elif unm.get("service_name"):
+                svc_obj = {"name": unm["service_name"], "port": unm.get("listen_port")}
         if isinstance(svc_obj, dict) and svc_obj.get("name"):
             sname = str(svc_obj["name"])
-            sport = svc_obj.get("port")
+            sport = (
+                svc_obj.get("port") if svc_obj.get("port") is not None else unm.get("listen_port")
+            )
             skey = f"{sname.lower()}:{sport if sport is not None else '*'}"
+            svc_attrs = {k: v for k, v in svc_obj.items() if v is not None}
+            if sport is not None:
+                svc_attrs["port"] = sport
             obs.append(
                 EntityObservation(
                     role="service",
@@ -138,7 +161,7 @@ class OcsfEntityExtractor(EntityExtractor):
                             "host_service", skey, is_authoritative=True, scope_role="host"
                         ),
                     ),
-                    attributes={k: v for k, v in svc_obj.items() if v is not None},
+                    attributes=svc_attrs,
                 )
             )
 
@@ -191,7 +214,13 @@ class OcsfEntityExtractor(EntityExtractor):
             raw_answers = p.get("answers")
             ans_list: list[str] = []
             if isinstance(raw_answers, list):
-                ans_list = [str(x).strip() for x in raw_answers]
+                for x in raw_answers:
+                    if isinstance(x, dict):
+                        rd = str(x.get("rdata") or "").strip()
+                        if rd:
+                            ans_list.append(rd)
+                    elif x is not None:
+                        ans_list.append(str(x).strip())
             elif isinstance(raw_answers, str):
                 ans_list = [s.strip() for s in raw_answers.replace(",", ";").split(";")]
             idx = 0
@@ -218,6 +247,9 @@ class OcsfEntityExtractor(EntityExtractor):
         self, payload: dict[str, Any], event: NormalizedEvent
     ) -> EntityObservation | None:
         dev = payload.get("device") if isinstance(payload.get("device"), dict) else None
+        unm: dict[str, Any] = (
+            payload["unmapped"] if isinstance(payload.get("unmapped"), dict) else {}
+        )
         dst_ep = (
             payload.get("dst_endpoint") if isinstance(payload.get("dst_endpoint"), dict) else None
         )
@@ -234,12 +266,19 @@ class OcsfEntityExtractor(EntityExtractor):
             asset_id = str(dev["uid"]) if dev.get("uid") else None
             hostname = str(dev["hostname"]) if dev.get("hostname") else None
             ip = str(dev["ip"]) if dev.get("ip") else None
-            is_nat = bool(dev.get("is_nat_shared", False))
-            if dev.get("valid_from"):
-                vf = parse_utc_timestamp(dev["valid_from"])
-            if dev.get("valid_to"):
-                vt = parse_utc_timestamp(dev["valid_to"])
+            nat_val = (
+                dev["is_nat_shared"] if "is_nat_shared" in dev else unm.get("is_nat_shared", False)
+            )
+            is_nat = bool(nat_val)
+            raw_vf = dev.get("valid_from") or unm.get("valid_from")
+            raw_vt = dev.get("valid_to") or unm.get("valid_to")
+            if raw_vf:
+                vf = parse_utc_timestamp(raw_vf)
+            if raw_vt:
+                vt = parse_utc_timestamp(raw_vt)
             attrs.update({k: v for k, v in dev.items() if v is not None})
+            if "is_nat_shared" in unm:
+                attrs["is_nat_shared"] = is_nat
         elif (
             event.class_uid == int(OcsfClassUid.AUTHENTICATION)
             and dst_ep

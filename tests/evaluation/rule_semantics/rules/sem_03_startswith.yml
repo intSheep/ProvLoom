@@ -1,0 +1,11 @@
+title: Semantic 03 - Startswith Prefix Match
+id: 11111111-0000-4000-8000-000000000003
+status: test
+level: medium
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection:
+    TargetFilename|startswith: 'C:\Users\Public\'
+  condition: selection

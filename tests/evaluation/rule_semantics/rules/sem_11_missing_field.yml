@@ -1,0 +1,13 @@
+title: Semantic 11 - Missing Field vs Exists True/False
+id: 11111111-0000-4000-8000-000000000011
+status: test
+level: medium
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\cmd.exe'
+    CommandLine|exists: true
+    ParentImage|exists: false
+  condition: selection

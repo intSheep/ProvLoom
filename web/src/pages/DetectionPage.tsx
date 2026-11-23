@@ -557,7 +557,7 @@ export function DetectionPage() {
             检测与调查线索中心 (Detection & Signal Layer)
           </h1>
           <p className="text-xs text-[var(--pl-text-muted)]">
-            基于 pySigma OCSF v1.3.0 参数化 SQL 与一跳确定性图关系检测，产出可追溯的 RuleMatch、Signal 与 CandidateGroup（不直接断言攻击定性）。
+            基于 pySigma OCSF v1.4.0 参数化 SQL 与一跳确定性图关系检测，产出可追溯的 RuleMatch、Signal 与 CandidateGroup（不直接断言攻击定性）。
           </p>
         </div>
 
@@ -1206,7 +1206,7 @@ export function DetectionPage() {
 
                     {Object.keys(ruleDetailQ.data.rule.compatibility.field_mappings).length > 0 && (
                       <div className="space-y-1">
-                        <h3 className="text-xs font-semibold">OCSF v1.3.0 字段映射</h3>
+                        <h3 className="text-xs font-semibold">OCSF v1.4.0 字段映射</h3>
                         <JsonViewer
                           value={ruleDetailQ.data.rule.compatibility.field_mappings}
                           maxHeightClass="max-h-40"
@@ -1378,7 +1378,7 @@ export function DetectionPage() {
                     )}
 
                     <div className="space-y-1">
-                      <h3 className="text-xs font-semibold">2. OCSF v1.3.0 字段映射</h3>
+                      <h3 className="text-xs font-semibold">2. OCSF v1.4.0 字段映射</h3>
                       <JsonViewer value={activeSandboxMappings} maxHeightClass="max-h-36" />
                     </div>
 
