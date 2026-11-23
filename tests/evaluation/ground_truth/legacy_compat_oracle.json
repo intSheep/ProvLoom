@@ -1,0 +1,102 @@
+[
+  {
+    "test_id": "leg-01-dns-string-array-tp",
+    "target_rule_source": "semantic_oracle",
+    "rule_id": "11111111-0000-4000-8000-000000000015",
+    "rule_file": "sem_15_array_fields.yml",
+    "legacy_format": "OCSF v1.3.0 historical string[] answers from pre-replay zeek_dns_4003",
+    "case": {
+      "test_event_id": "leg-01-dns-string-array-tp",
+      "ocsf_version": "1.3.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 4,
+      "class_uid": 4003,
+      "activity_id": 6,
+      "ocsf_fields": {
+        "query": {
+          "hostname": "c2.example.net"
+        },
+        "answers": [
+          "93.184.216.34",
+          "198.51.100.77"
+        ]
+      },
+      "expected_match": true,
+      "expected_reason": "Historical compatibility path matches string element '198.51.100.77' in pre-replay string[] answers."
+    }
+  },
+  {
+    "test_id": "leg-02-dns-string-array-tn",
+    "target_rule_source": "semantic_oracle",
+    "rule_id": "11111111-0000-4000-8000-000000000015",
+    "rule_file": "sem_15_array_fields.yml",
+    "legacy_format": "OCSF v1.3.0 historical string[] answers benign",
+    "case": {
+      "test_event_id": "leg-02-dns-string-array-tn",
+      "ocsf_version": "1.3.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 4,
+      "class_uid": 4003,
+      "activity_id": 6,
+      "ocsf_fields": {
+        "query": {
+          "hostname": "benign.example.org"
+        },
+        "answers": [
+          "1.1.1.1",
+          "8.8.8.8"
+        ]
+      },
+      "expected_match": false,
+      "expected_reason": "Historical string[] elements do not match 198.51.100.77 or 'IEX ('."
+    }
+  },
+  {
+    "test_id": "leg-03-dns-scalar-string-tp",
+    "target_rule_source": "sigmahq",
+    "rule_id": "8ae51330-899c-4641-8125-e39f2e07da72",
+    "rule_file": "net_dns_susp_txt_exec_strings.yml",
+    "legacy_format": "OCSF v1.3.0 historical scalar string answers from pre-replay sysmon_dns_4003",
+    "case": {
+      "test_event_id": "leg-03-dns-scalar-string-tp",
+      "ocsf_version": "1.3.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 4,
+      "class_uid": 4003,
+      "activity_id": 1,
+      "ocsf_fields": {
+        "query": {
+          "hostname": "stage.c2.example",
+          "type": "TXT"
+        },
+        "answers": "cmd.exe /c whoami"
+      },
+      "expected_match": true,
+      "expected_reason": "Historical compatibility path matches scalar string answers before tenant replay."
+    }
+  },
+  {
+    "test_id": "leg-04-dns-scalar-string-tn",
+    "target_rule_source": "sigmahq",
+    "rule_id": "8ae51330-899c-4641-8125-e39f2e07da72",
+    "rule_file": "net_dns_susp_txt_exec_strings.yml",
+    "legacy_format": "OCSF v1.3.0 historical scalar string answers benign",
+    "case": {
+      "test_event_id": "leg-04-dns-scalar-string-tn",
+      "ocsf_version": "1.3.0",
+      "strict_ocsf_v140": false,
+      "category_uid": 4,
+      "class_uid": 4003,
+      "activity_id": 1,
+      "ocsf_fields": {
+        "query": {
+          "hostname": "example.com",
+          "type": "TXT"
+        },
+        "answers": "v=spf1 -all"
+      },
+      "expected_match": false,
+      "expected_reason": "Benign historical scalar string answers does not match."
+    }
+  }
+]

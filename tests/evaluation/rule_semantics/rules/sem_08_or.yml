@@ -1,0 +1,14 @@
+title: Semantic 08 - Disjunction (OR and 1 of)
+id: 11111111-0000-4000-8000-000000000008
+status: test
+level: medium
+logsource:
+  category: authentication
+  product: windows
+detection:
+  sel_network_admin:
+    LogonType: 3
+    TargetUserName: 'Administrator'
+  sel_rdp_any:
+    LogonType: 10
+  condition: sel_network_admin or sel_rdp_any

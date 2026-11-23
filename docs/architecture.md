@@ -14,7 +14,7 @@
 
 | PRD 核心原则 | 工程设计保障机制 |
 | :--- | :--- |
-| **优先复用成熟标准** | 标准化层严格采用 **OCSF v1.3.0** 事件与对象字典，保留 `metadata.version` 与 `unmapped` 扩展槽位。 |
+| **优先复用成熟标准** | 标准化层严格采用 **OCSF v1.4.0**（tag `1.4.0`, commit `6109cc5e834c1adfee67dda6c9bcfa5e37f79012`）事件与对象字典，保留 `metadata.version` 与 `unmapped` 扩展槽位。 |
 | **确定性程序处理** | 解析、映射、实体归一与关系提取全部基于纯函数、显式规则版本（`rule_id` + `rule_version`）和严格时间窗口，无黑盒推断。 |
 | **不把推断写成事实** | 实体区分 `RESOLVED` / `SCOPED_TEMPORAL` / `PROVISIONAL` 状态；关系强制区分 `DETERMINISTIC`（确定性）与 `CANDIDATE`（候选），Web 图谱上分别以实线与虚线高亮区分。 |
 | **原始数据不丢、结果可重建** | `raw_events` 表仅追加（Append-Only），不支持的事件回退为 OCSF Base/Passthrough 记录留存，失败事件进入 `pipeline_failures`；支持通过 CLI 或 Web 控制台触发重放与删图重建。 |
@@ -375,9 +375,9 @@ erDiagram
 1. **原始事件幂等防重（`RawEvent`）**
    - 计算确定性指纹 `raw_fingerprint = SHA256(tenant_scope + "\0" + source_id + "\0" + canonical_raw_payload)`，施加数据库唯一约束 `UNIQUE (tenant_scope, source_id, raw_fingerprint)`。
    - 接入损坏或解析/映射失败统一写入 `pipeline_failures`（含阶段、错误码、可重试标记与原始片段），确保零静默丢数。
-2. **OCSF v1.3.0 标准化与兜底模型（`NormalizedEvent`）**
-   - 优先支持 6 大类别/事件类：**Process Activity (`1007`)**、**File System Activity (`1001`)**、**Network Activity (`4001`)**、**Authentication (`3002`)**、**DNS Activity (`4003`)**、**Application Activity (`category_uid=6`: `6001`/`6002`/`6003`，兼容 Web/WAF `4002`)**，外加资产清单 **Inventory Info (`5001`)**。
-   - 强制保留 `ocsf_version = "1.3.0"`、`metadata.original_uid`、`raw_event_id`；未映射字段归入 `unmapped_fields`。
+2. **OCSF v1.4.0 标准化与兜底模型（`NormalizedEvent`）**
+   - 优先支持类别/事件类：**Process Activity (`1007`)**、**File System Activity (`1001`)**、**Script Activity (`1009`)**、**Network Activity (`4001`)**、**Authentication (`3002`)**、**DNS Activity (`4003`)**、**Application Activity (`category_uid=6`: `6001`/`6002`/`6003`，兼容 Web/WAF `4002`)**，外加资产清单 **Inventory Info (`5001`)**。
+   - 强制保留 `ocsf_version = "1.4.0"`（与 `metadata.version` 一致）、`metadata.original_uid`、`raw_event_id`；未映射字段归入 `unmapped_fields`。
    - **不支持的事件非静默保留**：无匹配映射规则的合法日志转为 `class_uid = 0`（Base Event）、`normalization_status = "UNSUPPORTED_PASSTHROUGH"`，完整保留时间、源信息与解析键值。
 
 ### 4.3 七类首批实体的三级身份归一与防误合设计

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 
 from sqlalchemy import Connection, Engine, create_engine, delete, event, select, update
 from sqlalchemy.pool import StaticPool
@@ -37,10 +38,7 @@ def _sqlite_regexp(pattern: str | None, flags_str: str | None, value: str | None
             flags |= re.MULTILINE
         if "s" in flags_str:
             flags |= re.DOTALL
-    try:
-        return 1 if re.search(pattern, str(value), flags) is not None else 0
-    except re.error:
-        return 0
+    return 1 if re.search(pattern, str(value), flags) is not None else 0
 
 
 def create_db_engine(database_url: str, echo: bool = False) -> Engine:
@@ -101,6 +99,12 @@ class SqlUnitOfWork(UnitOfWork):
     def rollback(self) -> None:
         if self._conn is not None and self._tx.is_active:
             self._tx.rollback()
+
+    @contextmanager
+    def savepoint(self) -> Iterator[None]:
+        assert self._conn is not None
+        with self._conn.begin_nested():
+            yield
 
     def purge_derived_data(self, tenant_scope: str) -> None:
         assert self._conn is not None

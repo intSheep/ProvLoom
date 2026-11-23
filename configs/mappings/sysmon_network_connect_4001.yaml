@@ -1,6 +1,6 @@
 rule_id: sysmon_network_connect_4001
 rule_version: "1.0.0"
-ocsf_version: "1.3.0"
+ocsf_version: "1.4.0"
 match:
   parser_id: sysmon
   event_code: "3"

@@ -1,7 +1,15 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import Any, ClassVar
 
+from sigma.conditions import (
+    ConditionAND,
+    ConditionItem,
+    ConditionNOT,
+)
+from sigma.exceptions import SigmaRuleLocation
 from sigma.pipelines.ocsf.ocsf import ocsf_pipeline as upstream_ocsf_pipeline
 from sigma.processing.conditions import (
     LogsourceCondition,
@@ -14,18 +22,23 @@ from sigma.processing.transformations import (
     AddConditionTransformation,
     FieldMappingTransformation,
 )
+from sigma.processing.transformations.base import DetectionItemTransformation
 from sigma.rule import SigmaRule
+from sigma.rule.detection import SigmaDetection, SigmaDetectionItem, SigmaDetections
+from sigma.types import SigmaExists, SigmaNull, SigmaNumber, SigmaString
 
 from provloom.normalization.interfaces import MappingSpecSummary
 
-# Canonical OCSF v1.3.0 fields supported by the SQL Detection Backend.
-KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
+# Canonical OCSF v1.4.0 scalar fields supported by the SQL Detection Backend
+# (pinned to ocsf/ocsf-schema tag 1.4.0, commit 6109cc5e834c1adfee67dda6c9bcfa5e37f79012).
+KNOWN_OCSF_V14_FIELDS: frozenset[str] = frozenset(
     {
         # Top-level / envelope attributes
         "class_uid",
         "category_uid",
         "activity_id",
         "type_uid",
+        "severity_id",
         "source_id",
         "ocsf_version",
         "original_event_uid",
@@ -35,15 +48,21 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
         "metadata.log_name",
         "metadata.log_provider",
         "unmapped.EventID",
-        # Device / Host / Asset (1007, 1001, 4001, 5001, 600x)
+        "unmapped.is_nat_shared",
+        "unmapped.valid_from",
+        "unmapped.valid_to",
+        "unmapped.container_id",
+        "unmapped.runtime",
+        "unmapped.service_name",
+        "unmapped.listen_port",
+        # Device / Host / Container
         "device.uid",
         "device.hostname",
         "device.ip",
         "device.os.name",
-        "device.is_nat_shared",
         "container.uid",
         "container.runtime",
-        # Actor & Process (1007, 1001, 4001, 4003)
+        # Actor & Process (1007, 1001, 1009, 4001, 4003)
         "actor.user.name",
         "actor.user.domain",
         "actor.user.uid",
@@ -60,7 +79,9 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
         "process.file.name",
         "process.file.desc",
         "process.file.internal_name",
-        "process.file.hashes.sha256",
+        "process.file.hashes.algorithm_id",
+        "process.file.hashes.algorithm",
+        "process.file.hashes.value",
         "process.parent_process.uid",
         "process.parent_process.pid",
         "process.parent_process.cmd_line",
@@ -70,9 +91,14 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
         "file.path",
         "file.name",
         "file.created_time",
-        "file.hashes.sha256",
-        "file_result.file.path",
-        "file_result.file.name",
+        "file.hashes.algorithm_id",
+        "file.hashes.algorithm",
+        "file.hashes.value",
+        # Script Activity (1009) — script_content is long_string object; text is in .value
+        "script.script_content.value",
+        "script.file.path",
+        "script.uid",
+        "script.name",
         # Network & Firewall (4001)
         "src_endpoint.ip",
         "src_endpoint.port",
@@ -85,34 +111,47 @@ KNOWN_OCSF_V13_FIELDS: frozenset[str] = frozenset(
         "disposition",
         "traffic.bytes_in",
         "traffic.bytes_out",
-        # DNS Activity (4003)
+        # DNS Activity (4003) — answers is dns_answer[]; answer value is in .rdata
         "query.hostname",
         "query.type",
-        "answers",
+        "answers.rdata",
         "rcode",
         # Authentication / IAM (3002)
         "user.uid",
         "user.name",
         "user.domain",
         "logon_type_id",
-        # Service & Application Activity (6001, 6002, 6003)
         "service.name",
-        "service.port",
+        # Application Activity (6001, 6002, 6003)
         "app.name",
         "api.operation",
-        "web_resources.path",
-        # PowerShell / Script / Registry / Service extensions
-        "script.script_content",
-        "script.file.path",
+        "api.service.name",
+        "web_resources.url_string",
+        # Windows Registry / Service extensions
         "reg_key.path",
         "win_service.name",
         "win_service.cmd_line",
     }
 )
 
-ARRAY_OCSF_FIELDS: frozenset[str] = frozenset({"answers"})
+# Historical alias retained for external imports.
+KNOWN_OCSF_V13_FIELDS: frozenset[str] = KNOWN_OCSF_V14_FIELDS
 
-# Default field coverage from ProvLoom's built-in OCSF v1.3.0 YAML mappings by class_uid.
+# OCSF object-array fields: field_path -> (array_path, leaf_attr, allow_legacy_str)
+# allow_legacy_str=True on answers.rdata is a historical compatibility path for
+# pre-1.4.0 string-array/scalar DNS answers before tenant replay.
+OBJECT_ARRAY_OCSF_FIELDS: dict[str, tuple[tuple[str, ...], str, bool]] = {
+    "answers.rdata": (("answers",), "rdata", True),
+    "file.hashes.algorithm_id": (("file", "hashes"), "algorithm_id", False),
+    "file.hashes.algorithm": (("file", "hashes"), "algorithm", False),
+    "file.hashes.value": (("file", "hashes"), "value", False),
+    "process.file.hashes.algorithm_id": (("process", "file", "hashes"), "algorithm_id", False),
+    "process.file.hashes.algorithm": (("process", "file", "hashes"), "algorithm", False),
+    "process.file.hashes.value": (("process", "file", "hashes"), "value", False),
+    "web_resources.url_string": (("web_resources",), "url_string", False),
+}
+
+# Default field coverage from ProvLoom's built-in OCSF v1.4.0 YAML mappings by class_uid.
 DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
     1001: frozenset(
         {
@@ -127,7 +166,9 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
             "actor.process.pid",
             "actor.process.file.path",
             "file.path",
-            "file.hashes.sha256",
+            "file.hashes.algorithm_id",
+            "file.hashes.algorithm",
+            "file.hashes.value",
             "unmapped.EventID",
         }
     ),
@@ -208,7 +249,7 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
             "dst_endpoint.port",
             "connection_info.protocol_name",
             "query.hostname",
-            "answers",
+            "answers.rdata",
             "rcode",
             "unmapped.EventID",
         }
@@ -224,11 +265,13 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
             "device.hostname",
             "device.ip",
             "device.os.name",
-            "device.is_nat_shared",
-            "container.uid",
-            "container.runtime",
-            "service.name",
-            "service.port",
+            "unmapped.is_nat_shared",
+            "unmapped.valid_from",
+            "unmapped.valid_to",
+            "unmapped.container_id",
+            "unmapped.runtime",
+            "unmapped.service_name",
+            "unmapped.listen_port",
         }
     ),
     6001: frozenset(
@@ -241,10 +284,10 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
             "device.hostname",
             "actor.user.name",
             "actor.user.domain",
-            "service.name",
-            "service.port",
-            "web_resources.path",
+            "web_resources.url_string",
             "src_endpoint.ip",
+            "unmapped.service_name",
+            "unmapped.listen_port",
         }
     ),
     6002: frozenset(
@@ -256,8 +299,8 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
             "metadata.original_uid",
             "device.hostname",
             "app.name",
-            "service.name",
-            "service.port",
+            "unmapped.service_name",
+            "unmapped.listen_port",
         }
     ),
     6003: frozenset(
@@ -270,10 +313,10 @@ DEFAULT_PROVLOOM_COVERED_FIELDS: dict[int, frozenset[str]] = {
             "device.hostname",
             "actor.user.name",
             "actor.user.domain",
-            "service.name",
-            "service.port",
+            "api.service.name",
             "api.operation",
             "src_endpoint.ip",
+            "unmapped.listen_port",
         }
     ),
 }
@@ -282,6 +325,8 @@ _CATEGORY_TO_OCSF_CONDITION: dict[str, dict[str, int]] = {
     "process_creation": {"class_uid": 1007, "activity_id": 1},
     "process_termination": {"class_uid": 1007, "activity_id": 2},
     "process_access": {"class_uid": 1007, "activity_id": 99},
+    "ps_script": {"class_uid": 1009, "activity_id": 1},
+    "ps_module": {"class_uid": 1009, "activity_id": 1},
     "file_event": {"class_uid": 1001, "activity_id": 1},
     "file_access": {"class_uid": 1001, "activity_id": 2},
     "file_change": {"class_uid": 1001},
@@ -302,11 +347,117 @@ def _make_fmap(mapping: dict[str, str]) -> dict[str | None, str | list[str]]:
     return {k: v for k, v in mapping.items()}
 
 
+_HASH_FIELD_TO_ALGO_ID: dict[str, int] = {
+    "md5": 1,
+    "MD5": 1,
+    "sha1": 2,
+    "SHA1": 2,
+    "sha256": 3,
+    "SHA256": 3,
+    "sha512": 4,
+    "SHA512": 4,
+}
+
+
+class _NegatableSigmaDetection(SigmaDetection):
+    """SigmaDetection subclass that preserves negation for multi-item algorithm+value rewrites."""
+
+    def __init__(
+        self,
+        detection_items: list[SigmaDetectionItem | SigmaDetection],
+        source: SigmaRuleLocation | None = None,
+        item_linking: type[ConditionAND | Any] | None = None,
+        *,
+        negated: bool = False,
+    ) -> None:
+        super().__init__(detection_items=detection_items, source=source, item_linking=item_linking)
+        self.negated = negated
+
+    def postprocess(
+        self,
+        detections: SigmaDetections,
+        parent: SigmaDetection | SigmaDetectionItem | ConditionItem | None = None,
+        source: SigmaRuleLocation | None = None,
+    ) -> ConditionItem | Any | None:
+        cond = super().postprocess(detections, parent, source)
+        if self.negated and cond is not None:
+            not_cond = ConditionNOT([cond])
+            not_cond.parent = parent
+            not_cond.source = self.source
+            cond.parent = not_cond
+            return not_cond
+        return cond
+
+
+@dataclass
+class _ScopedHashAlgorithmTransformation(DetectionItemTransformation):
+    """Expand Sigma hash fields (md5/sha1/sha256/sha512) into (algorithm_id AND value) pairs."""
+
+    prefix: str
+    _HASH_MAP: ClassVar[dict[str, int]] = _HASH_FIELD_TO_ALGO_ID
+
+    def apply_detection_item(
+        self, detection_item: SigmaDetectionItem
+    ) -> SigmaDetection | SigmaDetectionItem | None:
+        orig_field = detection_item.field
+        if orig_field is None or orig_field not in self._HASH_MAP:
+            return detection_item
+
+        alg_id = self._HASH_MAP[orig_field]
+        alg_item = SigmaDetectionItem(
+            field=f"{self.prefix}.algorithm_id",
+            modifiers=[],
+            value=[SigmaNumber(alg_id)],
+            source=detection_item.source,
+            auto_modifiers=False,
+        )
+        vals = list(detection_item.value)
+        if not vals or (len(vals) == 1 and isinstance(vals[0], SigmaNull)):
+            val_item = SigmaDetectionItem(
+                field=f"{self.prefix}.value",
+                modifiers=[],
+                value=[SigmaString("*")],
+                source=detection_item.source,
+                auto_modifiers=False,
+            )
+            negated = not bool(detection_item.negated)
+        elif len(vals) == 1 and isinstance(vals[0], SigmaExists):
+            val_item = SigmaDetectionItem(
+                field=f"{self.prefix}.value",
+                modifiers=[],
+                value=[SigmaExists(True)],
+                source=detection_item.source,
+                auto_modifiers=False,
+            )
+            negated = (not bool(vals[0].exists)) ^ bool(detection_item.negated)
+        else:
+            val_item = SigmaDetectionItem(
+                field=f"{self.prefix}.value",
+                modifiers=[],
+                value=vals,
+                value_linking=detection_item.value_linking,
+                negated=False,
+                source=detection_item.source,
+                auto_modifiers=False,
+            )
+            negated = bool(detection_item.negated)
+
+        if self._pipeline is not None:
+            self._pipeline.field_mappings.setdefault(orig_field, set()).add(f"{self.prefix}.value")
+
+        return _NegatableSigmaDetection(
+            detection_items=[alg_item, val_item],
+            source=detection_item.source,
+            item_linking=ConditionAND,
+            negated=negated,
+        )
+
+
 def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
-    """Composes ProvLoom OCSF v1.3.0 canonical field mappings with pySigma-pipeline-ocsf."""
-    v13_items: list[ProcessingItem] = [
+    """Composes ProvLoom OCSF v1.4.0 field mappings with sanitized pySigma-pipeline-ocsf."""
+    v14_items: list[ProcessingItem] = [
         ProcessingItem(
-            identifier=f"provloom_ocsf_v13_cat_{category}_{field}",
+            identifier=f"provloom_ocsf_v14_cat_{category}_{field}",
             transformation=AddConditionTransformation({field: val}),
             rule_conditions=[LogsourceCondition(category=category)],
         )
@@ -314,9 +465,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
         for field, val in sorted(cond_map.items())
     ]
 
-    v13_items.append(
+    v14_items.append(
         ProcessingItem(
-            identifier="provloom_ocsf_v13_win_security_auth_class",
+            identifier="provloom_ocsf_v14_win_security_auth_class",
             transformation=AddConditionTransformation({"class_uid": 3002}),
             rule_conditions=[
                 LogsourceCondition(product="windows"),
@@ -326,9 +477,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
             ],
         )
     )
-    v13_items.append(
+    v14_items.append(
         ProcessingItem(
-            identifier="provloom_ocsf_v13_win_security_auth_fail_class",
+            identifier="provloom_ocsf_v14_win_security_auth_fail_class",
             transformation=AddConditionTransformation({"class_uid": 3002}),
             rule_conditions=[
                 LogsourceCondition(product="windows"),
@@ -357,7 +508,8 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
                 "Hostname": "device.hostname",
                 "CurrentDirectory": "process.working_directory",
                 "OriginalFileName": "process.file.internal_name",
-                "sha256": "process.file.hashes.sha256",
+                "Description": "process.file.desc",
+                "LogonId": "process.session.uid",
                 "EventID": "unmapped.EventID",
             },
         ),
@@ -388,12 +540,39 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
                 "EventID": "unmapped.EventID",
             },
         ),
+        (
+            "ps_script",
+            [LogsourceCondition(category="ps_script")],
+            {
+                "ScriptBlockText": "script.script_content.value",
+                "Path": "script.file.path",
+                "ScriptBlockId": "script.uid",
+                "Computer": "device.hostname",
+                "EventID": "unmapped.EventID",
+            },
+        ),
+        (
+            "ps_module",
+            [LogsourceCondition(category="ps_module")],
+            {
+                "Payload": "script.script_content.value",
+                "Computer": "device.hostname",
+                "EventID": "unmapped.EventID",
+            },
+        ),
     ]
 
+    v14_items.append(
+        ProcessingItem(
+            identifier="provloom_ocsf_v14_hashes_process_creation",
+            transformation=_ScopedHashAlgorithmTransformation(prefix="process.file.hashes"),
+            rule_conditions=[LogsourceCondition(category="process_creation")],
+        )
+    )
     for ident, conds, fmap in category_field_maps:
-        v13_items.append(
+        v14_items.append(
             ProcessingItem(
-                identifier=f"provloom_ocsf_v13_fields_{ident}",
+                identifier=f"provloom_ocsf_v14_fields_{ident}",
                 transformation=FieldMappingTransformation(_make_fmap(fmap)),
                 rule_conditions=conds,
             )
@@ -407,22 +586,28 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
         "Computer": "device.hostname",
         "TargetFilename": "file.path",
         "FileName": "file.path",
-        "sha256": "file.hashes.sha256",
         "EventID": "unmapped.EventID",
     }
     for file_cat in ("file_event", "file_access", "file_change", "file_delete"):
-        v13_items.append(
+        v14_items.append(
             ProcessingItem(
-                identifier=f"provloom_ocsf_v13_fields_{file_cat}",
+                identifier=f"provloom_ocsf_v14_hashes_{file_cat}",
+                transformation=_ScopedHashAlgorithmTransformation(prefix="file.hashes"),
+                rule_conditions=[LogsourceCondition(category=file_cat)],
+            )
+        )
+        v14_items.append(
+            ProcessingItem(
+                identifier=f"provloom_ocsf_v14_fields_{file_cat}",
                 transformation=FieldMappingTransformation(_make_fmap(file_fmap)),
                 rule_conditions=[LogsourceCondition(category=file_cat)],
             )
         )
 
     for net_cat in ("network_connection", "firewall"):
-        v13_items.append(
+        v14_items.append(
             ProcessingItem(
-                identifier=f"provloom_ocsf_v13_fields_{net_cat}",
+                identifier=f"provloom_ocsf_v14_fields_{net_cat}",
                 transformation=FieldMappingTransformation(
                     _make_fmap(
                         {
@@ -455,9 +640,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
         )
 
     for dns_cat in ("dns", "dns_query"):
-        v13_items.append(
+        v14_items.append(
             ProcessingItem(
-                identifier=f"provloom_ocsf_v13_fields_{dns_cat}",
+                identifier=f"provloom_ocsf_v14_fields_{dns_cat}",
                 transformation=FieldMappingTransformation(
                     _make_fmap(
                         {
@@ -467,9 +652,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
                             "Computer": "device.hostname",
                             "QueryName": "query.hostname",
                             "query": "query.hostname",
-                            "QueryResults": "answers",
-                            "answers": "answers",
-                            "answer": "answers",
+                            "QueryResults": "answers.rdata",
+                            "answers": "answers.rdata",
+                            "answer": "answers.rdata",
                             "rcode_name": "rcode",
                             "record_type": "query.type",
                             "SourceIp": "src_endpoint.ip",
@@ -495,16 +680,16 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
         "ServiceName": "service.name",
         "EventID": "unmapped.EventID",
     }
-    v13_items.append(
+    v14_items.append(
         ProcessingItem(
-            identifier="provloom_ocsf_v13_fields_authentication",
+            identifier="provloom_ocsf_v14_fields_authentication",
             transformation=FieldMappingTransformation(auth_map),
             rule_conditions=[LogsourceCondition(category="authentication")],
         )
     )
-    v13_items.append(
+    v14_items.append(
         ProcessingItem(
-            identifier="provloom_ocsf_v13_fields_windows_security",
+            identifier="provloom_ocsf_v14_fields_windows_security",
             transformation=FieldMappingTransformation(auth_map),
             rule_conditions=[
                 LogsourceCondition(product="windows"),
@@ -514,20 +699,19 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
     )
 
     for web_cat in ("webserver", "web_access"):
-        v13_items.append(
+        v14_items.append(
             ProcessingItem(
-                identifier=f"provloom_ocsf_v13_fields_{web_cat}",
+                identifier=f"provloom_ocsf_v14_fields_{web_cat}",
                 transformation=FieldMappingTransformation(
                     _make_fmap(
                         {
-                            "cs-uri-stem": "web_resources.path",
-                            "cs-uri": "web_resources.path",
-                            "resource_path": "web_resources.path",
+                            "cs-uri-stem": "web_resources.url_string",
+                            "cs-uri": "web_resources.url_string",
+                            "resource_path": "web_resources.url_string",
                             "c-ip": "src_endpoint.ip",
                             "src_ip": "src_endpoint.ip",
                             "username": "actor.user.name",
                             "hostname": "device.hostname",
-                            "service_name": "service.name",
                         }
                     )
                 ),
@@ -535,57 +719,92 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
             )
         )
 
-    for app_cat in ("application", "api_activity"):
-        v13_items.append(
-            ProcessingItem(
-                identifier=f"provloom_ocsf_v13_fields_{app_cat}",
-                transformation=FieldMappingTransformation(
-                    _make_fmap(
-                        {
-                            "operation": "api.operation",
-                            "service_name": "service.name",
-                            "username": "actor.user.name",
-                            "domain": "actor.user.domain",
-                            "hostname": "device.hostname",
-                            "src_ip": "src_endpoint.ip",
-                            "EventID": "unmapped.EventID",
-                        }
-                    )
-                ),
-                rule_conditions=[LogsourceCondition(category=app_cat)],
-            )
+    v14_items.append(
+        ProcessingItem(
+            identifier="provloom_ocsf_v14_fields_application",
+            transformation=FieldMappingTransformation(
+                _make_fmap(
+                    {
+                        "service_name": "app.name",
+                        "hostname": "device.hostname",
+                        "EventID": "unmapped.EventID",
+                    }
+                )
+            ),
+            rule_conditions=[LogsourceCondition(category="application")],
         )
+    )
+    v14_items.append(
+        ProcessingItem(
+            identifier="provloom_ocsf_v14_fields_api_activity",
+            transformation=FieldMappingTransformation(
+                _make_fmap(
+                    {
+                        "operation": "api.operation",
+                        "service_name": "api.service.name",
+                        "username": "actor.user.name",
+                        "domain": "actor.user.domain",
+                        "hostname": "device.hostname",
+                        "src_ip": "src_endpoint.ip",
+                        "EventID": "unmapped.EventID",
+                    }
+                )
+            ),
+            rule_conditions=[LogsourceCondition(category="api_activity")],
+        )
+    )
 
-    # Layer sanitized upstream pySigma-pipeline-ocsf items for additional categories.
+    # Layer sanitized upstream pySigma-pipeline-ocsf items only for unhandled categories,
+    # excluding upstream collisions and non-OCSF-v1.4.0 paths.
     upstream: ProcessingPipeline = upstream_ocsf_pipeline()
     upstream._clear_pipeline()
     handled_categories = set(_CATEGORY_TO_OCSF_CONDITION.keys())
+    invalid_upstream_pairs: frozenset[tuple[str, str]] = frozenset(
+        {
+            ("Image", "reg_key.path"),
+            ("Image", "file.name"),
+            ("Image", "query.hostname"),
+            ("ParentImage", "file.name"),
+            ("ScriptBlockText", "script.script_content"),
+            ("Payload", "script.script_content"),
+            ("answer", "answer.rdata"),
+        }
+    )
     sanitized_upstream_items: list[ProcessingItem] = []
     for item in upstream.items:
         ident = item.identifier or ""
+        r_conds = (
+            list(item.rule_conditions.values())
+            if isinstance(item.rule_conditions, dict)
+            else list(item.rule_conditions)
+        )
+        cat_conds = [
+            c.category
+            for c in r_conds
+            if isinstance(c, LogsourceCondition) and c.category is not None
+        ]
         if isinstance(item.transformation, AddConditionTransformation):
-            cat_conds = [
-                c.category
-                for c in item.rule_conditions
-                if isinstance(c, LogsourceCondition) and c.category is not None
-            ]
             if any(c in handled_categories for c in cat_conds):
                 continue
             if ident.startswith("ocsf_windows_security_"):
                 continue
             sanitized_upstream_items.append(item)
         elif isinstance(item.transformation, FieldMappingTransformation):
+            if any(c in handled_categories for c in cat_conds):
+                continue
+            if ident == "ocsf_field_mappings_windows_security":
+                continue
             cleaned_map: dict[str | None, str | list[str]] = {
                 src: dst
                 for src, dst in item.transformation.mapping.items()
-                if isinstance(dst, str) and src != dst and not dst.startswith("unmapped.")
+                if isinstance(src, str)
+                and isinstance(dst, str)
+                and src != dst
+                and not dst.startswith("unmapped.")
+                and dst in KNOWN_OCSF_V14_FIELDS
+                and (src, dst) not in invalid_upstream_pairs
             }
             if cleaned_map:
-                r_conds = (
-                    list(item.rule_conditions.values())
-                    if isinstance(item.rule_conditions, dict)
-                    else list(item.rule_conditions)
-                )
                 d_conds = (
                     list(item.detection_item_conditions.values())
                     if isinstance(item.detection_item_conditions, dict)
@@ -607,9 +826,9 @@ def build_provloom_ocsf_pipeline() -> ProcessingPipeline:
                 )
 
     return ProcessingPipeline(
-        name="ProvLoom OCSF v1.3.0 Pipeline",
+        name="ProvLoom OCSF v1.4.0 Pipeline",
         priority=10,
-        items=v13_items + sanitized_upstream_items,
+        items=v14_items + sanitized_upstream_items,
     )
 
 
@@ -645,6 +864,7 @@ def evaluate_data_coverage(
         "category_uid",
         "activity_id",
         "type_uid",
+        "severity_id",
         "source_id",
         "ocsf_version",
         "original_event_uid",

@@ -1,6 +1,6 @@
 rule_id: sysmon_file_create_1001
 rule_version: "1.0.0"
-ocsf_version: "1.3.0"
+ocsf_version: "1.4.0"
 match:
   parser_id: sysmon
   event_code: "11"
@@ -16,4 +16,4 @@ fields:
   actor.process.pid: ProcessId
   actor.process.file.path: Image
   file.path: TargetFilename
-  file.hashes.sha256: sha256
+  file.hashes.value: sha256

@@ -110,7 +110,7 @@ src/provloom/
 
 ## 5. 检测规则来源与兼容性
 
-- **Sigma（主要单事件知识源）**：基于 `pySigma` 与 `pySigma-pipeline-ocsf`（结合 ProvLoom OCSF v1.3.0 规范映射对齐），优先覆盖 `process_creation`、`file_event` / `file_access` / `file_change`、`network_connection`、`authentication`、`dns` / `dns_query`、`process_access`。保留原始 YAML、ID、版本、来源路径、ATT&CK 标签、严重程度与兼容性结果。
+- **Sigma（主要单事件知识源）**：基于 `pySigma` 与 `pySigma-pipeline-ocsf`（结合 ProvLoom OCSF v1.4.0 规范映射对齐，校正如 `answers.rdata`、`script.script_content.value` 等嵌套对象路径），优先覆盖 `process_creation`、`ps_script` / `ps_module`、`file_event` / `file_access` / `file_change`、`network_connection`、`authentication`、`dns` / `dns_query`、`process_access`。保留原始 YAML、ID、版本、来源路径、ATT&CK 标签、严重程度与兼容性结果。
 - **ProvLoom Custom Rules**：结构化 YAML 表达，支持 OCSF 原生字段条件与一跳实体关系检测，禁止任意 Python 代码或任意 SQL。
 - **五阶段兼容性报告**：明确区分 `PARSE_SUCCESS`、`MAPPING_SUCCESS`、`DATA_COVERAGE`、`COMPILE_SUCCESS`、`EXECUTION_SUCCESS`。不支持的字段、修饰符或 Correlation 语义必须显式报告，禁止静默忽略。
 

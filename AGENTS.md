@@ -6,7 +6,7 @@ Repository guide and architectural invariants for coding agents and contributors
 
 ProvLoom is a deterministic, traceable **Security Fact, Provenance Graph & Detection Signal Service** built for downstream APT Investigation Agents, paired with a lightweight Web Debug Console.
 
-- **In Scope (MVP v0.1 Data Layer + v0.2 Detection Layer):** Multi-source log ingestion, parsing, OCSF v1.3.0 normalization, entity identity resolution, provenance relation extraction, Sigma (`pySigma` + OCSF pipeline) single-event detection, structured 1-hop graph relation detection, traceable `RuleMatch` / `Signal` / `CandidateGroup` generation, PostgreSQL persistence, read-only Query & Detection APIs, Ops/Debug API, and Web Inspector UI.
+- **In Scope (MVP v0.1 Data Layer + v0.2 Detection Layer):** Multi-source log ingestion, parsing, OCSF v1.4.0 normalization, entity identity resolution, provenance relation extraction, Sigma (`pySigma` + OCSF pipeline) single-event detection, structured 1-hop graph relation detection, traceable `RuleMatch` / `Signal` / `CandidateGroup` generation, PostgreSQL persistence, read-only Query & Detection APIs, Ops/Debug API, and Web Inspector UI.
 - **Out of Scope:** Multi-hop graph pattern / complex temporal / UEBA baseline detection, Sigma correlation rules, IOC intelligence platform, LLM semantic reasoning, attack hypothesis management, Agent runtime, automated SOAR response.
 
 ## 2. Non-Negotiable Domain Invariants
@@ -19,8 +19,9 @@ Every change MUST preserve these five guarantees:
    - Parsed events without a dedicated OCSF class mapper MUST fall back to `class_uid = 0` (`UNSUPPORTED_PASSTHROUGH`), never silently discarded.
    - Derived tables (`normalized_events`, `entities`, `relations`, `relation_evidences`) MUST be deterministically rebuildable from `raw_events`.
 
-2. **OCSF v1.3.0 Standard Fidelity**
-   - Preserve `ocsf_version` (`"1.3.0"`), `metadata.original_uid`, and `raw_event_id` on every normalized event.
+2. **OCSF v1.4.0 Standard Fidelity**
+   - Pin official OCSF `v1.4.0` (`tag: 1.4.0`, commit `6109cc5e834c1adfee67dda6c9bcfa5e37f79012`).
+   - Preserve `ocsf_version` (`"1.4.0"`), matching `metadata.version`, `metadata.original_uid`, and `raw_event_id` on every newly normalized event; keep historical raw inputs untouched and upgrade derived data via explicit replay/conversion.
    - Preserve unmapped source attributes in `unmapped_fields` / `ocsf_payload.unmapped`.
 
 3. **Scoped & Lifecycle-Bounded Entity Resolution**
