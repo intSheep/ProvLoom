@@ -51,6 +51,7 @@ class EventSearchRequest(ApiModel):
     category_uids: list[int] | None = None
     field_equals: dict[str, str | int | bool] | None = None
     include_fallback: bool = True
+    fields: list[str] | None = Field(default=None, max_length=25)
     limit: int = Field(default=100, ge=1, le=500)
     cursor: str | None = None
 
@@ -66,6 +67,7 @@ class NormalizedEventSummaryDto(ApiModel):
     event_time: datetime
     normalization_status: NormalizationStatus
     original_event_uid: str | None = None
+    projected_fields: dict[str, Any] | None = None
 
 
 class RawEventDto(ApiModel):
@@ -227,6 +229,43 @@ class PipelineFailureDto(ApiModel):
     retryable: bool
     retry_count: int
     occurred_at: datetime
+
+
+class TelemetryCoverageDto(ApiModel):
+    time_range: TimeRangeDto
+    dataset_time_bounds: TimeRangeDto | None = None
+    total_events: int
+    by_source: dict[str, int]
+    by_class_uid: dict[int, int]
+    by_normalization_status: dict[str, int]
+    ingest_batches: list[IngestBatchDto] = Field(default_factory=list)
+    failures_total: int = 0
+    failures_by_stage_code: dict[str, int] = Field(default_factory=dict)
+    sample_failures: list[PipelineFailureDto] = Field(default_factory=list)
+
+
+class NeighborhoodItemDto(ApiModel):
+    relation: RelationDto
+    neighbor: EntityDto
+    direction: Direction
+
+
+class NeighborhoodGroupSummaryDto(ApiModel):
+    relation_type: RelationType
+    neighbor_entity_type: EntityType
+    certainty: Certainty
+    relation_count: int
+    evidence_count: int
+    sample_neighbor_labels: list[str] = Field(default_factory=list)
+
+
+class EntityNeighborhoodResponse(ApiModel):
+    center_entity: EntityDto
+    items: list[NeighborhoodItemDto] = Field(default_factory=list)
+    groups: list[NeighborhoodGroupSummaryDto] = Field(default_factory=list)
+    total_relations_matched: int = 0
+    next_cursor: str | None = None
+    truncated: bool = False
 
 
 class ReplayRequestDto(ApiModel):

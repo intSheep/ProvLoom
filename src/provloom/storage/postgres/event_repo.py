@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
@@ -7,21 +8,68 @@ from uuid import UUID
 from sqlalchemy import Connection, delete, func, insert, select
 
 from provloom.domain.common import AccessScope, PageResult, PageSpec, TimeRange
-from provloom.domain.enums import NormalizationStatus, RawProcessStatus
+from provloom.domain.enums import BatchStatus, NormalizationStatus, PipelineStage, RawProcessStatus
+from provloom.domain.errors import QueryLimitExceededError
 from provloom.domain.ocsf_models import (
     EventWithRawDetail,
     NormalizedEvent,
     NormalizedEventSummary,
+    TelemetryCoverage,
 )
-from provloom.domain.raw_models import RawEvent
+from provloom.domain.raw_models import IngestBatch, PipelineFailure, RawEvent
 from provloom.storage.interfaces import NormalizedEventRepository
-from provloom.storage.postgres.tables import normalized_events, raw_events
+from provloom.storage.postgres.tables import (
+    ingest_batches,
+    normalized_events,
+    pipeline_failures,
+    raw_events,
+)
 from provloom.storage.postgres.utils import (
     extract_nested,
     next_offset_cursor,
     parse_offset,
     require_utc,
 )
+
+_FIELD_PATH_RE = re.compile(r"^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+){0,6}$")
+
+
+def validate_projection_fields(fields: Sequence[str] | None) -> tuple[str, ...] | None:
+    if not fields:
+        return None
+    if len(fields) > 25:
+        raise QueryLimitExceededError("At most 25 projection fields may be requested")
+    cleaned: list[str] = []
+    for raw in fields:
+        fp = raw.strip()
+        if not _FIELD_PATH_RE.match(fp):
+            raise QueryLimitExceededError(f"Invalid projection field path: {raw!r}")
+        if fp not in cleaned:
+            cleaned.append(fp)
+    return tuple(cleaned)
+
+
+def _extract_projected(row: Any, fields: Sequence[str]) -> dict[str, Any]:
+    payload = dict(row["ocsf_payload"] or {})
+    envelope = {
+        "source_id": row["source_id"],
+        "class_uid": int(row["class_uid"]),
+        "category_uid": int(row["category_uid"]),
+        "activity_id": int(row["activity_id"]),
+        "ocsf_version": row["ocsf_version"],
+        "original_event_uid": row["original_event_uid"],
+        "normalization_status": row["normalization_status"],
+    }
+    projected: dict[str, Any] = {}
+    for fp in fields:
+        val = extract_nested(payload, fp)
+        if val is None and fp in envelope:
+            val = envelope[fp]
+        if val is not None:
+            if isinstance(val, str) and len(val) > 500:
+                val = val[:500] + "...[truncated]"
+            projected[fp] = val
+    return projected
 
 
 class SqlNormalizedEventRepository(NormalizedEventRepository):
@@ -120,7 +168,9 @@ class SqlNormalizedEventRepository(NormalizedEventRepository):
         field_equals: dict[str, str | int | bool] | None,
         include_fallback: bool,
         page: PageSpec,
+        fields: Sequence[str] | None = None,
     ) -> PageResult[NormalizedEventSummary]:
+        clean_fields = validate_projection_fields(fields)
         offset = parse_offset(page.cursor)
         stmt = select(normalized_events).where(
             normalized_events.c.tenant_scope == scope.tenant_id,
@@ -143,22 +193,164 @@ class SqlNormalizedEventRepository(NormalizedEventRepository):
             normalized_events.c.event_time.desc(),
             normalized_events.c.event_id.asc(),
         )
-        rows = self._conn.execute(stmt).mappings().all()
         if field_equals:
-            rows = [
+            all_rows = [
                 r
-                for r in rows
+                for r in self._conn.execute(stmt).mappings().all()
                 if all(
                     extract_nested(dict(r["ocsf_payload"] or {}), k) == v
                     for k, v in field_equals.items()
                 )
             ]
-        sliced = rows[offset : offset + page.limit + 1]
+            sliced = list(all_rows[offset : offset + page.limit + 1])
+        else:
+            sliced = list(
+                self._conn.execute(stmt.offset(offset).limit(page.limit + 1)).mappings().all()
+            )
+
         cursor, has_more = next_offset_cursor(offset, page.limit, len(sliced))
         return PageResult(
-            items=tuple(self._to_summary(r) for r in sliced[: page.limit]),
+            items=tuple(self._to_summary(r, clean_fields) for r in sliced[: page.limit]),
             next_cursor=cursor,
             truncated=has_more,
+        )
+
+    def get_coverage(
+        self,
+        scope: AccessScope,
+        time_range: TimeRange,
+        include_batches: bool = True,
+        include_failures: bool = True,
+    ) -> TelemetryCoverage:
+        base_where = [
+            normalized_events.c.tenant_scope == scope.tenant_id,
+            normalized_events.c.event_time >= time_range.start_time,
+            normalized_events.c.event_time <= time_range.end_time,
+        ]
+        if scope.allowed_sources is not None:
+            base_where.append(normalized_events.c.source_id.in_(scope.allowed_sources))
+
+        by_source: dict[str, int] = {}
+        for r in self._conn.execute(
+            select(normalized_events.c.source_id, func.count().label("cnt"))
+            .where(*base_where)
+            .group_by(normalized_events.c.source_id)
+            .order_by(normalized_events.c.source_id.asc())
+        ).mappings():
+            by_source[str(r["source_id"])] = int(r["cnt"])
+
+        by_class_uid: dict[int, int] = {}
+        for r in self._conn.execute(
+            select(normalized_events.c.class_uid, func.count().label("cnt"))
+            .where(*base_where)
+            .group_by(normalized_events.c.class_uid)
+            .order_by(normalized_events.c.class_uid.asc())
+        ).mappings():
+            by_class_uid[int(r["class_uid"])] = int(r["cnt"])
+
+        by_status: dict[str, int] = {}
+        for r in self._conn.execute(
+            select(normalized_events.c.normalization_status, func.count().label("cnt"))
+            .where(*base_where)
+            .group_by(normalized_events.c.normalization_status)
+            .order_by(normalized_events.c.normalization_status.asc())
+        ).mappings():
+            by_status[str(r["normalization_status"])] = int(r["cnt"])
+
+        total_events = sum(by_source.values())
+        dataset_bounds = self.get_time_bounds(scope)
+
+        batch_objs: list[IngestBatch] = []
+        if include_batches:
+            b_stmt = select(ingest_batches).where(ingest_batches.c.tenant_scope == scope.tenant_id)
+            if scope.allowed_sources is not None:
+                b_stmt = b_stmt.where(ingest_batches.c.source_id.in_(scope.allowed_sources))
+            b_rows = (
+                self._conn.execute(b_stmt.order_by(ingest_batches.c.received_at.desc()).limit(25))
+                .mappings()
+                .all()
+            )
+            batch_objs = [
+                IngestBatch(
+                    batch_id=r["batch_id"],
+                    tenant_scope=r["tenant_scope"],
+                    source_id=r["source_id"],
+                    source_type=r["source_type"],
+                    adapter_type=r["adapter_type"],
+                    source_uri=r["source_uri"],
+                    received_at=require_utc(r["received_at"]),
+                    status=BatchStatus(r["status"]),
+                    total_count=int(r["total_count"]),
+                    accepted_count=int(r["accepted_count"]),
+                    duplicate_count=int(r["duplicate_count"]),
+                    failed_count=int(r["failed_count"]),
+                )
+                for r in b_rows
+            ]
+
+        failures_total = 0
+        failures_by_stage_code: dict[str, int] = {}
+        sample_failures: list[PipelineFailure] = []
+        if include_failures:
+            f_where: list[Any] = [pipeline_failures.c.tenant_scope == scope.tenant_id]
+            if scope.allowed_sources is not None:
+                allowed_batch_ids = select(ingest_batches.c.batch_id).where(
+                    ingest_batches.c.tenant_scope == scope.tenant_id,
+                    ingest_batches.c.source_id.in_(scope.allowed_sources),
+                )
+                f_where.append(pipeline_failures.c.batch_id.in_(allowed_batch_ids))
+
+            for r in self._conn.execute(
+                select(
+                    pipeline_failures.c.stage,
+                    pipeline_failures.c.error_code,
+                    func.count().label("cnt"),
+                )
+                .where(*f_where)
+                .group_by(pipeline_failures.c.stage, pipeline_failures.c.error_code)
+            ).mappings():
+                cnt = int(r["cnt"])
+                failures_total += cnt
+                failures_by_stage_code[f"{r['stage']}:{r['error_code']}"] = cnt
+
+            f_rows = (
+                self._conn.execute(
+                    select(pipeline_failures)
+                    .where(*f_where)
+                    .order_by(pipeline_failures.c.occurred_at.desc())
+                    .limit(5)
+                )
+                .mappings()
+                .all()
+            )
+            sample_failures = [
+                PipelineFailure(
+                    failure_id=r["failure_id"],
+                    batch_id=r["batch_id"],
+                    raw_event_id=r["raw_event_id"],
+                    tenant_scope=r["tenant_scope"],
+                    stage=PipelineStage(r["stage"]),
+                    error_code=r["error_code"],
+                    error_message=r["error_message"],
+                    occurred_at=require_utc(r["occurred_at"]),
+                    raw_snippet=r["raw_snippet"],
+                    retryable=bool(r["retryable"]),
+                    retry_count=int(r["retry_count"]),
+                )
+                for r in f_rows
+            ]
+
+        return TelemetryCoverage(
+            time_range=time_range,
+            dataset_time_bounds=dataset_bounds,
+            total_events=total_events,
+            by_source=by_source,
+            by_class_uid=by_class_uid,
+            by_normalization_status=by_status,
+            ingest_batches=tuple(batch_objs),
+            failures_total=failures_total,
+            failures_by_stage_code=failures_by_stage_code,
+            sample_failures=tuple(sample_failures),
         )
 
     @staticmethod
@@ -181,7 +373,7 @@ class SqlNormalizedEventRepository(NormalizedEventRepository):
         )
 
     @staticmethod
-    def _to_summary(row: Any) -> NormalizedEventSummary:
+    def _to_summary(row: Any, fields: Sequence[str] | None = None) -> NormalizedEventSummary:
         return NormalizedEventSummary(
             event_id=row["event_id"],
             raw_event_id=row["raw_event_id"],
@@ -193,4 +385,5 @@ class SqlNormalizedEventRepository(NormalizedEventRepository):
             event_time=require_utc(row["event_time"]),
             normalization_status=NormalizationStatus(row["normalization_status"]),
             original_event_uid=row["original_event_uid"],
+            projected_fields=_extract_projected(row, fields) if fields else None,
         )

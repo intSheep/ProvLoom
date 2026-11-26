@@ -53,6 +53,7 @@ export interface EventSearchRequest {
   category_uids?: number[] | null;
   field_equals?: Record<string, string | number | boolean> | null;
   include_fallback?: boolean;
+  fields?: string[] | null;
   limit?: number;
   cursor?: string | null;
 }
@@ -68,6 +69,7 @@ export interface NormalizedEventSummary {
   event_time: string;
   normalization_status: NormalizationStatus;
   original_event_uid: string | null;
+  projected_fields?: Record<string, unknown> | null;
 }
 
 export interface RawEventDto {
@@ -178,6 +180,30 @@ export interface RelationEvidenceDetail {
   ocsf_class_uid: number;
   raw_payload: string;
   match_detail: Record<string, unknown>;
+}
+
+export interface NeighborhoodItem {
+  relation: RelationDto;
+  neighbor: EntityDto;
+  direction: Direction;
+}
+
+export interface NeighborhoodGroupSummary {
+  relation_type: RelationType;
+  neighbor_entity_type: EntityType;
+  certainty: Certainty;
+  relation_count: number;
+  evidence_count: number;
+  sample_neighbor_labels: string[];
+}
+
+export interface EntityNeighborhoodResponse {
+  center_entity: EntityDto;
+  items: NeighborhoodItem[];
+  groups: NeighborhoodGroupSummary[];
+  total_relations_matched: number;
+  next_cursor: string | null;
+  truncated: boolean;
 }
 
 // --- Ops & Debug API (/api/v1/ops/*) ---

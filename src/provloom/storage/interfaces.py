@@ -35,8 +35,10 @@ from provloom.domain.enums import (
 )
 from provloom.domain.graph_models import (
     CandidateRelation,
+    EntityNeighborhoodResult,
     GraphBuildResult,
     GraphTraversalSpec,
+    NeighborhoodSortBy,
     Relation,
     RelationEvidenceDetail,
     SubgraphResult,
@@ -45,6 +47,7 @@ from provloom.domain.ocsf_models import (
     EventWithRawDetail,
     NormalizedEvent,
     NormalizedEventSummary,
+    TelemetryCoverage,
 )
 from provloom.domain.raw_models import IngestBatch, PipelineFailure, RawEvent
 
@@ -103,7 +106,15 @@ class NormalizedEventRepository(Protocol):
         field_equals: dict[str, str | int | bool] | None,
         include_fallback: bool,
         page: PageSpec,
+        fields: Sequence[str] | None = None,
     ) -> PageResult[NormalizedEventSummary]: ...
+    def get_coverage(
+        self,
+        scope: AccessScope,
+        time_range: TimeRange,
+        include_batches: bool = True,
+        include_failures: bool = True,
+    ) -> TelemetryCoverage: ...
 
 
 class EntityRepository(Protocol):
@@ -185,6 +196,21 @@ class GraphRepository(Protocol):
         time_range: TimeRange | None,
         page: PageSpec,
     ) -> PageResult[RelationEvidenceDetail]: ...
+    def get_entity_neighborhood(
+        self,
+        scope: AccessScope,
+        entity_id: UUID,
+        time_range: TimeRange,
+        direction: Direction,
+        relation_types: Sequence[RelationType] | None,
+        neighbor_types: Sequence[EntityType] | None,
+        label_contains: str | None,
+        exclude_labels: Sequence[str] | None,
+        include_candidates: bool,
+        sort_by: NeighborhoodSortBy,
+        group_summary: bool,
+        page: PageSpec,
+    ) -> EntityNeighborhoodResult: ...
 
 
 class EventSqlSelector(Protocol):

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from provloom.domain.entity_models import Entity
-from provloom.domain.enums import Certainty, Direction, RelationType
+from provloom.domain.enums import Certainty, Direction, EntityType, RelationType
 from provloom.domain.errors import QueryLimitExceededError
 
 
@@ -106,3 +106,33 @@ class GraphBuildResult:
     created_relations: int
     updated_relations: int
     attached_evidences: int
+
+
+NeighborhoodSortBy = Literal["rare", "last_seen", "evidence_count", "certainty"]
+
+
+@dataclass(frozen=True)
+class NeighborhoodItem:
+    relation: Relation
+    neighbor: Entity
+    direction: Direction
+
+
+@dataclass(frozen=True)
+class NeighborhoodGroupSummary:
+    relation_type: RelationType
+    neighbor_entity_type: EntityType
+    certainty: Certainty
+    relation_count: int
+    evidence_count: int
+    sample_neighbor_labels: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class EntityNeighborhoodResult:
+    center_entity: Entity | None
+    items: tuple[NeighborhoodItem, ...] = ()
+    groups: tuple[NeighborhoodGroupSummary, ...] = ()
+    total_relations_matched: int = 0
+    next_cursor: str | None = None
+    truncated: bool = False

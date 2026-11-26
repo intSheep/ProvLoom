@@ -35,6 +35,7 @@ def search_events(
             category_uids=tuple(body.category_uids) if body.category_uids else None,
             field_equals=body.field_equals,
             include_fallback=body.include_fallback,
+            fields=tuple(body.fields) if body.fields else None,
         ),
         page=PageSpec(limit=body.limit, cursor=body.cursor),
     )
