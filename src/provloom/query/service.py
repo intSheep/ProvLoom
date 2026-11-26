@@ -7,16 +7,23 @@ from uuid import UUID
 from provloom.config import QueryGuardConfig
 from provloom.domain.common import AccessScope, PageResult, PageSpec, TimeRange
 from provloom.domain.entity_models import Entity, EntityDetail
-from provloom.domain.enums import Direction, RelationType
+from provloom.domain.enums import Direction, EntityType, RelationType
 from provloom.domain.graph_models import (
+    EntityNeighborhoodResult,
     GraphTraversalSpec,
+    NeighborhoodSortBy,
     Relation,
     RelationEvidenceDetail,
     SubgraphResult,
 )
-from provloom.domain.ocsf_models import EventWithRawDetail, NormalizedEventSummary
+from provloom.domain.ocsf_models import (
+    EventWithRawDetail,
+    NormalizedEventSummary,
+    TelemetryCoverage,
+)
 from provloom.observability.interfaces import PipelineTelemetry
 from provloom.query.interfaces import EntitySearchFilter, EventSearchFilter, QueryService
+from provloom.storage.postgres.event_repo import validate_projection_fields
 from provloom.storage.postgres.uow import UnitOfWorkFactory
 
 
@@ -40,6 +47,7 @@ class DefaultQueryService(QueryService):
     ) -> PageResult[NormalizedEventSummary]:
         t0 = time.perf_counter()
         validated_page = page.validate(self._guards.max_page_limit)
+        clean_fields = validate_projection_fields(filters.fields)
         with self._uow_factory() as uow:
             res = uow.normalized_events.search(
                 scope=scope,
@@ -50,6 +58,7 @@ class DefaultQueryService(QueryService):
                 field_equals=filters.field_equals,
                 include_fallback=filters.include_fallback,
                 page=validated_page,
+                fields=clean_fields,
             )
         self._telemetry.observe_query_latency("search_events", time.perf_counter() - t0)
         return res
@@ -167,4 +176,57 @@ class DefaultQueryService(QueryService):
                 page=validated_page,
             )
         self._telemetry.observe_query_latency("get_relation_evidence", time.perf_counter() - t0)
+        return res
+
+    def get_telemetry_coverage(
+        self,
+        scope: AccessScope,
+        time_range: TimeRange,
+        include_batches: bool = True,
+        include_failures: bool = True,
+    ) -> TelemetryCoverage:
+        t0 = time.perf_counter()
+        with self._uow_factory() as uow:
+            res = uow.normalized_events.get_coverage(
+                scope=scope,
+                time_range=time_range,
+                include_batches=include_batches,
+                include_failures=include_failures,
+            )
+        self._telemetry.observe_query_latency("get_telemetry_coverage", time.perf_counter() - t0)
+        return res
+
+    def get_entity_neighborhood(
+        self,
+        scope: AccessScope,
+        entity_id: UUID,
+        time_range: TimeRange,
+        direction: Direction = Direction.BOTH,
+        relation_types: Sequence[RelationType] | None = None,
+        neighbor_types: Sequence[EntityType] | None = None,
+        label_contains: str | None = None,
+        exclude_labels: Sequence[str] | None = None,
+        include_candidates: bool = True,
+        sort_by: NeighborhoodSortBy = "rare",
+        group_summary: bool = True,
+        page: PageSpec = PageSpec(limit=25),
+    ) -> EntityNeighborhoodResult:
+        t0 = time.perf_counter()
+        validated_page = page.validate(self._guards.max_page_limit)
+        with self._uow_factory() as uow:
+            res = uow.graph.get_entity_neighborhood(
+                scope=scope,
+                entity_id=entity_id,
+                time_range=time_range,
+                direction=direction,
+                relation_types=relation_types,
+                neighbor_types=neighbor_types,
+                label_contains=label_contains,
+                exclude_labels=exclude_labels,
+                include_candidates=include_candidates,
+                sort_by=sort_by,
+                group_summary=group_summary,
+                page=validated_page,
+            )
+        self._telemetry.observe_query_latency("get_entity_neighborhood", time.perf_counter() - t0)
         return res

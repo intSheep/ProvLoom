@@ -9,12 +9,18 @@ from provloom.domain.common import AccessScope, PageResult, PageSpec, TimeRange
 from provloom.domain.entity_models import Entity, EntityDetail
 from provloom.domain.enums import Direction, EntityType, RelationType, ResolutionState
 from provloom.domain.graph_models import (
+    EntityNeighborhoodResult,
     GraphTraversalSpec,
+    NeighborhoodSortBy,
     Relation,
     RelationEvidenceDetail,
     SubgraphResult,
 )
-from provloom.domain.ocsf_models import EventWithRawDetail, NormalizedEventSummary
+from provloom.domain.ocsf_models import (
+    EventWithRawDetail,
+    NormalizedEventSummary,
+    TelemetryCoverage,
+)
 
 
 @dataclass(frozen=True)
@@ -24,6 +30,7 @@ class EventSearchFilter:
     category_uids: tuple[int, ...] | None = None
     field_equals: dict[str, str | int | bool] | None = None
     include_fallback: bool = True
+    fields: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -93,3 +100,27 @@ class QueryService(Protocol):
         time_range: TimeRange | None = None,
         page: PageSpec = PageSpec(limit=100),
     ) -> PageResult[RelationEvidenceDetail]: ...
+
+    def get_telemetry_coverage(
+        self,
+        scope: AccessScope,
+        time_range: TimeRange,
+        include_batches: bool = True,
+        include_failures: bool = True,
+    ) -> TelemetryCoverage: ...
+
+    def get_entity_neighborhood(
+        self,
+        scope: AccessScope,
+        entity_id: UUID,
+        time_range: TimeRange,
+        direction: Direction = Direction.BOTH,
+        relation_types: Sequence[RelationType] | None = None,
+        neighbor_types: Sequence[EntityType] | None = None,
+        label_contains: str | None = None,
+        exclude_labels: Sequence[str] | None = None,
+        include_candidates: bool = True,
+        sort_by: NeighborhoodSortBy = "rare",
+        group_summary: bool = True,
+        page: PageSpec = PageSpec(limit=25),
+    ) -> EntityNeighborhoodResult: ...

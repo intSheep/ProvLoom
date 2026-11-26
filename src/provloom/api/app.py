@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from provloom import __version__
-from provloom.api.v1 import detection, entities, events, graph, ops
+from provloom.api.v1 import detection, entities, events, graph, ops, telemetry
 from provloom.config import AppConfig
 from provloom.domain.errors import (
     AdapterReadError,
@@ -81,6 +81,7 @@ def create_app(runtime: ProvLoomRuntime | None = None) -> FastAPI:
     app.include_router(events.router, prefix="/api/v1")
     app.include_router(entities.router, prefix="/api/v1")
     app.include_router(graph.router, prefix="/api/v1")
+    app.include_router(telemetry.router, prefix="/api/v1")
     app.include_router(detection.router, prefix="/api/v1")
     app.include_router(ops.router, prefix="/api/v1")
 

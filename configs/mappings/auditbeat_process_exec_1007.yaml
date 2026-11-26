@@ -1,0 +1,22 @@
+rule_id: auditbeat_process_exec_1007
+rule_version: "1.0.0"
+ocsf_version: "1.4.0"
+match:
+  parser_id: auditbeat
+  event_code: execve
+target:
+  category_uid: 1
+  class_uid: 1007
+  activity_id: 1
+fields:
+  metadata.original_uid: event_uid
+  device.uid: host_id
+  device.hostname: host_name
+  actor.user.name: user_name
+  actor.user.uid: user_uid
+  process.pid: pid
+  process.file.path: executable
+  process.name: process_name
+  process.cmd_line: cmd_line
+  process.working_directory: working_dir
+  process.parent_process.pid: ppid

@@ -5,8 +5,9 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
+from provloom.domain.common import TimeRange
 from provloom.domain.enums import NormalizationStatus
-from provloom.domain.raw_models import RawEvent
+from provloom.domain.raw_models import IngestBatch, PipelineFailure, RawEvent
 
 
 @dataclass(frozen=True)
@@ -41,9 +42,24 @@ class NormalizedEventSummary:
     event_time: datetime
     normalization_status: NormalizationStatus
     original_event_uid: str | None
+    projected_fields: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
 class EventWithRawDetail:
     normalized: NormalizedEvent
     raw: RawEvent | None = None
+
+
+@dataclass(frozen=True)
+class TelemetryCoverage:
+    time_range: TimeRange
+    dataset_time_bounds: TimeRange | None
+    total_events: int
+    by_source: dict[str, int]
+    by_class_uid: dict[int, int]
+    by_normalization_status: dict[str, int]
+    ingest_batches: tuple[IngestBatch, ...] = ()
+    failures_total: int = 0
+    failures_by_stage_code: dict[str, int] = field(default_factory=dict)
+    sample_failures: tuple[PipelineFailure, ...] = ()

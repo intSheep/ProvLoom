@@ -100,6 +100,10 @@ class OcsfEntityExtractor(EntityExtractor):
 
         # 5. File
         file_obj = p.get("file")
+        if not isinstance(file_obj, dict) and event.class_uid == int(OcsfClassUid.SCRIPT_ACTIVITY):
+            script_obj = p.get("script")
+            if isinstance(script_obj, dict) and isinstance(script_obj.get("file"), dict):
+                file_obj = script_obj["file"]
         if isinstance(file_obj, dict) and file_obj.get("path"):
             raw_path = str(file_obj["path"])
             fkeys: list[CandidateKey] = [

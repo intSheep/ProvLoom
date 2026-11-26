@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
 
-from sqlalchemy import Connection, delete, insert, literal, or_, select, update
+from sqlalchemy import Connection, case, delete, func, insert, literal, or_, select, update
 from sqlalchemy.exc import IntegrityError
 
 from provloom.domain.common import AccessScope, PageResult, PageSpec, TimeRange
@@ -13,8 +13,12 @@ from provloom.domain.entity_models import Entity
 from provloom.domain.enums import Certainty, Direction, EntityType, RelationType, ResolutionState
 from provloom.domain.graph_models import (
     CandidateRelation,
+    EntityNeighborhoodResult,
     GraphBuildResult,
     GraphTraversalSpec,
+    NeighborhoodGroupSummary,
+    NeighborhoodItem,
+    NeighborhoodSortBy,
     Relation,
     RelationEvidence,
     RelationEvidenceDetail,
@@ -288,6 +292,218 @@ class SqlGraphRepository(GraphRepository):
             truncated=has_more,
         )
 
+    def get_entity_neighborhood(
+        self,
+        scope: AccessScope,
+        entity_id: UUID,
+        time_range: TimeRange,
+        direction: Direction,
+        relation_types: Sequence[RelationType] | None,
+        neighbor_types: Sequence[EntityType] | None,
+        label_contains: str | None,
+        exclude_labels: Sequence[str] | None,
+        include_candidates: bool,
+        sort_by: NeighborhoodSortBy,
+        group_summary: bool,
+        page: PageSpec,
+    ) -> EntityNeighborhoodResult:
+        center_row = (
+            self._conn.execute(
+                select(entities).where(
+                    entities.c.entity_id == entity_id,
+                    entities.c.tenant_scope == scope.tenant_id,
+                )
+            )
+            .mappings()
+            .first()
+        )
+        if center_row is None:
+            return EntityNeighborhoodResult(center_entity=None)
+
+        center_entity = self._to_entity(center_row)
+        offset = parse_offset(page.cursor)
+
+        neighbor_ent = entities.alias("neighbor_ent")
+        neighbor_id_expr = case(
+            (relations.c.src_entity_id == entity_id, relations.c.dst_entity_id),
+            else_=relations.c.src_entity_id,
+        )
+
+        stmt = (
+            select(
+                relations.c.relation_id.label("rel_relation_id"),
+                relations.c.tenant_scope.label("rel_tenant_scope"),
+                relations.c.src_entity_id.label("rel_src_entity_id"),
+                relations.c.relation_type.label("rel_relation_type"),
+                relations.c.dst_entity_id.label("rel_dst_entity_id"),
+                relations.c.certainty.label("rel_certainty"),
+                relations.c.context_key.label("rel_context_key"),
+                relations.c.correlation_rule_id.label("rel_correlation_rule_id"),
+                relations.c.correlation_basis.label("rel_correlation_basis"),
+                relations.c.first_seen_at.label("rel_first_seen_at"),
+                relations.c.last_seen_at.label("rel_last_seen_at"),
+                relations.c.evidence_count.label("rel_evidence_count"),
+                neighbor_ent.c.entity_id.label("nb_entity_id"),
+                neighbor_ent.c.tenant_scope.label("nb_tenant_scope"),
+                neighbor_ent.c.entity_type.label("nb_entity_type"),
+                neighbor_ent.c.resolution_state.label("nb_resolution_state"),
+                neighbor_ent.c.display_label.label("nb_display_label"),
+                neighbor_ent.c.canonical_key.label("nb_canonical_key"),
+                neighbor_ent.c.valid_from.label("nb_valid_from"),
+                neighbor_ent.c.valid_to.label("nb_valid_to"),
+                neighbor_ent.c.attributes.label("nb_attributes"),
+                neighbor_ent.c.merged_into_id.label("nb_merged_into_id"),
+            )
+            .join(neighbor_ent, neighbor_ent.c.entity_id == neighbor_id_expr)
+            .where(
+                relations.c.tenant_scope == scope.tenant_id,
+                relations.c.first_seen_at <= time_range.end_time,
+                relations.c.last_seen_at >= time_range.start_time,
+            )
+        )
+
+        if direction == Direction.OUTBOUND:
+            stmt = stmt.where(relations.c.src_entity_id == entity_id)
+        elif direction == Direction.INBOUND:
+            stmt = stmt.where(relations.c.dst_entity_id == entity_id)
+        else:
+            stmt = stmt.where(
+                or_(
+                    relations.c.src_entity_id == entity_id,
+                    relations.c.dst_entity_id == entity_id,
+                )
+            )
+        if not include_candidates:
+            stmt = stmt.where(relations.c.certainty == Certainty.DETERMINISTIC.value)
+        if relation_types:
+            stmt = stmt.where(relations.c.relation_type.in_([rt.value for rt in relation_types]))
+        if neighbor_types:
+            stmt = stmt.where(neighbor_ent.c.entity_type.in_([nt.value for nt in neighbor_types]))
+        if label_contains and label_contains.strip():
+            stmt = stmt.where(
+                func.lower(neighbor_ent.c.display_label).contains(label_contains.strip().lower())
+            )
+        if exclude_labels:
+            cleaned_excl = [lbl.strip().lower() for lbl in exclude_labels if lbl.strip()]
+            if cleaned_excl:
+                stmt = stmt.where(~func.lower(neighbor_ent.c.display_label).in_(cleaned_excl))
+        if scope.allowed_sources is not None:
+            allowed_rel_ids = (
+                select(relation_evidences.c.relation_id)
+                .join(
+                    normalized_events,
+                    relation_evidences.c.event_id == normalized_events.c.event_id,
+                )
+                .where(normalized_events.c.source_id.in_(scope.allowed_sources))
+            )
+            stmt = stmt.where(relations.c.relation_id.in_(allowed_rel_ids))
+
+        rows = self._conn.execute(stmt).mappings().all()
+        matched_items: list[NeighborhoodItem] = []
+        for r in rows:
+            rel = Relation(
+                relation_id=r["rel_relation_id"],
+                tenant_scope=r["rel_tenant_scope"],
+                src_entity_id=r["rel_src_entity_id"],
+                relation_type=RelationType(r["rel_relation_type"]),
+                dst_entity_id=r["rel_dst_entity_id"],
+                certainty=Certainty(r["rel_certainty"]),
+                context_key=r["rel_context_key"],
+                correlation_rule_id=r["rel_correlation_rule_id"],
+                correlation_basis=dict(r["rel_correlation_basis"] or {}),
+                first_seen_at=require_utc(r["rel_first_seen_at"]),
+                last_seen_at=require_utc(r["rel_last_seen_at"]),
+                evidence_count=int(r["rel_evidence_count"]),
+            )
+            nb = Entity(
+                entity_id=r["nb_entity_id"],
+                tenant_scope=r["nb_tenant_scope"],
+                entity_type=EntityType(r["nb_entity_type"]),
+                resolution_state=ResolutionState(r["nb_resolution_state"]),
+                display_label=r["nb_display_label"],
+                canonical_key=r["nb_canonical_key"],
+                valid_from=ensure_utc(r["nb_valid_from"]),
+                valid_to=ensure_utc(r["nb_valid_to"]),
+                attributes=dict(r["nb_attributes"] or {}),
+                merged_into_id=r["nb_merged_into_id"],
+            )
+            item_dir = Direction.OUTBOUND if rel.src_entity_id == entity_id else Direction.INBOUND
+            matched_items.append(NeighborhoodItem(relation=rel, neighbor=nb, direction=item_dir))
+
+        groups: list[NeighborhoodGroupSummary] = []
+        if group_summary and matched_items:
+            grouped_counts: dict[tuple[RelationType, EntityType, Certainty], list[Any]] = {}
+            for item in matched_items:
+                gkey = (
+                    item.relation.relation_type,
+                    item.neighbor.entity_type,
+                    item.relation.certainty,
+                )
+                if gkey not in grouped_counts:
+                    grouped_counts[gkey] = [0, 0, []]
+                entry = grouped_counts[gkey]
+                entry[0] += 1
+                entry[1] += item.relation.evidence_count
+                lbl = item.neighbor.display_label
+                if lbl not in entry[2] and len(entry[2]) < 5:
+                    entry[2].append(lbl)
+            for (rtype, ntype, cert), (rcnt, ecnt, labels) in sorted(
+                grouped_counts.items(),
+                key=lambda kv: (kv[0][2] != Certainty.DETERMINISTIC, kv[1][0], kv[0][0].value),
+            ):
+                groups.append(
+                    NeighborhoodGroupSummary(
+                        relation_type=rtype,
+                        neighbor_entity_type=ntype,
+                        certainty=cert,
+                        relation_count=rcnt,
+                        evidence_count=ecnt,
+                        sample_neighbor_labels=tuple(labels),
+                    )
+                )
+
+        if sort_by == "last_seen":
+            matched_items.sort(
+                key=lambda it: (-it.relation.last_seen_at.timestamp(), str(it.relation.relation_id))
+            )
+        elif sort_by == "evidence_count":
+            matched_items.sort(
+                key=lambda it: (
+                    -it.relation.evidence_count,
+                    -it.relation.last_seen_at.timestamp(),
+                    str(it.relation.relation_id),
+                )
+            )
+        elif sort_by == "certainty":
+            matched_items.sort(
+                key=lambda it: (
+                    it.relation.certainty != Certainty.DETERMINISTIC,
+                    -it.relation.last_seen_at.timestamp(),
+                    str(it.relation.relation_id),
+                )
+            )
+        else:  # "rare"
+            matched_items.sort(
+                key=lambda it: (
+                    it.relation.certainty != Certainty.DETERMINISTIC,
+                    it.relation.evidence_count,
+                    -it.relation.last_seen_at.timestamp(),
+                    str(it.relation.relation_id),
+                )
+            )
+
+        total_matched = len(matched_items)
+        sliced = matched_items[offset : offset + page.limit + 1]
+        cursor, has_more = next_offset_cursor(offset, page.limit, len(sliced))
+        return EntityNeighborhoodResult(
+            center_entity=center_entity,
+            items=tuple(sliced[: page.limit]),
+            groups=tuple(groups),
+            total_relations_matched=total_matched,
+            next_cursor=cursor,
+            truncated=has_more,
+        )
+
     def traverse(
         self,
         scope: AccessScope,
@@ -330,9 +546,32 @@ class SqlGraphRepository(GraphRepository):
             )
             edge_filter.append(relations.c.relation_id.in_(allowed_rel_ids))
 
-        from sqlalchemy import String, cast
+        from sqlalchemy import String, cast, union_all
 
         valid_edges = select(relations).where(*edge_filter).cte("valid_edges")
+        dir_branches = []
+        if spec.direction in (Direction.OUTBOUND, Direction.BOTH):
+            dir_branches.append(
+                select(
+                    valid_edges.c.src_entity_id.label("from_id"),
+                    valid_edges.c.dst_entity_id.label("to_id"),
+                    valid_edges.c.relation_id.label("rel_id"),
+                )
+            )
+        if spec.direction in (Direction.INBOUND, Direction.BOTH):
+            dir_branches.append(
+                select(
+                    valid_edges.c.dst_entity_id.label("from_id"),
+                    valid_edges.c.src_entity_id.label("to_id"),
+                    valid_edges.c.relation_id.label("rel_id"),
+                )
+            )
+        directed_edges = (
+            union_all(*dir_branches).cte("directed_edges")
+            if len(dir_branches) > 1
+            else dir_branches[0].cte("directed_edges")
+        )
+
         seed_str = str(spec.seed_entity_id)
         walk = select(
             literal(spec.seed_entity_id).label("node_id"),
@@ -341,32 +580,17 @@ class SqlGraphRepository(GraphRepository):
             literal(f"|{seed_str}|").cast(String).label("path"),
         ).cte(name="graph_walk", recursive=True)
 
-        steps = []
-        if spec.direction in (Direction.OUTBOUND, Direction.BOTH):
-            dst_token = "|" + cast(valid_edges.c.dst_entity_id, String) + "|"
-            steps.append(
-                select(
-                    valid_edges.c.dst_entity_id.label("node_id"),
-                    valid_edges.c.relation_id.label("rel_id"),
-                    (walk.c.depth + 1).label("depth"),
-                    (walk.c.path + cast(valid_edges.c.dst_entity_id, String) + "|").label("path"),
-                )
-                .join(walk, valid_edges.c.src_entity_id == walk.c.node_id)
-                .where(walk.c.depth < spec.max_depth, ~walk.c.path.contains(dst_token))
+        next_token = "|" + cast(directed_edges.c.to_id, String) + "|"
+        walk = walk.union_all(
+            select(
+                directed_edges.c.to_id.label("node_id"),
+                directed_edges.c.rel_id.label("rel_id"),
+                (walk.c.depth + 1).label("depth"),
+                (walk.c.path + cast(directed_edges.c.to_id, String) + "|").label("path"),
             )
-        if spec.direction in (Direction.INBOUND, Direction.BOTH):
-            src_token = "|" + cast(valid_edges.c.src_entity_id, String) + "|"
-            steps.append(
-                select(
-                    valid_edges.c.src_entity_id.label("node_id"),
-                    valid_edges.c.relation_id.label("rel_id"),
-                    (walk.c.depth + 1).label("depth"),
-                    (walk.c.path + cast(valid_edges.c.src_entity_id, String) + "|").label("path"),
-                )
-                .join(walk, valid_edges.c.dst_entity_id == walk.c.node_id)
-                .where(walk.c.depth < spec.max_depth, ~walk.c.path.contains(src_token))
-            )
-        walk = walk.union_all(*steps)
+            .join(walk, directed_edges.c.from_id == walk.c.node_id)
+            .where(walk.c.depth < spec.max_depth, ~walk.c.path.contains(next_token))
+        )
 
         walk_rows = self._conn.execute(select(walk.c.node_id, walk.c.rel_id)).all()
         discovered_nodes: list[UUID] = [spec.seed_entity_id]

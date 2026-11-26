@@ -1,0 +1,19 @@
+rule_id: auditbeat_auth_3002
+rule_version: "1.0.0"
+ocsf_version: "1.4.0"
+match:
+  parser_id: auditbeat
+  event_code: auth
+target:
+  category_uid: 3
+  class_uid: 3002
+  activity_id: 1
+fields:
+  metadata.original_uid: event_uid
+  device.uid: host_id
+  device.hostname: host_name
+  dst_endpoint.hostname: host_name
+  user.name: user_name
+  user.uid: user_uid
+  src_endpoint.ip: src_ip
+  service.name: service_name
