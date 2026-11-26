@@ -1,0 +1,20 @@
+rule_id: powershell_script_4103_1009
+rule_version: "1.0.0"
+ocsf_version: "1.4.0"
+match:
+  parser_id: powershell
+  event_code: "4103"
+target:
+  category_uid: 1
+  class_uid: 1009
+  activity_id: 1
+fields:
+  metadata.original_uid: EventRecordID
+  device.hostname: Computer
+  actor.user.name: User
+  actor.process.pid: ProcessId
+  script.uid: ScriptBlockId
+  script.name: ScriptName
+  script.type_id: ScriptTypeId
+  script.file.path: ScriptPath
+  script.script_content.value: ScriptBlockText

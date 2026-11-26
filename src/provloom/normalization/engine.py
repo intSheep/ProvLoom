@@ -58,6 +58,39 @@ def _ensure_file_object_defaults(file_obj: dict[str, Any]) -> None:
         file_obj["name"] = basename or "unknown"
 
 
+_ACTOR_KEYS: tuple[str, ...] = ("process", "user", "invoked_by", "session", "app_name", "app_uid")
+_ENDPOINT_KEYS: tuple[str, ...] = (
+    "ip",
+    "uid",
+    "name",
+    "hostname",
+    "svc_name",
+    "instance_uid",
+    "interface_uid",
+    "interface_name",
+    "domain",
+)
+
+
+def _has_any_attr(obj: Any, keys: tuple[str, ...]) -> bool:
+    if not isinstance(obj, dict):
+        return False
+    for k in keys:
+        val = obj.get(k)
+        if val is not None and val != "" and val != {} and val != []:
+            return True
+    return False
+
+
+def _product_name_fallback(payload: dict[str, Any], default: str = "system") -> str:
+    meta = payload.get("metadata")
+    if isinstance(meta, dict):
+        prod = meta.get("product")
+        if isinstance(prod, dict) and prod.get("name"):
+            return str(prod["name"])
+    return default
+
+
 def _finalize_ocsf_v140_objects(payload: dict[str, Any], class_uid: int) -> None:
     if class_uid in (1001, 1007, 1009, 5001):
         payload.setdefault("device", {})
@@ -83,6 +116,78 @@ def _finalize_ocsf_v140_objects(payload: dict[str, Any], class_uid: int) -> None
     top_file = payload.get("file")
     if isinstance(top_file, dict):
         _ensure_file_object_defaults(top_file)
+
+    if class_uid == 1007:
+        actor = payload.get("actor")
+        if isinstance(actor, dict) and not _has_any_attr(actor, _ACTOR_KEYS):
+            proc = payload.get("process")
+            if isinstance(proc, dict):
+                parent = proc.get("parent_process")
+                cand = (
+                    parent
+                    if payload.get("activity_id") == 1
+                    and isinstance(parent, dict)
+                    and (parent.get("pid") is not None or parent.get("uid"))
+                    else proc
+                )
+                actor_proc: dict[str, Any] = {}
+                if cand.get("uid"):
+                    actor_proc["uid"] = cand["uid"]
+                if cand.get("pid") is not None:
+                    actor_proc["pid"] = cand["pid"]
+                if isinstance(cand.get("file"), dict):
+                    actor_proc["file"] = dict(cand["file"])
+                if actor_proc.get("pid") is not None or actor_proc.get("uid"):
+                    actor["process"] = actor_proc
+            if not _has_any_attr(actor, _ACTOR_KEYS):
+                actor["app_name"] = _product_name_fallback(payload)
+
+    if class_uid == 1001:
+        actor = payload.get("actor")
+        if isinstance(actor, dict) and not _has_any_attr(actor, _ACTOR_KEYS):
+            actor["app_name"] = _product_name_fallback(payload)
+
+    if class_uid == 1009:
+        script = payload.setdefault("script", {})
+        if isinstance(script, dict):
+            raw_tid = script.get("type_id")
+            if isinstance(raw_tid, bool) or raw_tid is None:
+                script["type_id"] = 0
+            elif isinstance(raw_tid, str):
+                script["type_id"] = int(raw_tid) if raw_tid.strip().isdigit() else 0
+            sc = script.get("script_content")
+            if isinstance(sc, str):
+                script["script_content"] = {"value": sc}
+            elif isinstance(sc, dict):
+                val = sc.get("value")
+                sc["value"] = "" if val is None else str(val)
+            else:
+                script["script_content"] = {"value": str(payload.get("message") or "")}
+            if isinstance(script.get("file"), dict):
+                _ensure_file_object_defaults(script["file"])
+        actor = payload.get("actor")
+        if isinstance(actor, dict) and not _has_any_attr(actor, _ACTOR_KEYS):
+            actor["app_name"] = _product_name_fallback(payload, default="script")
+
+    if (
+        class_uid == 4003
+        and not _has_any_attr(payload.get("src_endpoint"), _ENDPOINT_KEYS)
+        and not _has_any_attr(payload.get("dst_endpoint"), _ENDPOINT_KEYS)
+        and isinstance(dev, dict)
+        and (dev.get("hostname") or dev.get("ip"))
+    ):
+        payload["src_endpoint"] = {k: dev[k] for k in ("hostname", "ip") if dev.get(k)}
+
+    if class_uid == 3002:
+        svc = payload.get("service")
+        has_svc = isinstance(svc, dict) and bool(svc.get("name") or svc.get("uid"))
+        if (
+            not has_svc
+            and not _has_any_attr(payload.get("dst_endpoint"), _ENDPOINT_KEYS)
+            and isinstance(dev, dict)
+            and (dev.get("hostname") or dev.get("ip"))
+        ):
+            payload["dst_endpoint"] = {k: dev[k] for k in ("hostname", "ip") if dev.get(k)}
 
     for proc_holder in (payload.get("process"), (payload.get("actor") or {}).get("process")):
         if isinstance(proc_holder, dict):

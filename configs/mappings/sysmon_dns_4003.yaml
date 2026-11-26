@@ -11,6 +11,7 @@ target:
 fields:
   metadata.original_uid: EventRecordID
   device.hostname: Computer
+  src_endpoint.hostname: Computer
   actor.process.uid: ProcessGuid
   actor.process.pid: ProcessId
   actor.process.file.path: Image

@@ -1,0 +1,20 @@
+rule_id: auditbeat_file_read_1001
+rule_version: "1.0.0"
+ocsf_version: "1.4.0"
+match:
+  parser_id: auditbeat
+  event_code: file_read
+target:
+  category_uid: 1
+  class_uid: 1001
+  activity_id: 2
+fields:
+  metadata.original_uid: event_uid
+  device.uid: host_id
+  device.hostname: host_name
+  actor.user.name: user_name
+  actor.user.uid: user_uid
+  actor.process.pid: pid
+  actor.process.file.path: executable
+  actor.process.cmd_line: cmd_line
+  file.path: file_path

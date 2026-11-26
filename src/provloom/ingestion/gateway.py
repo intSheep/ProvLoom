@@ -16,6 +16,8 @@ from provloom.domain.raw_models import (
 from provloom.ingestion.adapters.asset_manifest import AssetManifestAdapter
 from provloom.ingestion.adapters.csv_file import CsvFileAdapter
 from provloom.ingestion.adapters.json_file import JsonFileAdapter, JsonlFileAdapter
+from provloom.ingestion.adapters.xml_file import XmlEventFileAdapter
+from provloom.ingestion.adapters.zeek_tsv import ZeekTsvFileAdapter
 from provloom.ingestion.fingerprint import Sha256Fingerprinter
 from provloom.ingestion.interfaces import Fingerprinter, IngestionGateway, SourceAdapter
 from provloom.observability.interfaces import PipelineTelemetry
@@ -39,6 +41,8 @@ class DefaultIngestionGateway(IngestionGateway):
                 JsonlFileAdapter(),
                 CsvFileAdapter(),
                 AssetManifestAdapter(),
+                ZeekTsvFileAdapter(),
+                XmlEventFileAdapter(),
             )
         }
 

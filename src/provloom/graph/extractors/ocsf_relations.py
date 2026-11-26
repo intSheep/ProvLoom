@@ -95,6 +95,21 @@ class OcsfRelationExtractor(RelationExtractor):
                 )
             )
 
+        # Script Activity (1009): Process -> Script File READS
+        if event.class_uid == int(OcsfClassUid.SCRIPT_ACTIVITY) and actor_proc and target_file:
+            out.append(
+                self._rel(
+                    event=event,
+                    src_id=actor_proc.entity_id,
+                    rel_type=RelationType.READS,
+                    dst_id=target_file.entity_id,
+                    context_key="script_file",
+                    rule_id="ocsf_1009_script_file",
+                    role="SCRIPT_EXECUTION",
+                    basis={"file_path": target_file.display_label},
+                )
+            )
+
         # Network / HTTP Activity (4001 / 4002): CONNECTS_TO
         dst_ep = roles.get("dst_endpoint")
         if (

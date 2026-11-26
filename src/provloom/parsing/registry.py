@@ -4,9 +4,11 @@ from provloom.domain.raw_models import RawEvent
 from provloom.parsing.interfaces import LogParser, ParserRegistry
 from provloom.parsing.parsers.app_log import ApplicationLogParser
 from provloom.parsing.parsers.asset_parser import AssetManifestParser
+from provloom.parsing.parsers.auditbeat import AuditbeatParser
 from provloom.parsing.parsers.auth_log import AuthLogParser
 from provloom.parsing.parsers.firewall_csv import FirewallParser
 from provloom.parsing.parsers.generic import GenericJsonCsvParser
+from provloom.parsing.parsers.powershell import PowerShellParser
 from provloom.parsing.parsers.sysmon import SysmonParser
 from provloom.parsing.parsers.zeek_json import ZeekJsonParser
 
@@ -30,6 +32,8 @@ class DefaultParserRegistry(ParserRegistry):
         reg = cls()
         for p in (
             SysmonParser(),
+            PowerShellParser(),
+            AuditbeatParser(),
             ZeekJsonParser(),
             FirewallParser(),
             AuthLogParser(),

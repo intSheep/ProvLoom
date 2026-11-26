@@ -66,7 +66,7 @@ class SigmaHqCompatibilityAndCorrectnessTests(unittest.TestCase):
 
         self.assertEqual(parsed_ok, 45)
         self.assertEqual(mapped_ok, 32)
-        self.assertEqual(datacov_ok, 21)
+        self.assertEqual(datacov_ok, 23)
         self.assertEqual(compiled_ok, 32)
 
         # Verify unsupported rejection audit (#25) is explicitly separated and rejected.
